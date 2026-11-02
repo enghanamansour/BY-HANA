@@ -201,8 +201,9 @@ function frame(root) {
   const eyes = eyeBox.getCenter(new THREE.Vector3());
   const size = headBox.getSize(new THREE.Vector3());
   const front = new THREE.Vector3(eyes.x - centre.x, 0, eyes.z - centre.z).normalize();
-  const target = eyes.clone().add(new THREE.Vector3(0, -size.y * 0.08, 0));
-  const dist = size.y * 3.1;
+  // Frame the face like a mirror: eyes a little above centre, shoulders out of frame.
+  const target = eyes.clone().add(new THREE.Vector3(0, -size.y * 0.1, 0));
+  const dist = size.y * 2.65;
   camera.position.copy(target).addScaledVector(front, dist);
   camera.near = dist / 50;
   camera.far = dist * 10;
@@ -236,11 +237,22 @@ async function init() {
   scene = new THREE.Scene();
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-  const key = new THREE.DirectionalLight(0xfff1e6, 1.1);
-  key.position.set(1.5, 2, 3);
-  scene.add(key, new THREE.HemisphereLight(0xffffff, 0x6b4b5a, 0.45));
+  scene.add(new THREE.HemisphereLight(0xfff4ee, 0x5a3f4d, 0.35));
 
   camera = new THREE.PerspectiveCamera(22, 1, 0.1, 1000);
+  // Beauty lighting that travels with the camera, so the face stays lit as she turns it (like a vanity mirror):
+  // a warm key from upper front-left, a soft fill from the right, and a rim light from behind for the hair.
+  const key = new THREE.DirectionalLight(0xffe9dc, 1.25);
+  key.position.set(-0.8, 0.9, 1.4);
+  const fill = new THREE.DirectionalLight(0xf3e6ff, 0.45);
+  fill.position.set(1.2, 0.1, 1);
+  const rim = new THREE.DirectionalLight(0xfff1e8, 0.9);
+  rim.position.set(0.4, 1.2, -1.6);
+  for (const light of [key, fill, rim]) {
+    camera.add(light);
+    light.target = camera;   // direction comes from the offset alone
+  }
+  scene.add(camera);
   controls = new OrbitControls(camera, renderer.domElement);
   controls.enablePan = false;
   controls.enableDamping = true;
@@ -274,6 +286,10 @@ async function init() {
   mats.hair.color.set(0xffffff);
   mats.hair.roughness = 0.62;          // the original gloss reads as plastic under our lights
   mats.hair.envMapIntensity = 0.45;
+  mats.hair.alphaTest = 0.22;
+  mats.hair.alphaToCoverage = true;    // with MSAA this softens the jagged edges of the hair cards
+  mats.head.roughness = 0.58;          // softer, less waxy skin
+  mats.head.envMapIntensity = 0.7;
   Object.assign(iris, canvasFor(mats.iris));
 
   scene.add(root);
