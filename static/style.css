@@ -428,6 +428,7 @@ textarea { resize: vertical; min-height: 64px; }
   transition: transform .15s var(--ease), box-shadow .15s var(--ease);
 }
 .swatches button:hover { transform: scale(1.1); }
+.swatches button.lens-none { width: auto; padding: 0 12px; border-radius: 999px; background: var(--surface); color: var(--ink); font-size: .8rem; }
 .swatches button[aria-pressed="true"] { box-shadow: 0 0 0 2.5px var(--accent); transform: scale(1.1); }
 
 /* ---------- Saved looks ---------- */

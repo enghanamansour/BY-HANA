@@ -677,6 +677,35 @@ function renderManual() {
     box.append(title, row);
     wrap.append(box);
   }
+  wrap.append(lensPicker());
+}
+
+/** Coloured lenses, shared with the "my face" step: picking one here checks the same option there. */
+const LENS_AR = { none: ["بدون", "None"], honey: ["عسلي", "Honey"], hazel: ["بندقي", "Hazel"],
+                  grey: ["رمادي", "Grey"], green: ["أخضر", "Green"], blue: ["أزرق", "Blue"] };
+function lensPicker() {
+  const box = el("div", "area");
+  const current = new FormData(form).get("lens") || "none";
+  const title = el("p", "area-label", tr("العدسات", "Lenses"));
+  const chosen = el("span", null, pick(LENS_AR[current]));
+  title.append(chosen);
+  const row = el("div", "swatches");
+  for (const [value, label] of Object.entries(LENS_AR)) {
+    const b = el("button", value === "none" ? "lens-none" : null, value === "none" ? pick(label) : null);
+    b.type = "button";
+    if (value !== "none") b.style.background = LENS[value];
+    b.title = pick(label);
+    b.setAttribute("aria-label", `${tr("العدسات", "Lenses")}: ${pick(label)}`);
+    b.setAttribute("aria-pressed", value === current);
+    b.addEventListener("click", () => {
+      document.querySelector(`input[name="lens"][value="${value}"]`).click();   // updates the face step and the mirror
+      row.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b));
+      chosen.textContent = pick(label);
+    });
+    row.append(b);
+  }
+  box.append(title, row);
+  return box;
 }
 
 $("manual-save").addEventListener("click", () => {
