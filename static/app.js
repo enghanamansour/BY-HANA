@@ -219,14 +219,14 @@ function updateMirrorBase() {
 
 /** Mirror the same face and look onto the 3D head. The 3D model has no hijab, so the drawn face covers that case. */
 function sync3D() {
-  const head3d = window.Head3D;
+  const portrait = window.Portrait;
   const data = new FormData(form);
-  const use3D = head3d?.status === "ready" && (data.get("coverage") || "none") === "none";
+  const use3D = portrait?.status === "ready" && (data.get("coverage") || "none") === "none";
   $("mirror").classList.toggle("is-3d", use3D);
   if (!use3D) return;
   const f = faceValues();
   const [hair, brow] = HAIR[f.hair_color] || HAIR.black;
-  head3d.update({
+  portrait.update({
     skin: TONE_SKIN[f.skin_tone] || TONE_SKIN.medium,
     hair, brow,
     iris: (f.lens && f.lens !== "none" ? LENS[f.lens] : IRIS[f.eye_color]) || IRIS.dark_brown,
@@ -234,7 +234,7 @@ function sync3D() {
     makeup: state.current ? Object.fromEntries(Object.entries(state.current.colors).map(([k, c]) => [k, c.hex])) : null,
   });
 }
-window.addEventListener("head3d:ready", sync3D);
+window.addEventListener("portrait:ready", sync3D);
 
 function updateFaceSummary() {
   const f = faceValues();

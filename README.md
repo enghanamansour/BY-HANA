@@ -73,12 +73,11 @@ A plain HTML/CSS/JS page served by the same FastAPI app ([`static/`](static/)), 
 - A responsive RTL Arabic layout that works on phones.
 - Model output is rendered with `textContent` only, never injected as HTML.
 
-## 3D mirror
+## Portrait mirror
 
-The mirror shows a real-time 3D head ([`static/head3d.js`](static/head3d.js), three.js). The code recolours the skin, brows, hair and irises and paints the makeup straight onto the head's texture. It finds the lips by their colour, so the lipstick keeps the lips' own light and shade. Blush, eyeshadow, liner and highlighter are painted in place. You can drag the face to turn it. The drawn SVG face ([`static/face.js`](static/face.js)) is used with a hijab or niqab (the 3D model has none), and as a fallback when WebGL or the model is unavailable.
+The mirror is a still, front-facing portrait ([`static/portrait.png`](static/portrait.png)), repainted live on a canvas by [`static/portrait.js`](static/portrait.js). The code changes the skin tone, hair and brow colours and the iris colour, and paints the lipstick (found by the lips' own colour), blush, eyeshadow, liner and highlighter at fixed spots on the face. The lighting never changes. With a hijab or niqab, or if the image can't load, it falls back to the drawn SVG face ([`static/face.js`](static/face.js)).
 
-**Model credit:** [“Angelica”](https://sketchfab.com/3d-models/angelica-27f75fa94c384000bb6a79a3000f8e80) by [NikZava284](https://sketchfab.com/NikZava284), licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Changes: materials converted from specular-glossiness to metallic-roughness, hair switched to alpha-tested, and textures recoloured at runtime with makeup.
-
+**Image credit:** a front render of ["Female face Anime"](https://sketchfab.com/3d-models/female-face-anime-9a2018ca836648b982cdfddd8b9fe717) by [giueppeccc](https://sketchfab.com/giueppeccc), licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Changes: rendered as a single front view, decorative face dots removed, and recoloured at runtime with makeup.
 ## Project structure
 
 ```
