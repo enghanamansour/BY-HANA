@@ -37,12 +37,41 @@ _CYRILLIC_TO_ARABIC = str.maketrans({
 })
 
 
+def _escape_inner_quotes(raw: str) -> str:
+    """Escape quotes Llama puts inside a string, e.g. "روج "مطفي" ثابت". A quote only closes a string
+    when the next non-space character is JSON punctuation (, : } ]); any other quote is part of the text."""
+    out, in_str, i = [], False, 0
+    while i < len(raw):
+        ch = raw[i]
+        if ch == "\\" and in_str:
+            out.append(raw[i:i + 2])
+            i += 2
+            continue
+        if ch == '"':
+            if not in_str:
+                in_str = True
+            else:
+                rest = raw[i + 1:].lstrip()
+                if not rest or rest[0] in ",:}]":
+                    in_str = False
+                else:
+                    out.append('\\"')
+                    i += 1
+                    continue
+        out.append(ch)
+        i += 1
+    return "".join(out)
+
+
 def _extract_json(text: str) -> dict:
     """Llama sometimes wraps JSON in ```json fences or adds a sentence; keep only the {...} object."""
     match = re.search(r"\{.*\}", text, re.DOTALL)
     if not match:
         raise ValueError("no JSON object in reply")
-    return json.loads(match.group(0))
+    try:
+        return json.loads(match.group(0))
+    except json.JSONDecodeError:
+        return json.loads(_escape_inner_quotes(match.group(0)))
 
 
 def _call_llama(model: str, messages: list[dict], max_tokens: int) -> str:

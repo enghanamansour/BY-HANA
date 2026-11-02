@@ -40,7 +40,8 @@ Each part of the work goes to whoever does it best:
 
 1. **Llama does the reasoning.** It chooses shades that suit her undertone and occasion, picks products and writes instructions.
 2. **Code supplies the exact colours.** Language models can't see colour, so hex codes they invent often clash. Llama picks shade *names* from [`app/shades.py`](app/shades.py), and the code maps each name to a tested colour.
-3. **Code makes the safety decision.** [`app/compatibility.py`](app/compatibility.py) checks the product bases with fixed rules, so the water/silicone warning is always consistent and never hallucinated.
+3. **Code translates Saudi dialect.** Llama often misreads dialect (it took «المويه», water, for a product). [`app/dialect.py`](app/dialect.py) finds dialect words in her message (مويه، يطيح، يتكتل، روج، طرحة…) and sends their meaning along with it, so she can write the way she talks.
+4. **Code makes the safety decision.** [`app/compatibility.py`](app/compatibility.py) checks the product bases with fixed rules, so the water/silicone warning is always consistent and never hallucinated.
 
 ### Handling bad or missing responses
 
