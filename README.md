@@ -1,0 +1,109 @@
+# by HANA — خبيرة مكياجك الذكية
+
+**An AI makeup artist for women in Saudi Arabia, powered by Meta's Llama.**
+
+Pick your skin type, skin tone, city, occasion, budget and whether you wear a hijab or niqab. by HANA designs a complete look: shades, products in application order, how to apply each one, and tips for your city's weather. It paints the look onto an illustrated face and warns you when two products won't layer well together (water-based vs silicone-based).
+
+---
+
+## The problem
+
+Generic makeup advice ignores what matters here:
+
+- **Climate.** Jeddah's humidity and Riyadh's dry heat need different products.
+- **Occasions.** A milka, a wedding, Eid and the office each call for a different look.
+- **Coverage.** With a niqab the look is all about the eyes, and products must not transfer onto fabric.
+- **Product clashes.** A silicone primer under a water-based foundation pills and breaks apart. Most people don't know this until it happens.
+
+## How Llama is used
+
+Llama is the main model. It receives the user's profile and returns **one JSON object with a fixed shape**:
+
+| Field | What Llama decides |
+|---|---|
+| `look_name`, `description` | Arabic name and description of the look |
+| `shades` | One shade **name** per area (lips, blush, lid, crease, liner, highlighter), chosen from a curated palette |
+| `products[]` | Step, product name, how to apply, **base** (water / silicone / oil / powder), cheaper alternative |
+| `climate_tips[]` | Tips for her city's weather |
+
+Each part of the work goes to whoever does it best:
+
+1. **Llama does the reasoning.** It chooses shades that suit her undertone and occasion, picks products and writes instructions.
+2. **Code supplies the exact colours.** Language models can't see colour, so hex codes they invent often clash. Llama picks shade *names* from [`app/shades.py`](app/shades.py), and the code maps each name to a tested colour.
+3. **Code makes the safety decision.** [`app/compatibility.py`](app/compatibility.py) checks the product bases with fixed rules, so the water/silicone warning is always consistent and never hallucinated.
+
+### Handling bad or missing responses
+
+- Every reply is validated against a strict Pydantic schema ([`app/schemas.py`](app/schemas.py)): required fields, allowed shade names, allowed steps and bases, list lengths.
+- JSON wrapped in markdown fences or extra text is extracted automatically.
+- If the reply is invalid, Llama is told exactly what was wrong and asked once more.
+- Provider failures (bad key, timeout, rate limit, no credit, outage) each return a clear Arabic message with the right HTTP status.
+
+## API
+
+| Method | Route | Description |
+|---|---|---|
+| `POST` | `/api/look` | Body: `skin_type`, `skin_tone`, `undertone`, `city`, `occasion`, `budget`, `coverage`, `notes`. Returns the look. |
+| `GET` | `/api/health` | Shows whether the server is up and Llama is configured. |
+
+Empty or invalid input returns `400` with an Arabic message and the list of bad fields. Interactive docs are at `/docs`.
+
+## Frontend
+
+A plain HTML/CSS/JS page served by the same FastAPI app ([`static/`](static/)). It includes:
+
+- A live "mirror": the SVG face updates as you pick skin tone and hijab/niqab, then gets painted with the look.
+- Client-side validation that highlights missing fields.
+- A loading state with a scanning animation and progress messages.
+- Clear error messages with a retry button.
+- A responsive RTL Arabic layout that works on phones.
+- Model output is rendered with `textContent` only, never injected as HTML.
+
+## Project structure
+
+```
+app/
+  main.py           API routes and error handlers
+  llama.py          Calls Llama, extracts and validates JSON, retries
+  prompts.py        System prompt and user prompt builder
+  schemas.py        Input and output contracts (Pydantic)
+  shades.py         Curated makeup palette
+  compatibility.py  Water / silicone / oil clash rules
+  config.py         Settings from environment variables
+static/
+  index.html        Page and SVG face
+  style.css         Design
+  app.js            Form, API call, rendering
+```
+
+## Run locally
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate          # macOS/Linux: source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env            # then put your key in .env
+uvicorn app.main:app --reload
+```
+
+Open http://127.0.0.1:8000
+
+## Configuration
+
+| Variable | Default | |
+|---|---|---|
+| `LLM_API_KEY` | — | API key for the Llama provider (required) |
+| `LLM_BASE_URL` | `https://openrouter.ai/api/v1` | Any OpenAI-compatible endpoint that serves Llama |
+| `LLAMA_MODEL` | `meta-llama/llama-3.3-70b-instruct` | Model ID |
+| `LLM_TIMEOUT` | `90` | Seconds to wait for Llama |
+| `LLM_MAX_RETRIES` | `1` | Extra attempts when the reply is invalid |
+
+The provider is just configuration. Llama providers change which models they offer (Groq, for example, dropped its Llama chat models), so you can switch to another one by editing two variables, without touching the code.
+
+## Deploy
+
+The repo includes [`render.yaml`](render.yaml). On [Render](https://render.com), create a new Blueprint from this repo and set `LLM_API_KEY` in the dashboard.
+
+---
+
+> The suggestions are guidance only. Patch-test any new product on a small area of skin first.

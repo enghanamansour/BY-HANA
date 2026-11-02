@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>by HANA | خبيرة مكياجك الذكية</title>
+  <meta name="description" content="لوك مكياج مصمم لبشرتك وجو مدينتك ومناسبتك، بالذكاء الاصطناعي Llama.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='16' fill='%23B4536A'/><text x='16' y='22' font-size='16' text-anchor='middle' fill='white' font-family='Georgia' font-style='italic'>H</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,500;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="logo" href="#top" aria-label="by HANA"><span>by</span> HANA</a>
+    <span class="powered">مدعوم بـ Llama من Meta</span>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <p class="eyebrow">خبيرة مكياجك الذكية</p>
+      <h1>لوكك المثالي، مصمم لبشرتك<br>وجو مدينتك ومناسبتك</h1>
+      <p class="lead">اختاري تفاصيلك، ونصمم لك لوك كامل بالألوان والمنتجات وطريقة التطبيق، ونتأكد إن منتجاتك ما تتعارض (مائي ولا سيليكون).</p>
+    </section>
+
+    <section class="studio">
+      <!-- Mirror: the illustrated face, painted live from the form and from Llama's colours -->
+      <aside class="mirror-card" aria-label="معاينة اللوك">
+        <div class="mirror" id="mirror">
+          <svg id="face" viewBox="0 0 400 480" role="img" aria-label="وجه توضيحي يعرض اللوك">
+            <defs>
+              <radialGradient id="g-blush">
+                <stop offset="0%" class="stop-blush" stop-opacity=".75"/>
+                <stop offset="100%" class="stop-blush" stop-opacity="0"/>
+              </radialGradient>
+              <radialGradient id="g-hl">
+                <stop offset="0%" class="stop-hl" stop-opacity=".95"/>
+                <stop offset="100%" class="stop-hl" stop-opacity="0"/>
+              </radialGradient>
+              <linearGradient id="g-skin-shade" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+                <stop offset="100%" stop-color="#000" stop-opacity=".12"/>
+              </linearGradient>
+              <filter id="soft" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
+            </defs>
+
+            <rect width="400" height="480" class="backdrop"/>
+
+            <path class="hair" d="M200,58 C302,58 338,140 332,232 C328,305 342,382 362,480 L38,480 C58,382 72,305 68,232 C62,140 98,58 200,58 Z"/>
+            <path class="hijab" d="M200,50 C308,50 348,140 342,240 C337,330 304,392 340,480 L60,480 C96,392 63,330 58,240 C52,140 92,50 200,50 Z"/>
+
+            <path class="skin neck" d="M165,345 L165,410 C120,420 72,440 52,480 L348,480 C328,440 280,420 235,410 L235,345 Z"/>
+            <path class="neck" d="M165,345 L235,345 L235,392 C212,402 188,402 165,392 Z" fill="url(#g-skin-shade)"/>
+
+            <path class="skin" d="M200,95 C272,95 302,152 302,218 C302,302 262,370 200,386 C138,370 98,302 98,218 C98,152 128,95 200,95 Z"/>
+
+            <ellipse class="blush" cx="138" cy="275" rx="34" ry="22" fill="url(#g-blush)"/>
+            <ellipse class="blush" cx="262" cy="275" rx="34" ry="22" fill="url(#g-blush)"/>
+            <ellipse class="hl" cx="146" cy="250" rx="22" ry="7" fill="url(#g-hl)" transform="rotate(-12 146 250)"/>
+            <ellipse class="hl" cx="254" cy="250" rx="22" ry="7" fill="url(#g-hl)" transform="rotate(12 254 250)"/>
+            <ellipse class="hl" cx="200" cy="248" rx="4" ry="20" fill="url(#g-hl)"/>
+
+            <!-- Left eye; the right eye is the same drawing mirrored. -->
+            <g>
+              <path class="crease" filter="url(#soft)" d="M122,212 C130,182 186,178 196,207 C182,191 140,190 122,212 Z"/>
+              <path class="lid" d="M127,215 C133,193 182,190 191,213 Q158,198 127,215 Z"/>
+              <path class="eye-white" d="M130,215 Q158,198 186,215 Q158,231 130,215 Z"/>
+              <circle class="iris" cx="158" cy="214" r="9.5"/>
+              <circle cx="158" cy="214" r="4.2" fill="#1a1110"/>
+              <circle cx="161" cy="211" r="2" fill="#fff" opacity=".8"/>
+              <path class="liner" d="M187,214 Q158,197 130,214 L118,205"/>
+              <path class="lashes" d="M136,208 l-4,-6 M146,203 l-2,-7 M158,201 l0,-7 M170,203 l2,-7 M180,207 l4,-6"/>
+              <path class="brow" d="M122,191 Q148,171 188,182"/>
+            </g>
+            <g transform="translate(400,0) scale(-1,1)">
+              <path class="crease" filter="url(#soft)" d="M122,212 C130,182 186,178 196,207 C182,191 140,190 122,212 Z"/>
+              <path class="lid" d="M127,215 C133,193 182,190 191,213 Q158,198 127,215 Z"/>
+              <path class="eye-white" d="M130,215 Q158,198 186,215 Q158,231 130,215 Z"/>
+              <circle class="iris" cx="158" cy="214" r="9.5"/>
+              <circle cx="158" cy="214" r="4.2" fill="#1a1110"/>
+              <circle cx="155" cy="211" r="2" fill="#fff" opacity=".8"/>
+              <path class="liner" d="M187,214 Q158,197 130,214 L118,205"/>
+              <path class="lashes" d="M136,208 l-4,-6 M146,203 l-2,-7 M158,201 l0,-7 M170,203 l2,-7 M180,207 l4,-6"/>
+              <path class="brow" d="M122,191 Q148,171 188,182"/>
+            </g>
+
+            <path class="nose" d="M194,232 Q190,266 184,279 Q200,290 216,279"/>
+
+            <path class="lips" d="M166,314 Q183,300 200,308 Q217,300 234,314 Q200,321 166,314 Z"/>
+            <path class="lips" d="M166,314 Q200,321 234,314 Q218,338 200,339 Q182,338 166,314 Z"/>
+            <ellipse cx="200" cy="327" rx="12" ry="3.5" fill="#fff" opacity=".22"/>
+
+            <path class="fringe" d="M98,206 C98,124 148,84 200,84 C252,84 302,124 302,206 C288,150 250,118 200,116 C152,118 112,146 98,206 Z"/>
+            <path class="hijab hijab-band" d="M96,210 C94,120 146,78 200,78 C254,78 306,120 304,210 C292,142 252,104 200,103 C148,104 108,142 96,210 Z"/>
+            <path class="niqab" d="M90,236 C130,244 270,244 310,236 C318,300 322,380 342,480 L58,480 C78,380 82,300 90,236 Z"/>
+
+            <rect class="scan" x="0" y="0" width="400" height="60"/>
+          </svg>
+        </div>
+
+        <div class="palette" id="palette" hidden>
+          <p class="palette-title">ألوان اللوك</p>
+          <ul id="palette-list"></ul>
+        </div>
+        <p class="mirror-hint" id="mirror-hint">المرآة تتغير مع اختياراتك</p>
+      </aside>
+
+      <div class="panel">
+        <!-- Input form -->
+        <form id="look-form" class="card" novalidate>
+          <h2>عرّفينا عليك</h2>
+
+          <fieldset class="field" data-field="skin_type">
+            <legend>نوع البشرة <span class="req">*</span></legend>
+            <div class="chips">
+              <label><input type="radio" name="skin_type" value="dry"><span>جافة</span></label>
+              <label><input type="radio" name="skin_type" value="oily"><span>دهنية</span></label>
+              <label><input type="radio" name="skin_type" value="combination"><span>مختلطة</span></label>
+              <label><input type="radio" name="skin_type" value="normal"><span>عادية</span></label>
+              <label><input type="radio" name="skin_type" value="sensitive"><span>حساسة</span></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="field" data-field="skin_tone">
+            <legend>لون البشرة <span class="req">*</span></legend>
+            <div class="chips tones">
+              <label><input type="radio" name="skin_tone" value="fair"><span><i style="--c:#F3D9C6"></i>فاتحة جدًا</span></label>
+              <label><input type="radio" name="skin_tone" value="light"><span><i style="--c:#E9C3A3"></i>فاتحة</span></label>
+              <label><input type="radio" name="skin_tone" value="medium"><span><i style="--c:#D1A07A"></i>حنطية</span></label>
+              <label><input type="radio" name="skin_tone" value="tan"><span><i style="--c:#AF7C55"></i>سمراء</span></label>
+              <label><input type="radio" name="skin_tone" value="deep"><span><i style="--c:#7A4E33"></i>داكنة</span></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="field" data-field="undertone">
+            <legend>درجة البشرة التحتية <small>(اختياري)</small></legend>
+            <div class="chips">
+              <label><input type="radio" name="undertone" value="warm"><span>دافئة</span></label>
+              <label><input type="radio" name="undertone" value="cool"><span>باردة</span></label>
+              <label><input type="radio" name="undertone" value="neutral"><span>محايدة</span></label>
+              <label><input type="radio" name="undertone" value="unknown" checked><span>ما أعرف</span></label>
+            </div>
+          </fieldset>
+
+          <div class="row">
+            <label class="field select" data-field="city">
+              <span class="legend">المدينة <span class="req">*</span></span>
+              <select name="city">
+                <option value="" selected disabled>اختاري مدينتك</option>
+                <option value="riyadh">الرياض</option>
+                <option value="jeddah">جدة</option>
+                <option value="dammam">الدمام / الشرقية</option>
+                <option value="makkah">مكة</option>
+                <option value="madinah">المدينة</option>
+                <option value="abha">أبها</option>
+                <option value="other">مدينة ثانية</option>
+              </select>
+            </label>
+            <label class="field select" data-field="occasion">
+              <span class="legend">المناسبة <span class="req">*</span></span>
+              <select name="occasion">
+                <option value="" selected disabled>اختاري المناسبة</option>
+                <option value="wedding">زواج</option>
+                <option value="milka">ملكة</option>
+                <option value="eid">عيد</option>
+                <option value="graduation">تخرج</option>
+                <option value="work">دوام</option>
+                <option value="daily">يومي</option>
+                <option value="evening">طلعة مسائية</option>
+              </select>
+            </label>
+          </div>
+
+          <fieldset class="field" data-field="budget">
+            <legend>الميزانية <span class="req">*</span></legend>
+            <div class="chips">
+              <label><input type="radio" name="budget" value="low"><span>اقتصادية</span></label>
+              <label><input type="radio" name="budget" value="medium"><span>متوسطة</span></label>
+              <label><input type="radio" name="budget" value="high"><span>فاخرة</span></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="field" data-field="coverage">
+            <legend>الحجاب</legend>
+            <div class="chips">
+              <label><input type="radio" name="coverage" value="none" checked><span>بدون</span></label>
+              <label><input type="radio" name="coverage" value="hijab"><span>حجاب</span></label>
+              <label><input type="radio" name="coverage" value="niqab"><span>نقاب</span></label>
+            </div>
+          </fieldset>
+
+          <label class="field" data-field="notes">
+            <span class="legend">ملاحظات <small>(اختياري)</small></span>
+            <textarea name="notes" rows="2" maxlength="300" placeholder="مثلًا: أحب الروج النيود، وعندي حساسية من العطور"></textarea>
+            <span class="counter"><span id="notes-count">0</span>/300</span>
+          </label>
+
+          <p class="form-error" id="form-error" role="alert" hidden></p>
+
+          <button class="btn primary" type="submit" id="submit">
+            <span class="btn-label">صممي لوكي</span>
+            <span class="spinner" aria-hidden="true"></span>
+          </button>
+        </form>
+
+        <!-- Loading -->
+        <section class="card status" id="loading" hidden aria-live="polite">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <p class="status-title" id="loading-stage">نحلل بشرتك...</p>
+          <p class="status-sub">Llama يصمم لوكك، وهذا ياخذ تقريبًا 30 ثانية</p>
+        </section>
+
+        <!-- Error -->
+        <section class="card status error" id="error" hidden role="alert">
+          <p class="status-title">ما قدرنا نصمم اللوك</p>
+          <p class="status-sub" id="error-message"></p>
+          <button class="btn ghost" type="button" id="retry">حاولي مرة ثانية</button>
+        </section>
+
+        <!-- Result -->
+        <section id="result" hidden>
+          <article class="card result-head">
+            <p class="eyebrow">لوكك</p>
+            <h2 id="look-name"></h2>
+            <p id="look-desc"></p>
+          </article>
+
+          <article class="card compat" id="compat">
+            <h3 id="compat-title"></h3>
+            <p id="compat-note"></p>
+            <ul id="compat-list"></ul>
+          </article>
+
+          <article class="card">
+            <h3>الخطوات والمنتجات</h3>
+            <ol class="steps" id="steps"></ol>
+          </article>
+
+          <article class="card">
+            <h3>نصايح لجو مدينتك</h3>
+            <ul class="tips" id="tips"></ul>
+          </article>
+
+          <div class="result-foot">
+            <span class="model-tag" id="model-tag"></span>
+            <button class="btn ghost" type="button" id="again">صممي لوك ثاني</button>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>by HANA · الاقتراحات إرشادية، جربي أي منتج جديد على جزء صغير من بشرتك قبل استخدامه.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
