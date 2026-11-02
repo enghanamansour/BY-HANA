@@ -64,7 +64,7 @@ Empty or invalid input returns `400` with an Arabic message and the list of bad 
 
 ## Frontend
 
-A plain HTML/CSS/JS page served by the same FastAPI app ([`static/`](static/)). It includes:
+A plain HTML/CSS/JS page served by the same FastAPI app ([`static/`](static/)), with no build step. It has a modern clean design with light and dark themes (it follows the device the first time), Arabic (RTL, Saudi dialect) and English (LTR) versions, and Lucide icons. The flow is two clear steps, **1. My face → 2. Hanu designs**, plus side sections for **Try it yourself** and **My looks**. The chat button is a powder compact with a red heart, and its lid opens when the chat opens. Llama answers in whichever language the page is in. It includes:
 
 - A live "mirror": the SVG face updates as you pick skin tone and hijab/niqab, then gets painted with the look.
 - Client-side validation that highlights missing fields.

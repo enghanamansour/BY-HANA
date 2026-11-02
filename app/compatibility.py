@@ -10,16 +10,21 @@ from .schemas import CompatibilityWarning, Product
 # Face-base layers that sit on top of each other and must agree.
 FACE_STEPS = ["primer", "foundation", "concealer", "setting_spray"]
 
+# Each label is (Arabic, English).
 CONFLICTS = {
-    frozenset({"water", "silicone"}): "المائي والسيليكوني ما يركبون على بعض، ويكتّلون المكياج ويقشّرونه.",
-    frozenset({"water", "oil"}): "المائي والزيتي ما يركبون على بعض، والمكياج يتكسّر ويروح بسرعة.",
+    frozenset({"water", "silicone"}): ("المائي والسيليكوني ما يركبون على بعض، ويكتّلون المكياج ويقشّرونه.",
+                                       "Water- and silicone-based products don't layer: the makeup pills and flakes."),
+    frozenset({"water", "oil"}): ("المائي والزيتي ما يركبون على بعض، والمكياج يتكسّر ويروح بسرعة.",
+                                  "Water- and oil-based products separate: the makeup breaks up and fades fast."),
 }
+STEPS = {"primer": ("البرايمر", "Primer"), "foundation": ("الفاونديشن", "Foundation"),
+         "concealer": ("الكونسيلر", "Concealer"), "setting_spray": ("مثبت المكياج", "Setting spray")}
+BASES = {"water": ("مائي", "water-based"), "silicone": ("سيليكوني", "silicone-based"),
+         "oil": ("زيتي", "oil-based"), "powder": ("بودرة", "powder")}
 
-STEP_AR = {"primer": "البرايمر", "foundation": "الفاونديشن", "concealer": "الكونسيلر", "setting_spray": "مثبت المكياج"}
-BASE_AR = {"water": "مائي", "silicone": "سيليكوني", "oil": "زيتي", "powder": "بودرة"}
 
-
-def check_compatibility(products: list[Product]) -> list[CompatibilityWarning]:
+def check_compatibility(products: list[Product], lang: str = "ar") -> list[CompatibilityWarning]:
+    li = 1 if lang == "en" else 0  # index into the (Arabic, English) labels
     face = [p for p in products if p.step in FACE_STEPS and p.base]
     counts = Counter(p.base for p in face)
 
@@ -34,10 +39,10 @@ def check_compatibility(products: list[Product]) -> list[CompatibilityWarning]:
     warnings = []
     for odd, *others in clashes.values():
         warnings.append(CompatibilityWarning(
-            product=STEP_AR[odd.step],
+            product=STEPS[odd.step][li],
             product_name=odd.name,
-            base=BASE_AR[odd.base],
-            conflicts_with=[f"{STEP_AR[o.step]} ({BASE_AR[o.base]})" for o in others],
-            message=CONFLICTS[frozenset({odd.base, others[0].base})],
+            base=BASES[odd.base][li],
+            conflicts_with=[f"{STEPS[o.step][li]} ({BASES[o.base][li]})" for o in others],
+            message=CONFLICTS[frozenset({odd.base, others[0].base})][li],
         ))
     return warnings

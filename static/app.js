@@ -1,62 +1,69 @@
-// by HANA frontend: four tabs (Hanu designs, try it yourself, ask Hanu, saved looks) sharing one mirror.
+// by HANA frontend: two steps (my face -> Hanu designs), side sections (try it yourself, my looks),
+// a floating chat with Hanu, light/dark themes and Arabic/English. All talk to the FastAPI backend.
 
 const $ = (id) => document.getElementById(id);
 const form = $("look-form");
 const face = $("face");
+const tr = (ar, en) => I18N.t(ar, en);                         // pick the string for the current language
+const pick = (pair) => (pair ? pair[I18N.lang === "en" ? 1 : 0] : "");
 
-// ---------- Vocabularies ----------
+// ---------- Vocabularies (Arabic, English) ----------
 
 const REQUIRED = ["skin_type", "skin_tone", "city", "occasion", "budget"];
-// Everything that describes her face; saved together as "my face".
 const FACE_FIELDS = ["skin_tone", "undertone", "hair_color", "face_shape", "jaw", "eye_shape", "eye_color", "lens",
                      "brow_shape", "brow_thickness", "nose", "lips_shape", "coverage"];
-const FACE_KEY = "byhana.face";
-const TONE_AR = { fair: "فاتحة جدًا", light: "فاتحة", medium: "حنطية", tan: "سمراء", deep: "داكنة" };
-const EYE_AR = { almond: "لوزية", round: "واسعة", narrow: "ضيقة", upturned: "مسحوبة لفوق", downturned: "مائلة لتحت", hooded: "جفن مبطّن" };
-const HAIR_AR = { black: "أسود", dark_brown: "بني غامق", brown: "بني", caramel: "كراميل", honey: "عسلي", burgundy: "عنابي" };
 const LOOK_TIMEOUT_MS = 150000;
 const PHOTO_TIMEOUT_MS = 90000;
+const KEYS = { face: "byhana.face", looks: "byhana.looks", bag: "byhana.bag", lang: "byhana.lang", theme: "byhana.theme" };
 
 const TONE_SKIN = { fair: "#F3D9C6", light: "#E9C3A3", medium: "#D1A07A", tan: "#AF7C55", deep: "#7A4E33" };
 const HAIR = {
   black: ["#1B1412", "#1E1614"], dark_brown: ["#3A2419", "#2E1D15"], brown: ["#5A3825", "#3E281B"],
   caramel: ["#8A5A34", "#5A3A24"], honey: ["#A57A45", "#6B4B2E"], burgundy: ["#5A1E26", "#3A1C1C"],
 };
-const STEP_AR = {
-  skincare: "العناية", primer: "برايمر", foundation: "فاونديشن", concealer: "كونسيلر", powder: "بودرة",
-  contour: "كونتور", blush: "بلشر", highlighter: "هايلايتر", eyeshadow: "ظلال العيون", eyeliner: "آيلاينر",
-  mascara: "ماسكارا", lashes: "رموش", brows: "الحواجب", lips: "الشفايف", setting_spray: "مثبت المكياج",
+const TONE = { fair: ["فاتحة جدًا", "very fair"], light: ["فاتحة", "light"], medium: ["حنطية", "medium"],
+               tan: ["سمراء", "tan"], deep: ["داكنة", "deep"] };
+const EYE = { almond: ["لوزية", "almond"], round: ["واسعة", "round"], narrow: ["ضيقة", "narrow"],
+              upturned: ["مسحوبة لفوق", "upturned"], downturned: ["مائلة لتحت", "downturned"], hooded: ["جفن مبطّن", "hooded"] };
+const HAIR_NAME = { black: ["أسود", "black"], dark_brown: ["بني غامق", "dark brown"], brown: ["بني", "brown"],
+                    caramel: ["كراميل", "caramel"], honey: ["عسلي", "honey"], burgundy: ["عنابي", "burgundy"] };
+const STEP = {
+  skincare: ["العناية", "Skincare"], primer: ["برايمر", "Primer"], foundation: ["فاونديشن", "Foundation"],
+  concealer: ["كونسيلر", "Concealer"], powder: ["بودرة", "Powder"], contour: ["كونتور", "Contour"],
+  blush: ["بلشر", "Blush"], highlighter: ["هايلايتر", "Highlighter"], eyeshadow: ["ظلال العيون", "Eyeshadow"],
+  eyeliner: ["آيلاينر", "Eyeliner"], mascara: ["ماسكارا", "Mascara"], lashes: ["رموش", "Lashes"],
+  brows: ["الحواجب", "Brows"], lips: ["الشفايف", "Lips"], setting_spray: ["مثبت المكياج", "Setting spray"],
 };
-const BASE_AR = { water: "مائي", silicone: "سيليكون", oil: "زيتي", powder: "بودرة" };
-const CONF_AR = { high: "متأكدة", medium: "غالبًا", low: "مو متأكدة" };
-const AREA_AR = {
-  lips: "الشفايف", blush: "البلشر", eyeshadow_lid: "الجفن",
-  eyeshadow_crease: "الطيّة", eyeliner: "الآيلاينر", highlighter: "الهايلايتر",
+const BASE = { water: ["مائي", "Water-based"], silicone: ["سيليكون", "Silicone"], oil: ["زيتي", "Oil-based"], powder: ["بودرة", "Powder"] };
+const CONF = { high: ["متأكدة", "Sure"], medium: ["غالبًا", "Likely"], low: ["مو متأكدة", "Not sure"] };
+const AREA = {
+  lips: ["الشفايف", "Lips"], blush: ["البلشر", "Blush"], eyeshadow_lid: ["الجفن", "Lid"],
+  eyeshadow_crease: ["الطيّة", "Crease"], eyeliner: ["الآيلاينر", "Liner"], highlighter: ["الهايلايتر", "Highlight"],
 };
 // Look colour key -> CSS variable on the face. Skin stays the tone she picked, so the face always looks like her.
-const FACE_VARS = {
-  lips: "--lips", blush: "--blush", eyeshadow_lid: "--lid",
-  eyeshadow_crease: "--crease", eyeliner: "--liner", highlighter: "--hl",
-};
+const FACE_VARS = { lips: "--lips", blush: "--blush", eyeshadow_lid: "--lid", eyeshadow_crease: "--crease",
+                    eyeliner: "--liner", highlighter: "--hl" };
 const STEP_COLOR = { lips: "lips", blush: "blush", eyeshadow: "eyeshadow_lid", eyeliner: "eyeliner", highlighter: "highlighter" };
-const MANUAL_START = {
-  lips: "nude_rose", blush: "soft_pink", eyeshadow_lid: "champagne",
-  eyeshadow_crease: "soft_peach", eyeliner: "brown", highlighter: "champagne",
-};
-const STAGES = ["هنو تشوف بشرتك...", "تشيّك على جو مدينتك...", "تقلّب في شنطتك...", "تختار الألوان...", "ترتب الخطوات...", "تشيّك إن منتجاتك تركب على بعض..."];
+const MANUAL_START = { lips: "nude_rose", blush: "soft_pink", eyeshadow_lid: "champagne",
+                       eyeshadow_crease: "soft_peach", eyeliner: "brown", highlighter: "champagne" };
+const STAGES = [
+  ["هنو تشوف بشرتك...", "Hanu is reading your skin..."], ["تشيّك على جو مدينتك...", "Checking your city's weather..."],
+  ["تقلّب في شنطتك...", "Going through your makeup bag..."], ["تختار الألوان...", "Choosing the colours..."],
+  ["ترتب الخطوات...", "Ordering the steps..."], ["تشيّك إن منتجاتك تركب على بعض...", "Checking your products layer well..."],
+];
 
 // ---------- State ----------
 
 const state = {
-  current: null,    // the look shown on the mirror: { source: "ai" | "manual", name, colors, look? }
-  palette: null,    // curated shades from /api/shades
-  manual: {},       // area -> { id, hex, name }
-  bag: [],          // products she owns: { name, step?, base? }
-  askImage: null,   // data URL of the photo attached to a question
+  current: null,   // the look on the mirror: { source: "ai" | "manual", name, colors, look? }
+  palette: null,   // curated shades from /api/shades
+  manual: {},      // area -> { id, hex, name, name_en }
+  bag: [],         // products she owns: { name, step?, base? }
   lastPayload: null,
+  stage: 0,
 };
 
-// ---------- Small helpers ----------
+// ---------- Helpers ----------
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -65,14 +72,21 @@ function el(tag, className, text) {
   return node;
 }
 
+function icon(name, extra = "") {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("class", `icon ${extra}`.trim());
+  const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+  use.setAttribute("href", `#i-${name}`);
+  svg.append(use);
+  return svg;
+}
+
 const store = {
-  get(key, fallback) {
-    try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; }
-  },
-  set(key, value) {
-    try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch { return false; }
-  },
+  get(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; } },
+  set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch { return false; } },
 };
+
+const colourName = (c) => (I18N.lang === "en" ? c.name_en || c.name : c.name);
 
 let toastTimer;
 function toast(message) {
@@ -83,34 +97,33 @@ function toast(message) {
   toastTimer = setTimeout(() => { t.hidden = true; }, 2600);
 }
 
-function setBusy(button, on, label) {
+function setBusy(button, on) {
   button.disabled = on;
   button.classList.toggle("loading", on);
-  if (label) button.querySelector(".btn-label").textContent = label;
 }
 
-/** POST JSON to our API. Resolves with the body, or throws an Error carrying a user-facing Arabic message. */
+/** POST JSON to our API. Resolves with the body, or throws an Error with a message for the user. */
 async function api(path, body, timeoutMs) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const res = await fetch(path, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      headers: { "Content-Type": "application/json", "X-Lang": I18N.lang },
+      body: JSON.stringify({ ...body, lang: I18N.lang }),
       signal: controller.signal,
     });
     const data = await res.json().catch(() => null);
     if (!res.ok) {
-      const err = new Error(data?.error || "صار شي غلط. جربي مرة ثانية.");
+      const err = new Error(data?.error || tr("صار شي غلط. جربي مرة ثانية.", "Something went wrong. Please try again."));
       err.fields = data?.fields || [];
       throw err;
     }
-    if (!data) throw new Error("الرد وصل ناقص. جربي مرة ثانية.");
+    if (!data) throw new Error(tr("الرد وصل ناقص. جربي مرة ثانية.", "The reply came back incomplete. Please try again."));
     return data;
   } catch (err) {
-    if (err.name === "AbortError") throw new Error("الطلب طوّل زيادة. جربي مرة ثانية.");
-    if (err instanceof TypeError) throw new Error("ما قدرنا نوصل للموقع. تأكدي من النت وجربي مرة ثانية.");
+    if (err.name === "AbortError") throw new Error(tr("الطلب طوّل زيادة. جربي مرة ثانية.", "That took too long. Please try again."));
+    if (err instanceof TypeError) throw new Error(tr("ما قدرنا نوصل للموقع. تأكدي من النت وجربي مرة ثانية.", "We couldn't reach the server. Check your connection and try again."));
     throw err;
   } finally {
     clearTimeout(timer);
@@ -120,7 +133,7 @@ async function api(path, body, timeoutMs) {
 /** Shrink a photo in the browser before upload: faster for Llama and well under the size limit. */
 function resizeImage(file, maxSide = 1024) {
   return new Promise((resolve, reject) => {
-    if (!file.type.startsWith("image/")) return reject(new Error("اختاري صورة."));
+    if (!file.type.startsWith("image/")) return reject(new Error(tr("اختاري صورة.", "Please choose an image.")));
     const img = new Image();
     const url = URL.createObjectURL(file);
     img.onload = () => {
@@ -132,27 +145,57 @@ function resizeImage(file, maxSide = 1024) {
       URL.revokeObjectURL(url);
       resolve(canvas.toDataURL("image/jpeg", 0.85));
     };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("ما قدرنا نقرأ الصورة. جربي صورة ثانية.")); };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error(tr("ما قدرنا نقرأ الصورة. جربي صورة ثانية.", "We couldn't read that image. Try another one."))); };
     img.src = url;
   });
 }
 
-// ---------- Tabs ----------
+// ---------- Theme & language ----------
+
+function currentTheme() {
+  return document.documentElement.dataset.theme
+    || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+}
+$("theme-toggle").addEventListener("click", () => {
+  const next = currentTheme() === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = next;
+  store.set(KEYS.theme, next);
+});
+
+function setLanguage(lang) {
+  I18N.apply(lang);
+  store.set(KEYS.lang, lang);
+  $("lang-label").textContent = lang === "en" ? "عربي" : "EN";
+  $("lang-toggle").setAttribute("aria-label", lang === "en" ? "العربية" : "English");
+  // Everything drawn by JavaScript is re-rendered in the new language.
+  updateFaceSummary();
+  renderBag();
+  renderSaved();
+  if (state.current) showOnMirror(state.current);
+  if (state.current?.look && !$("result").hidden) renderResult(state.current.look);
+  if (state.palette) renderManual();
+  $("loading-stage").textContent = pick(STAGES[state.stage]);
+  updateChatFab();
+}
+$("lang-toggle").addEventListener("click", () => setLanguage(I18N.lang === "en" ? "ar" : "en"));
+
+// ---------- Navigation: steps and side sections ----------
 
 function showTab(name) {
-  document.querySelectorAll(".tab").forEach((t) => {
-    const on = t.dataset.tab === name;
-    t.classList.toggle("active", on);
-    t.setAttribute("aria-selected", on);
-  });
+  document.querySelectorAll("[data-tab]").forEach((t) => t.setAttribute("aria-selected", t.dataset.tab === name));
   document.querySelectorAll(".tab-panel").forEach((p) => { p.hidden = p.dataset.panel !== name; });
   if (name === "manual") openManual();
 }
-document.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => showTab(t.dataset.tab)));
-document.querySelectorAll("[data-goto]").forEach((b) => b.addEventListener("click", () => {
-  showTab(b.dataset.goto);
-  document.querySelector(".tabs").scrollIntoView({ behavior: "smooth", block: "start" });
-}));
+function goTo(name) {
+  showTab(name);
+  document.querySelector(".flow").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+document.querySelectorAll("[data-tab]").forEach((t) => t.addEventListener("click", () => showTab(t.dataset.tab)));
+document.querySelectorAll("[data-goto]").forEach((b) => b.addEventListener("click", () => goTo(b.dataset.goto)));
+
+function markFaceDone(done) {
+  document.querySelector('.step[data-tab="face"]').classList.toggle("done", done);
+}
 
 // ---------- Mirror ----------
 
@@ -170,33 +213,17 @@ function updateMirrorBase() {
   face.style.setProperty("--brow", brow);
   face.dataset.coverage = data.get("coverage") || "none";
   face.dataset.lashes = data.get("lashes") || "natural";
-  face.dataset.eye = data.get("eye_shape") || "almond";
   updateFaceSummary();
 }
 
 function updateFaceSummary() {
   const f = faceValues();
+  const lens = f.lens && f.lens !== "none" ? tr(" بعدسة", " with lenses") : "";
   $("face-summary-text").textContent = f.skin_tone
-    ? `وجهك: بشرة ${TONE_AR[f.skin_tone]} · عيون ${EYE_AR[f.eye_shape]}${f.lens && f.lens !== "none" ? " بعدسة" : ""} · شعر ${HAIR_AR[f.hair_color]}`
-    : "ما حددتي لون بشرتك وملامحك للحين.";
+    ? tr(`وجهك: بشرة ${pick(TONE[f.skin_tone])} · عيون ${pick(EYE[f.eye_shape])}${lens} · شعر ${pick(HAIR_NAME[f.hair_color])}`,
+        `Your face: ${pick(TONE[f.skin_tone])} skin · ${pick(EYE[f.eye_shape])} eyes${lens} · ${pick(HAIR_NAME[f.hair_color])} hair`)
+    : tr("ما حددتي لون بشرتك وملامحك للحين.", "You haven't set your skin tone and features yet.");
 }
-
-$("save-face").addEventListener("click", () => {
-  const f = faceValues();
-  if (!f.skin_tone) {
-    $("face-error").textContent = "اختاري لون بشرتك أول.";
-    $("face-error").hidden = false;
-    document.querySelector('.field[data-field="skin_tone"]').classList.add("invalid");
-    return;
-  }
-  $("face-error").hidden = true;
-  if (!store.set(FACE_KEY, f)) return toast("ما قدرنا نحفظ، المتصفح مانع الحفظ.");
-  $("face-saved-note").hidden = false;
-  toast("حفظنا وجهك");
-  // Straight on to the next step: designing the look.
-  showTab("design");
-  document.querySelector(".tabs").scrollIntoView({ behavior: "smooth", block: "start" });
-});
 
 /** Paint a look onto the face and list its colours under the mirror. */
 function showOnMirror(look) {
@@ -205,17 +232,16 @@ function showOnMirror(look) {
     if (look.colors[key]) face.style.setProperty(cssVar, look.colors[key].hex);
   }
   face.classList.add("made");
-
-  $("palette-title").textContent = look.name ? `ألوان: ${look.name}` : "ألوان اللوك";
+  $("palette-title").textContent = look.name ? `${tr("ألوان:", "Colours:")} ${look.name}` : tr("ألوان اللوك", "Look colours");
   const list = $("palette-list");
   list.replaceChildren();
-  for (const [key, label] of Object.entries(AREA_AR)) {
+  for (const [key, label] of Object.entries(AREA)) {
     const c = look.colors[key];
     if (!c) continue;
     const li = el("li");
     const dot = el("i");
     dot.style.background = c.hex;
-    li.append(dot, el("b", null, c.name), label);
+    li.append(dot, el("b", null, colourName(c)), pick(label));
     list.append(li);
   }
   $("palette").hidden = false;
@@ -239,35 +265,25 @@ document.addEventListener("change", (e) => {
 });
 form.notes.addEventListener("input", () => { $("notes-count").textContent = form.notes.value.length; });
 
-// ---------- Saved looks ----------
+// ---------- Step 1: save my face ----------
 
-const SAVED_KEY = "byhana.looks";
-
-function mirrorSettings() {
-  return { ...faceValues(), lashes: new FormData(form).get("lashes") };
-}
-
-function saveCurrent(name) {
-  if (!state.current) return;
-  const looks = store.get(SAVED_KEY, []);
-  looks.unshift({
-    id: Date.now().toString(36),
-    name: name || state.current.name || "لوكي",
-    source: state.current.source,
-    savedAt: new Date().toISOString(),
-    colors: state.current.colors,
-    mirror: mirrorSettings(),
-    look: state.current.look || null,
-  });
-  if (!store.set(SAVED_KEY, looks.slice(0, 30))) {
-    toast("ما قدرنا نحفظ، المتصفح مانع الحفظ.");
+$("save-face").addEventListener("click", () => {
+  const f = faceValues();
+  if (!f.skin_tone) {
+    $("face-error").textContent = tr("اختاري لون بشرتك أول.", "Please choose your skin tone first.");
+    $("face-error").hidden = false;
+    document.querySelector('.field[data-field="skin_tone"]').classList.add("invalid");
     return;
   }
-  renderSaved();
-  toast("حفظنا اللوك في لوكاتي");
-}
+  $("face-error").hidden = true;
+  if (!store.set(KEYS.face, f)) return toast(tr("ما قدرنا نحفظ، المتصفح مانع الحفظ.", "Couldn't save: your browser is blocking storage."));
+  $("face-saved-note").hidden = false;
+  markFaceDone(true);
+  toast(tr("حفظنا وجهك", "Your face is saved"));
+  goTo("design");  // straight on to step 2
+});
 
-function applyMirrorSettings(m) {
+function applySettings(m) {
   for (const [name, value] of Object.entries(m || {})) {
     const input = document.querySelector(`input[name="${name}"][value="${value}"]`);
     if (input) input.checked = true;
@@ -275,8 +291,27 @@ function applyMirrorSettings(m) {
   updateMirrorBase();
 }
 
+// ---------- Saved looks ----------
+
+function saveCurrent(name) {
+  if (!state.current) return;
+  const looks = store.get(KEYS.looks, []);
+  looks.unshift({
+    id: Date.now().toString(36),
+    name: name || state.current.name || tr("لوكي", "My look"),
+    source: state.current.source,
+    savedAt: new Date().toISOString(),
+    colors: state.current.colors,
+    mirror: { ...faceValues(), lashes: new FormData(form).get("lashes") },
+    look: state.current.look || null,
+  });
+  if (!store.set(KEYS.looks, looks.slice(0, 30))) return toast(tr("ما قدرنا نحفظ، المتصفح مانع الحفظ.", "Couldn't save: your browser is blocking storage."));
+  renderSaved();
+  toast(tr("حفظنا اللوك في لوكاتي", "Saved to My looks"));
+}
+
 function openSaved(item) {
-  applyMirrorSettings(item.mirror);
+  applySettings(item.mirror);
   if (item.look) {
     renderResult(item.look);
     showTab("design");
@@ -290,7 +325,7 @@ function openSaved(item) {
 }
 
 function renderSaved() {
-  const looks = store.get(SAVED_KEY, []);
+  const looks = store.get(KEYS.looks, []);
   $("saved-count").textContent = looks.length;
   $("saved-empty").hidden = looks.length > 0;
   const list = $("saved-list");
@@ -298,27 +333,29 @@ function renderSaved() {
   for (const item of looks) {
     const li = el("li");
     const info = el("div", "saved-info");
-    const date = new Date(item.savedAt).toLocaleDateString("ar-SA", { day: "numeric", month: "long" });
+    const date = new Date(item.savedAt).toLocaleDateString(I18N.lang === "en" ? "en-GB" : "ar-SA", { day: "numeric", month: "long" });
     info.append(el("strong", null, item.name),
-                el("span", "saved-meta", `${item.source === "ai" ? "من هنو" : "تصميمي"} · ${date}`));
+                el("span", "saved-meta", `${item.source === "ai" ? tr("من هنو", "By Hanu") : tr("تصميمي", "My design")} · ${date}`));
     const dots = el("div", "saved-dots");
-    for (const key of Object.keys(AREA_AR)) {
+    for (const key of Object.keys(AREA)) {
       if (!item.colors[key]) continue;
       const d = el("i");
       d.style.background = item.colors[key].hex;
-      d.title = item.colors[key].name;
+      d.title = colourName(item.colors[key]);
       dots.append(d);
     }
     info.append(dots);
 
-    const btns = el("div", "saved-btns");
-    const open = el("button", "btn primary inline", "اعرضي");
+    const btns = el("div", "actions");
+    const open = el("button", "btn primary small");
     open.type = "button";
+    open.append(icon("eye"), tr("اعرضي", "View"));
     open.addEventListener("click", () => openSaved(item));
-    const del = el("button", "btn ghost small", "حذف");
+    const del = el("button", "btn ghost small");
     del.type = "button";
+    del.append(icon("trash"), tr("حذف", "Delete"));
     del.addEventListener("click", () => {
-      store.set(SAVED_KEY, store.get(SAVED_KEY, []).filter((x) => x.id !== item.id));
+      store.set(KEYS.looks, store.get(KEYS.looks, []).filter((x) => x.id !== item.id));
       renderSaved();
     });
     btns.append(open, del);
@@ -332,8 +369,6 @@ $("save-look").addEventListener("click", () => saveCurrent());
 
 // ---------- Makeup bag ----------
 
-const BAG_KEY = "byhana.bag";
-
 function addToBag(items) {
   let added = 0;
   for (const item of items) {
@@ -343,7 +378,7 @@ function addToBag(items) {
     state.bag.push({ name, step: item.step || null, base: item.base || null });
     added++;
   }
-  store.set(BAG_KEY, state.bag);
+  store.set(KEYS.bag, state.bag);
   renderBag();
   return added;
 }
@@ -354,13 +389,14 @@ function renderBag() {
   state.bag.forEach((p, i) => {
     const li = el("li");
     li.append(el("bdi", null, p.name));
-    if (p.base) li.append(el("span", `tag base-${p.base}`, BASE_AR[p.base]));
-    const rm = el("button", "remove", "×");
+    if (p.base) li.append(el("span", `tag base-${p.base}`, pick(BASE[p.base])));
+    const rm = el("button", "remove");
     rm.type = "button";
-    rm.setAttribute("aria-label", `حذف ${p.name}`);
+    rm.setAttribute("aria-label", `${tr("حذف", "Remove")} ${p.name}`);
+    rm.append(icon("x"));
     rm.addEventListener("click", () => {
       state.bag.splice(i, 1);
-      store.set(BAG_KEY, state.bag);
+      store.set(KEYS.bag, state.bag);
       renderBag();
     });
     li.append(rm);
@@ -391,12 +427,14 @@ async function scanPhoto(input) {
   const file = input.files[0];
   input.value = "";
   if (!file) return;
-  bagStatus("هنو تقرأ منتجاتك من الصورة...", "busy");
+  bagStatus(tr("هنو تقرأ منتجاتك من الصورة...", "Hanu is reading your products from the photo..."), "busy");
   try {
     const image = await resizeImage(file);
     const data = await api("/api/scan", { image }, PHOTO_TIMEOUT_MS);
     const added = addToBag(data.products);
-    bagStatus(added ? `ضفنا ${added} منتج من الصورة. شيكي على الأسماء واحذفي الغلط.` : "المنتجات اللي بالصورة موجودة في شنطتك من قبل.");
+    bagStatus(added
+      ? tr(`ضفنا ${added} منتج من الصورة. شيكي على الأسماء واحذفي الغلط.`, `Added ${added} product(s) from the photo. Check the names and remove any mistakes.`)
+      : tr("المنتجات اللي بالصورة موجودة في شنطتك من قبل.", "Those products are already in your bag."));
   } catch (err) {
     bagStatus(err.message, "error");
   }
@@ -404,34 +442,21 @@ async function scanPhoto(input) {
 $("bag-camera").addEventListener("change", (e) => scanPhoto(e.target));
 $("bag-album").addEventListener("change", (e) => scanPhoto(e.target));
 
-// ---------- 1) Hanu designs a look ----------
+// ---------- Step 2: Hanu designs a look ----------
 
 let stageTimer = null;
 
 function readForm() {
   const data = new FormData(form);
+  const get = (k, fallback = "") => data.get(k) || fallback;
   return {
-    skin_type: data.get("skin_type") || "",
-    skin_tone: data.get("skin_tone") || "",
-    undertone: data.get("undertone") || "unknown",
-    city: data.get("city") || "",
-    occasion: data.get("occasion") || "",
-    budget: data.get("budget") || "",
-    coverage: data.get("coverage") || "none",
-    hair_color: data.get("hair_color") || "black",
-    lashes: data.get("lashes") || "natural",
-    finish: data.get("finish") || "any",
-    face_shape: data.get("face_shape") || "oval",
-    jaw: data.get("jaw") || "defined",
-    eye_shape: data.get("eye_shape") || "almond",
-    eye_color: data.get("eye_color") || "dark_brown",
-    lens: data.get("lens") || "none",
-    brow_shape: data.get("brow_shape") || "arched",
-    brow_thickness: data.get("brow_thickness") || "natural",
-    nose: data.get("nose") || "medium",
-    lips_shape: data.get("lips_shape") || "medium",
-    owned_products: state.bag,
-    notes: (data.get("notes") || "").trim(),
+    skin_type: get("skin_type"), skin_tone: get("skin_tone"), undertone: get("undertone", "unknown"),
+    city: get("city"), occasion: get("occasion"), budget: get("budget"), coverage: get("coverage", "none"),
+    hair_color: get("hair_color", "black"), lashes: get("lashes", "natural"), finish: get("finish", "any"),
+    face_shape: get("face_shape", "oval"), jaw: get("jaw", "defined"), eye_shape: get("eye_shape", "almond"),
+    eye_color: get("eye_color", "dark_brown"), lens: get("lens", "none"), brow_shape: get("brow_shape", "arched"),
+    brow_thickness: get("brow_thickness", "natural"), nose: get("nose", "medium"), lips_shape: get("lips_shape", "medium"),
+    owned_products: state.bag, notes: get("notes").trim(),
   };
 }
 
@@ -440,16 +465,16 @@ function markInvalid(fields) {
 }
 
 function setLookLoading(on) {
-  setBusy($("submit"), on, on ? "هنو تشتغل على لوكك..." : "خلّي هنو تزبّط لوكك");
+  setBusy($("submit"), on);
   face.classList.toggle("scanning", on);
   $("loading").hidden = !on;
   clearInterval(stageTimer);
   if (on) {
-    let i = 0;
-    $("loading-stage").textContent = STAGES[0];
+    state.stage = 0;
+    $("loading-stage").textContent = pick(STAGES[0]);
     stageTimer = setInterval(() => {
-      i = Math.min(i + 1, STAGES.length - 1);
-      $("loading-stage").textContent = STAGES[i];
+      state.stage = Math.min(state.stage + 1, STAGES.length - 1);
+      $("loading-stage").textContent = pick(STAGES[state.stage]);
     }, 6000);
   }
 }
@@ -463,7 +488,7 @@ async function requestLook(payload) {
   $("loading").scrollIntoView({ behavior: "smooth", block: "center" });
   try {
     const look = await api("/api/look", payload, LOOK_TIMEOUT_MS);
-    if (!look.colors || !Array.isArray(look.products)) throw new Error("الرد وصل ناقص. جربي مرة ثانية.");
+    if (!look.colors || !Array.isArray(look.products)) throw new Error(tr("الرد وصل ناقص. جربي مرة ثانية.", "The reply came back incomplete. Please try again."));
     renderResult(look);
     showOnMirror({ source: "ai", name: look.look_name, colors: look.colors, look });
     $("result").scrollIntoView({ behavior: "smooth", block: "start" });
@@ -484,20 +509,16 @@ form.addEventListener("submit", (e) => {
   markInvalid(missing);
   const err = $("form-error");
   err.hidden = !missing.length;
+  $("face-summary").classList.toggle("invalid", missing.includes("skin_tone"));
   if (missing.length) {
-    if (missing.includes("skin_tone")) {
-      // Skin tone lives in the "my face" tab: take her there.
-      err.textContent = missing.length === 1
-        ? "حددي لون بشرتك من تبويب وجهي أول."
-        : "حددي لون بشرتك من تبويب وجهي، وعبّي الخانات اللي باللون الأحمر.";
-      $("face-summary").classList.add("invalid");
-    } else {
-      err.textContent = "عبّي الخانات اللي باللون الأحمر لو سمحتي.";
-    }
+    err.textContent = missing.includes("skin_tone")
+      ? (missing.length === 1
+        ? tr("حددي لون بشرتك من خطوة وجهي أول.", "Set your skin tone in the My face step first.")
+        : tr("حددي لون بشرتك من خطوة وجهي، وعبّي الخانات اللي باللون الأحمر.", "Set your skin tone in My face, and fill in the fields marked in red."))
+      : tr("عبّي الخانات اللي باللون الأحمر لو سمحتي.", "Please fill in the fields marked in red.");
     form.querySelector(".field.invalid, .face-summary.invalid")?.scrollIntoView({ behavior: "smooth", block: "center" });
     return;
   }
-  $("face-summary").classList.remove("invalid");
   requestLook(payload);
 });
 
@@ -509,23 +530,25 @@ $("again").addEventListener("click", () => {
 });
 
 function renderCompatibility(look) {
-  const box = $("compat");
-  box.classList.toggle("ok", look.compatibility_ok);
-  box.classList.toggle("bad", !look.compatibility_ok);
-  $("compat-title").textContent = look.compatibility_ok
-    ? "منتجات القاعدة تركب على بعض"
-    : "انتبهي: فيه منتجات ما تركب على بعض";
-  $("compat-note").textContent = look.compatibility_ok
-    ? "البرايمر والفاونديشن والكونسيلر والمثبت من نفس القاعدة، يعني مكياجك ما راح يتكتّل."
-    : "فيه منتج قاعدته غير عن الباقي. بدّليه بمنتج من نفس قاعدتهم:";
+  const ok = look.compatibility_ok;
+  $("compat").classList.toggle("ok", ok);
+  $("compat").classList.toggle("bad", !ok);
+  $("compat-icon").querySelector("use").setAttribute("href", ok ? "#i-check-circle" : "#i-alert");
+  $("compat-title").textContent = ok
+    ? tr("منتجات القاعدة تركب على بعض", "Your base products layer well together")
+    : tr("انتبهي: فيه منتجات ما تركب على بعض", "Heads up: some products don't layer well");
+  $("compat-note").textContent = ok
+    ? tr("البرايمر والفاونديشن والكونسيلر والمثبت من نفس القاعدة، يعني مكياجك ما راح يتكتّل.",
+        "Primer, foundation, concealer and setting spray share the same base, so your makeup won't pill.")
+    : tr("فيه منتج قاعدته غير عن الباقي. بدّليه بمنتج من نفس قاعدتهم:", "One product has a different base from the rest. Swap it for one that matches:");
   const list = $("compat-list");
   list.replaceChildren();
   for (const w of look.compatibility_warnings) {
     const li = el("li");
     li.append(
-      el("strong", null, `${w.product} ${w.base}`),
+      el("strong", null, `${w.product} (${w.base})`),
       el("bdi", "compat-name", w.product_name),
-      el("span", "compat-with", `ما يركب مع: ${w.conflicts_with.join("، ")}`),
+      el("span", "compat-with", `${tr("ما يركب مع:", "Clashes with:")} ${w.conflicts_with.join(tr("، ", ", "))}`),
       el("span", "compat-why", w.message),
     );
     list.append(li);
@@ -543,14 +566,18 @@ function renderSteps(products, colors) {
     if (colour) {
       const sw = el("span", "swatch");
       sw.style.background = colour.hex;
-      sw.title = colour.name;
+      sw.title = colourName(colour);
       top.append(sw);
     }
-    top.append(el("span", "step-name", p.name), el("span", "step-cat", STEP_AR[p.step] || p.step));
-    if (p.base) top.append(el("span", `tag base-${p.base}`, BASE_AR[p.base]));
-    if (p.owned) top.append(el("span", "tag tag-owned", "من شنطتك"));
+    top.append(el("bdi", "step-name", p.name), el("span", "step-cat", pick(STEP[p.step]) || p.step));
+    if (p.base) top.append(el("span", `tag base-${p.base}`, pick(BASE[p.base])));
+    if (p.owned) {
+      const tag = el("span", "tag tag-owned");
+      tag.append(icon("bag"), tr("من شنطتك", "From your bag"));
+      top.append(tag);
+    }
     body.append(top, el("p", "step-how", p.how_to_apply));
-    if (p.budget_alternative && !p.owned) body.append(el("p", "step-alt", `بديل أوفر: ${p.budget_alternative}`));
+    if (p.budget_alternative && !p.owned) body.append(el("p", "step-alt", `${tr("بديل أوفر:", "Cheaper option:")} ${p.budget_alternative}`));
     li.append(body);
     list.append(li);
   }
@@ -570,7 +597,7 @@ function renderResult(look) {
   $("result").hidden = false;
 }
 
-// ---------- 2) Try it yourself ----------
+// ---------- Side: try it yourself ----------
 
 async function openManual() {
   if (!state.palette) {
@@ -579,44 +606,42 @@ async function openManual() {
       if (!res.ok) throw new Error();
       state.palette = await res.json();
     } catch {
-      $("manual-areas").replaceChildren(el("p", "form-error", "ما قدرنا نحمّل الألوان. حدّثي الصفحة وجربي مرة ثانية."));
+      $("manual-areas").replaceChildren(el("p", "form-error", tr("ما قدرنا نحمّل الألوان. حدّثي الصفحة وجربي مرة ثانية.", "Couldn't load the colours. Refresh the page and try again.")));
       return;
     }
   }
   if (!Object.keys(state.manual).length) {
-    for (const [area, id] of Object.entries(MANUAL_START)) {
-      state.manual[area] = state.palette[area].find((s) => s.id === id);
-    }
+    for (const [area, id] of Object.entries(MANUAL_START)) state.manual[area] = state.palette[area].find((s) => s.id === id);
   }
   renderManual();
   paintManual();
 }
 
 function paintManual() {
-  const colors = Object.fromEntries(Object.entries(state.manual).map(([k, s]) => [k, { hex: s.hex, name: s.name }]));
+  const colors = Object.fromEntries(Object.entries(state.manual).map(([k, s]) => [k, { hex: s.hex, name: s.name, name_en: s.name_en }]));
   showOnMirror({ source: "manual", name: $("manual-name").value.trim(), colors });
 }
 
 function renderManual() {
   const wrap = $("manual-areas");
   wrap.replaceChildren();
-  for (const [area, label] of Object.entries(AREA_AR)) {
+  for (const [area, label] of Object.entries(AREA)) {
     const box = el("div", "area");
-    const title = el("p", "area-label", label);
-    const chosen = el("span", null, state.manual[area]?.name || "");
+    const title = el("p", "area-label", pick(label));
+    const chosen = el("span", null, state.manual[area] ? colourName(state.manual[area]) : "");
     title.append(chosen);
     const row = el("div", "swatches");
     for (const shade of state.palette[area]) {
       const b = el("button");
       b.type = "button";
       b.style.background = shade.hex;
-      b.title = shade.name;
-      b.setAttribute("aria-label", `${label}: ${shade.name}`);
+      b.title = colourName(shade);
+      b.setAttribute("aria-label", `${pick(label)}: ${colourName(shade)}`);
       b.setAttribute("aria-pressed", state.manual[area]?.hex === shade.hex);
       b.addEventListener("click", () => {
         state.manual[area] = shade;
         row.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b));
-        chosen.textContent = shade.name;
+        chosen.textContent = colourName(shade);
         paintManual();
       });
       row.append(b);
@@ -629,88 +654,26 @@ function renderManual() {
 $("manual-save").addEventListener("click", () => {
   if (!state.palette) return;
   paintManual();
-  saveCurrent($("manual-name").value.trim() || "تصميمي");
+  saveCurrent($("manual-name").value.trim() || tr("تصميمي", "My design"));
 });
-
-// ---------- 3) Ask Hanu ----------
-
-async function attachAskPhoto(input) {
-  const file = input.files[0];
-  input.value = "";
-  if (!file) return;
-  try {
-    state.askImage = await resizeImage(file);
-    $("ask-img").src = state.askImage;
-    $("ask-preview").hidden = false;
-    $("ask-form-error").hidden = true;
-  } catch (err) {
-    $("ask-form-error").textContent = err.message;
-    $("ask-form-error").hidden = false;
-  }
-}
-$("ask-camera").addEventListener("change", (e) => attachAskPhoto(e.target));
-$("ask-album").addEventListener("change", (e) => attachAskPhoto(e.target));
-$("ask-remove").addEventListener("click", () => {
-  state.askImage = null;
-  $("ask-preview").hidden = true;
-});
-
-$("ask-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const question = $("ask-question").value.trim();
-  const formErr = $("ask-form-error");
-  if (!question && !state.askImage) {
-    formErr.textContent = "اكتبي سؤالك أو حطي صورة المنتج.";
-    formErr.hidden = false;
-    $("ask-question").closest(".field").classList.add("invalid");
-    return;
-  }
-  formErr.hidden = true;
-  $("ask-question").closest(".field").classList.remove("invalid");
-  $("ask-error").hidden = true;
-  $("ask-answer").hidden = true;
-  setBusy($("ask-submit"), true, "هنو تفكر...");
-  try {
-    const ans = await api("/api/ask", { question, image: state.askImage }, PHOTO_TIMEOUT_MS);
-    renderAnswer(ans);
-  } catch (err) {
-    $("ask-error-message").textContent = err.message;
-    $("ask-error").hidden = false;
-  } finally {
-    setBusy($("ask-submit"), false, "اسألي هنو");
-  }
-});
-
-function renderAnswer(ans) {
-  $("ans-product").textContent = ans.product_name || "رد هنو";
-  const tags = $("ans-tags");
-  tags.replaceChildren();
-  if (ans.step) tags.append(el("span", "tag base-powder", STEP_AR[ans.step] || ans.step));
-  if (ans.base) tags.append(el("span", `tag base-${ans.base}`, BASE_AR[ans.base]));
-  if (ans.base) tags.append(el("span", `tag conf-${ans.confidence}`, CONF_AR[ans.confidence]));
-  $("ans-text").textContent = ans.answer;
-  $("ans-check").hidden = !ans.how_to_check;
-  $("ans-check").textContent = ans.how_to_check ? `كيف تتأكدين: ${ans.how_to_check}` : "";
-  for (const [key, boxId, listId] of [["pairs_well_with", "ans-pairs-box", "ans-pairs"], ["avoid_with", "ans-avoid-box", "ans-avoid"]]) {
-    $(boxId).hidden = !ans[key].length;
-    $(listId).replaceChildren(...ans[key].map((t) => el("li", null, t)));
-  }
-  $("ans-model").textContent = `Powered by ${ans.model.split("/").pop()}`;
-  $("ask-answer").hidden = false;
-  $("ask-answer").scrollIntoView({ behavior: "smooth", block: "nearest" });
-}
 
 // ---------- Floating chat with Hanu ----------
 
 const chat = { history: [], image: null, busy: false };
 const CHAT_HISTORY_TURNS = 8;
 
+function updateChatFab() {
+  const open = !$("chat").hidden;
+  $("chat-open").setAttribute("aria-expanded", open);
+  $("chat-fab-label").textContent = open ? tr("سكّري", "Close") : tr("اسألي هنو", "Ask Hanu");
+}
+
 function openChat(open) {
   $("chat").hidden = !open;
-  $("chat-open").setAttribute("aria-expanded", open);
+  updateChatFab();
   if (open) $("chat-text").focus();
 }
-$("chat-open").addEventListener("click", () => openChat(true));
+$("chat-open").addEventListener("click", () => openChat($("chat").hidden));  // the compact toggles the chat
 $("chat-close").addEventListener("click", () => openChat(false));
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("chat").hidden) openChat(false); });
 
@@ -722,30 +685,29 @@ function chatBubble(who, ...children) {
   return li;
 }
 
-/** Hanu's answer as a chat bubble: product, tags, answer, how to check, what pairs well / avoid. */
+/** Hanu's answer: product, tags, answer, how to check, what pairs well / to avoid. */
 function answerBubble(ans) {
   const parts = [];
-  if (ans.product_name) parts.push(el("p", "msg-product", ans.product_name));
+  if (ans.product_name) parts.push(el("bdi", "msg-product", ans.product_name));
   if (ans.base) {
     const tags = el("div", "msg-tags");
-    tags.append(el("span", `tag base-${ans.base}`, BASE_AR[ans.base]),
-                el("span", `tag conf-${ans.confidence}`, CONF_AR[ans.confidence]));
+    tags.append(el("span", `tag base-${ans.base}`, pick(BASE[ans.base])), el("span", `tag conf-${ans.confidence}`, pick(CONF[ans.confidence])));
     parts.push(tags);
   }
   parts.push(el("p", null, ans.answer));
-  if (ans.how_to_check) parts.push(el("p", "msg-check", `كيف تتأكدين: ${ans.how_to_check}`));
-  for (const [key, cls, title] of [["pairs_well_with", "good", "يمشي مع"], ["avoid_with", "bad", "لا تحطينه مع"]]) {
+  if (ans.how_to_check) parts.push(el("p", "msg-check", `${tr("كيف تتأكدين:", "How to check:")} ${ans.how_to_check}`));
+  for (const [key, cls, title] of [["pairs_well_with", "good", tr("يمشي مع", "Pairs well with")], ["avoid_with", "bad", tr("لا تحطينه مع", "Avoid with")]]) {
     if (!ans[key]?.length) continue;
     const box = el("div", `msg-list ${cls}`);
-    box.append(el("b", null, title), ans[key].join("، "));
+    box.append(el("b", null, title), ans[key].join(tr("، ", ", ")));
     parts.push(box);
   }
   return chatBubble("hanu", ...parts);
 }
 
-async function attachChatPhoto(input) {
-  const file = input.files[0];
-  input.value = "";
+$("chat-photo").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  e.target.value = "";
   if (!file) return;
   try {
     chat.image = await resizeImage(file);
@@ -754,12 +716,8 @@ async function attachChatPhoto(input) {
   } catch (err) {
     chatBubble("hanu err", el("p", null, err.message));
   }
-}
-$("chat-photo").addEventListener("change", (e) => attachChatPhoto(e.target));
-$("chat-attach-remove").addEventListener("click", () => {
-  chat.image = null;
-  $("chat-attach").hidden = true;
 });
+$("chat-attach-remove").addEventListener("click", () => { chat.image = null; $("chat-attach").hidden = true; });
 
 $("chat-form").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -768,9 +726,8 @@ $("chat-form").addEventListener("submit", async (e) => {
   const image = chat.image;
   if (!question && !image) return $("chat-text").focus();
 
-  // Show her message right away.
   const mine = [];
-  if (image) { const img = el("img"); img.src = image; img.alt = "صورة المنتج"; mine.push(img); }
+  if (image) { const img = el("img"); img.src = image; img.alt = ""; mine.push(img); }
   if (question) mine.push(el("p", null, question));
   chatBubble("user", ...mine);
   $("chat-text").value = "";
@@ -782,17 +739,14 @@ $("chat-form").addEventListener("submit", async (e) => {
   const typing = el("div", "dots");
   typing.append(el("span"), el("span"), el("span"));
   const waiting = chatBubble("hanu", typing);
-
   try {
     const ans = await api("/api/ask", {
-      question, image,
-      history: chat.history.slice(-CHAT_HISTORY_TURNS),
-      owned_products: state.bag,
+      question, image, history: chat.history.slice(-CHAT_HISTORY_TURNS), owned_products: state.bag,
     }, PHOTO_TIMEOUT_MS);
     waiting.remove();
     answerBubble(ans);
     chat.history.push(
-      { role: "user", content: (question || "وش هذا المنتج؟") + (image ? " [مع صورة]" : "") },
+      { role: "user", content: (question || tr("وش هذا المنتج؟", "What is this product?")) + (image ? " [photo]" : "") },
       { role: "assistant", content: ans.answer.slice(0, 1500) },
     );
   } catch (err) {
@@ -807,13 +761,13 @@ $("chat-form").addEventListener("submit", async (e) => {
 
 // ---------- Start ----------
 
-const savedFace = store.get(FACE_KEY, null);
+const savedFace = store.get(KEYS.face, null);
 if (savedFace) {
-  applyMirrorSettings(savedFace);
+  applySettings(savedFace);
   $("face-saved-note").hidden = false;
+  markFaceDone(true);
 }
-state.bag = store.get(BAG_KEY, []);
-renderBag();
-renderSaved();
+state.bag = store.get(KEYS.bag, []);
 updateMirrorBase();
-showTab(savedFace ? "design" : "face");  // first visit: start by drawing her face
+setLanguage(store.get(KEYS.lang, "ar"));
+showTab(savedFace ? "design" : "face");  // first visit: start with step 1

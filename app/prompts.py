@@ -7,6 +7,13 @@ PERSONA = 'You are "Hanu" (هنو), the professional Saudi makeup artist behind 
 
 JSON_RULE = 'Inside JSON string values never use the " character; write « » instead.'
 
+LANG_RULE = ('Write every text field in the language named in the "Language:" line of her message. '
+             'In Arabic, use a friendly Saudi (Najdi/Hijazi) tone, never Egyptian dialect or formal Arabic '
+             '(avoid يمكنك and يُفضّل); example: "حطي البرايمر على المسام بس، وخليه ينشف دقيقة قبل الفاونديشن." '
+             'In English, write warm, simple English. Keep JSON keys and enum values in English.')
+
+LANGUAGE_LINE = {"ar": "Language: Arabic (Saudi tone)", "en": "Language: English"}
+
 BASE_KNOWLEDGE = JSON_RULE + """
 
 Makeup base rules you know as a professional:
@@ -47,13 +54,12 @@ Rules:
   undertone (warm: peach, coral, gold, bronze, brick; cool: rose, berry, plum, mauve, pearl), and fit the
   occasion (soft nudes for work/daily, richer colour for weddings and evenings). Lid and crease must be
   from the same family, e.g. champagne + soft_peach, bronze + deep_brown, burgundy + plum.
-- Write every text field in Arabic using a friendly Saudi (Najdi/Hijazi) tone, never Egyptian dialect or formal
-  Arabic. Example tone: "حطي البرايمر على المسام بس، وخليه ينشف دقيقة قبل الفاونديشن." Keep JSON keys and enum values in English.
+- """ + LANG_RULE + """
 
 Return ONLY a JSON object, no markdown, with exactly this shape:
 {
-  "look_name": "short Arabic name for the look",
-  "description": "2-3 Arabic sentences describing the look and why it suits her",
+  "look_name": "short name for the look",
+  "description": "2-3 sentences describing the look and why it suits her",
   "shades": {
     "lips": "name", "blush": "name", "eyeshadow_lid": "name",
     "eyeshadow_crease": "name", "eyeliner": "name", "highlighter": "name"
@@ -63,15 +69,15 @@ Return ONLY a JSON object, no markdown, with exactly this shape:
       "step": one of ["skincare","primer","foundation","concealer","powder","contour","blush","highlighter",
                       "eyeshadow","eyeliner","mascara","lashes","brows","lips","setting_spray"],
       "name": "brand + product name",
-      "how_to_apply": "one short Arabic sentence",
+      "how_to_apply": "one short sentence",
       "base": "water" | "silicone" | "oil" | "powder",
       "owned": true | false,
       "budget_alternative": "cheaper alternative or null"
     }
   ],
-  "climate_tips": ["2-4 short Arabic tips for her city's weather"],
-  "face_tips": ["2-4 short Arabic tips on how this look is adapted to her eyes, face shape, lips and brows"],
-  "compatibility_note": "one Arabic sentence about the bases of the face products"
+  "climate_tips": ["2-4 short tips for her city's weather"],
+  "face_tips": ["2-4 short tips on how this look is adapted to her eyes, face shape, lips and brows"],
+  "compatibility_note": "one sentence about the bases of the face products"
 }
 List products in application order, 6 to 12 items. Every text field must be filled. Keep every text short.""".replace(
     "{SHADE_LIST}", prompt_list())
@@ -158,6 +164,7 @@ def build_look_prompt(req: LookRequest) -> str:
         notes = dialect_notes(req.notes)
         if notes:
             lines.append(notes)
+    lines.append(LANGUAGE_LINE[req.lang])
     return "Design a look for this client:\n" + "\n".join(lines)
 
 
@@ -189,9 +196,9 @@ A woman asks you about a makeup product (by name, by photo, or both). Answer lik
   (e.g. "المويه" is plain water, so "does it run with water" means: is it waterproof / sweat-proof).
 - "pairs_well_with" must only list things with the SAME base as the product; "avoid_with" lists clashing bases.
   Never contradict yourself between "answer" and these lists.
-- Talk like a Saudi friend, not formal Arabic. Example tone: "هذا البرايمر سيليكوني، فلا تحطينه تحت فاونديشن
-  مائي لأنه بيتكتّل. شوفي المكونات: لو فيها dimethicone في أولها فهو سيليكوني." Avoid "يمكنك" and "يُفضّل".
-- Write all text in Arabic using a friendly Saudi tone, never Egyptian dialect. Keep JSON keys and enum values in English.
+- In Arabic, talk like a Saudi friend. Example tone: "هذا البرايمر سيليكوني، فلا تحطينه تحت فاونديشن
+  مائي لأنه بيتكتّل. شوفي المكونات: لو فيها dimethicone في أولها فهو سيليكوني."
+- """ + LANG_RULE + """
 
 Return ONLY a JSON object, no markdown:
 {
@@ -199,14 +206,14 @@ Return ONLY a JSON object, no markdown:
   "step": "primer" | "foundation" | ... | null,
   "base": "water" | "silicone" | "oil" | "powder" | null,
   "confidence": "high" | "medium" | "low",
-  "answer": "2-4 Arabic sentences answering her question",
-  "how_to_check": "one Arabic sentence on how to confirm from the ingredients, or null",
-  "pairs_well_with": ["up to 3 Arabic items"],
-  "avoid_with": ["up to 3 Arabic items"]
+  "answer": "2-4 sentences answering her question",
+  "how_to_check": "one sentence on how to confirm from the ingredients, or null",
+  "pairs_well_with": ["up to 3 items"],
+  "avoid_with": ["up to 3 items"]
 }"""
 
 
-def build_ask_prompt(question: str, has_image: bool, owned: list | None = None) -> str:
+def build_ask_prompt(question: str, has_image: bool, owned: list | None = None, lang: str = "ar") -> str:
     q = question or "What is this product, and is it water-based or silicone-based?"
     notes = dialect_notes(question)
     if notes:
@@ -216,4 +223,4 @@ def build_ask_prompt(question: str, has_image: bool, owned: list | None = None) 
     if owned:
         bag = "; ".join(p.name + (f" ({p.base}-based)" if p.base else "") for p in owned)
         q += f"\n(Products she owns, if she refers to 'my' products: {bag})"
-    return q
+    return q + "\n" + LANGUAGE_LINE[lang]

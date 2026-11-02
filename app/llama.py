@@ -17,11 +17,11 @@ T = TypeVar("T", bound=BaseModel)
 
 
 class LlamaError(Exception):
-    """An error that is safe to show to the user, with the HTTP status the API should return."""
+    """An error that is safe to show to the user: a message key from i18n.py and the HTTP status to return."""
 
-    def __init__(self, message: str, status: int = 502):
-        super().__init__(message)
-        self.message = message
+    def __init__(self, key: str, status: int = 502):
+        super().__init__(key)
+        self.key = key
         self.status = status
 
 
@@ -83,18 +83,18 @@ def _call_llama(model: str, messages: list[dict], max_tokens: int) -> str:
             max_tokens=max_tokens,
         )
     except openai.AuthenticationError:
-        raise LlamaError("فيه مشكلة في إعدادات التطبيق. كلمي المسؤول عنه.", 500)
+        raise LlamaError("bad_key", 500)
     except openai.APITimeoutError:
-        raise LlamaError("هنو طوّلت في الرد. جربي مرة ثانية بعد شوي.", 504)
+        raise LlamaError("timeout", 504)
     except openai.RateLimitError:
-        raise LlamaError("فيه زحمة على الخدمة الحين. انتظري دقيقة وجربي مرة ثانية.", 429)
+        raise LlamaError("rate_limit", 429)
     except openai.APIStatusError as e:
         log.warning("Llama provider error %s: %s", e.status_code, e.message)
         if e.status_code == 402:
-            raise LlamaError("رصيد خدمة الذكاء الاصطناعي خلص. كلمي المسؤول عن التطبيق.", 503)
-        raise LlamaError("خدمة Llama واقفة الحين. جربي بعد شوي.", 503)
+            raise LlamaError("no_credit", 503)
+        raise LlamaError("unavailable", 503)
     except openai.APIConnectionError:
-        raise LlamaError("ما قدرنا نوصل لـ Llama. تأكدي من النت وجربي مرة ثانية.", 503)
+        raise LlamaError("connection", 503)
 
     content = response.choices[0].message.content if response.choices else None
     if not content or not content.strip():
@@ -106,7 +106,7 @@ def _ask_json(schema: type[T], model: str, system: str, user: str | list, max_to
               history: list[dict] | None = None) -> T:
     """Send a prompt, and keep only a reply that matches `schema`. Retries once with the exact error."""
     if not config.LLM_API_KEY:
-        raise LlamaError("التطبيق مو جاهز: مفتاح Llama ناقص.", 500)
+        raise LlamaError("not_configured", 500)
 
     messages = [{"role": "system", "content": system}, *(history or []), {"role": "user", "content": user}]
     for attempt in range(config.LLM_MAX_RETRIES + 1):
@@ -120,7 +120,7 @@ def _ask_json(schema: type[T], model: str, system: str, user: str | list, max_to
                                  f"Your previous reply was not valid ({str(e)[:300]}). "
                                  "Return ONLY the JSON object with the exact shape requested."})
 
-    raise LlamaError("رد هنو طلع ناقص. جربي مرة ثانية.", 502)
+    raise LlamaError("incomplete", 502)
 
 
 def _with_image(text: str, image: str) -> list[dict]:
@@ -137,8 +137,8 @@ def scan_products(image: str) -> ScanResult:
 
 
 def ask_product(question: str, image: str | None, history: list[ChatTurn] = (),
-                owned: list[OwnedProduct] = ()) -> AskAnswer:
-    text = build_ask_prompt(question, image is not None, list(owned))
+                owned: list[OwnedProduct] = (), lang: str = "ar") -> AskAnswer:
+    text = build_ask_prompt(question, image is not None, list(owned), lang)
     past = [t.model_dump() for t in history]  # earlier chat turns, as plain text
     if image:
         return _ask_json(AskAnswer, config.LLAMA_VISION_MODEL, ASK_PROMPT, _with_image(text, image), 900, past)

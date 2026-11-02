@@ -11,7 +11,8 @@ from . import config
 from .compatibility import check_compatibility
 from .llama import LlamaError, ask_product, generate_look, scan_products
 from .schemas import AskRequest, AskResponse, LookRequest, LookResponse, ScanRequest, ScanResult
-from .shades import SHADES, to_colors
+from .i18n import msg, request_lang
+from .shades import SHADES, english_name, to_colors
 
 logging.basicConfig(level=logging.INFO)
 
@@ -21,14 +22,13 @@ app = FastAPI(title="by HANA", description="Saudi AI makeup artist powered by Ll
 @app.exception_handler(RequestValidationError)
 async def invalid_input(request: Request, exc: RequestValidationError):
     fields = sorted({str(err["loc"][-1]) for err in exc.errors()})
-    message = ("الصورة لازم تكون JPG أو PNG وحجمها أقل من 4 ميقا." if "image" in fields
-               else "عبّي الخانات المطلوبة صح لو سمحتي.")
-    return JSONResponse(status_code=400, content={"error": message, "fields": fields})
+    key = "bad_image" if "image" in fields else "bad_input"
+    return JSONResponse(status_code=400, content={"error": msg(key, request_lang(request)), "fields": fields})
 
 
 @app.exception_handler(LlamaError)
 async def llama_failed(request: Request, exc: LlamaError):
-    return JSONResponse(status_code=exc.status, content={"error": exc.message})
+    return JSONResponse(status_code=exc.status, content={"error": msg(exc.key, request_lang(request))})
 
 
 @app.get("/api/health")
@@ -40,14 +40,14 @@ def health():
 @app.get("/api/shades")
 def shades():
     """The curated palette, so the manual 'try it yourself' mode uses exactly the same colours as Llama."""
-    return {area: [{"id": k, "hex": hex_, "name": name} for k, (hex_, name) in items.items()]
+    return {area: [{"id": k, "hex": hex_, "name": name, "name_en": english_name(k)} for k, (hex_, name) in items.items()]
             for area, items in SHADES.items()}
 
 
 @app.post("/api/look", response_model=LookResponse)
 def create_look(req: LookRequest):
     look = generate_look(req)
-    warnings = check_compatibility(look.products)
+    warnings = check_compatibility(look.products, req.lang)
     return LookResponse(
         **look.model_dump(),
         colors=to_colors(look.shades.model_dump()),
@@ -61,16 +61,16 @@ def create_look(req: LookRequest):
 def scan(req: ScanRequest):
     result = scan_products(req.image)
     if not result.products:
-        raise LlamaError("ما لقينا منتجات مكياج في الصورة. جربي صورة أوضح يبان فيها اسم المنتج.", 422)
+        raise LlamaError("no_products", 422)
     return result
 
 
 @app.post("/api/ask", response_model=AskResponse)
-def ask(req: AskRequest):
+def ask(req: AskRequest, request: Request):
     if not req.question and not req.image:
         return JSONResponse(status_code=400, content={
-            "error": "اكتبي سؤالك أو حطي صورة المنتج.", "fields": ["question"]})
-    answer = ask_product(req.question, req.image, req.history, req.owned_products)
+            "error": msg("empty_question", request_lang(request)), "fields": ["question"]})
+    answer = ask_product(req.question, req.image, req.history, req.owned_products, req.lang)
     return AskResponse(**answer.model_dump(),
                        model=config.LLAMA_VISION_MODEL if req.image else config.LLAMA_MODEL)
 

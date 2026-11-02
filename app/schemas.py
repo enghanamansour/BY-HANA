@@ -59,6 +59,7 @@ City = Literal["riyadh", "jeddah", "dammam", "makkah", "madinah", "abha", "other
 Occasion = Literal["wedding", "milka", "eid", "graduation", "work", "daily", "evening"]
 Budget = Literal["low", "medium", "high"]
 Coverage = Literal["none", "hijab", "niqab"]
+Lang = Literal["ar", "en"]
 HairColor = Literal["black", "dark_brown", "brown", "caramel", "honey", "burgundy"]
 Lashes = Literal["none", "natural", "dramatic"]
 Finish = Literal["any", "matte", "satin", "dewy"]
@@ -95,6 +96,7 @@ class LookRequest(BaseModel):
     lips_shape: LipsShape = "medium"
     owned_products: list[OwnedProduct] = Field(default_factory=list, max_length=25)
     notes: str = Field(default="", max_length=300)
+    lang: Lang = "ar"
 
     @field_validator("notes")
     @classmethod
@@ -140,7 +142,8 @@ class CompatibilityWarning(BaseModel):
 
 class Colour(BaseModel):
     hex: str
-    name: str
+    name: str      # Arabic
+    name_en: str
 
 
 class LookResponse(LlamaLook):
@@ -175,6 +178,7 @@ class AskRequest(BaseModel):
     # Chat mode: earlier turns so follow-up questions make sense, and her bag so "my primer" is known.
     history: list[ChatTurn] = Field(default_factory=list, max_length=12)
     owned_products: list[OwnedProduct] = Field(default_factory=list, max_length=25)
+    lang: Literal["ar", "en"] = "ar"
 
     _image = field_validator("image")(check_image)
 

@@ -69,9 +69,14 @@ SHADES: dict[str, dict[str, tuple[str, str]]] = {
 }
 
 
+def english_name(shade_id: str) -> str:
+    """'nude_rose' -> 'Nude Rose'."""
+    return shade_id.replace("_", " ").title()
+
+
 def to_colors(choice: dict[str, str]) -> dict[str, dict[str, str]]:
-    """{"lips": "berry", ...} -> {"lips": {"hex": "#8C3050", "name": "توتي"}, ...}"""
-    return {area: {"hex": SHADES[area][name][0], "name": SHADES[area][name][1]}
+    """{"lips": "berry", ...} -> {"lips": {"hex": "#8C3050", "name": "توتي", "name_en": "Berry"}, ...}"""
+    return {area: {"hex": SHADES[area][name][0], "name": SHADES[area][name][1], "name_en": english_name(name)}
             for area, name in choice.items()}
 
 

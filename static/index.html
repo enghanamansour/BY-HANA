@@ -5,28 +5,71 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>by HANA | خبيرة مكياجك الذكية</title>
   <meta name="description" content="هنو تزبّط لك لوك يناسب بشرتك وجو مدينتك ومناسبتك، ومن مكياجك اللي عندك. شغّالة بـ Llama.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='16' fill='%23B4536A'/><text x='16' y='22' font-size='16' text-anchor='middle' fill='white' font-family='Georgia' font-style='italic'>H</text></svg>">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%233B2535'/><path d='M32 47C20 39 20 27 26.5 27c3 0 4.6 1.8 5.5 3.6.9-1.8 2.5-3.6 5.5-3.6C44 27 44 39 32 47Z' fill='%23E11D48'/></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,500;1,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <script>
+    // Apply the saved theme before first paint so the page never flashes the wrong colours.
+    try {
+      const t = JSON.parse(localStorage.getItem("byhana.theme"));
+      if (t === "dark" || t === "light") document.documentElement.dataset.theme = t;
+    } catch {}
+  </script>
 </head>
 <body>
+  <!-- Lucide icons (lucide.dev), inlined as a sprite -->
+  <svg class="sprite" aria-hidden="true">
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2m-7.07-17.07 1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+    <symbol id="i-languages" viewBox="0 0 24 24"><path d="m5 8 6 6M4 14l6-6 2-3M2 5h12M7 2h1m14 20-5-10-5 10m2-4h6"/></symbol>
+    <symbol id="i-scan-face" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2m10 0h2a2 2 0 0 1 2 2v2m0 10v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></symbol>
+    <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></symbol>
+    <symbol id="i-palette" viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.65-.75 1.65-1.69 0-.44-.18-.83-.44-1.12-.29-.29-.44-.65-.44-1.13a1.64 1.64 0 0 1 1.67-1.67h2c3.05 0 5.55-2.5 5.55-5.55C21.97 6.01 17.46 2 12 2Z"/></symbol>
+    <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2Z"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3Z"/><circle cx="12" cy="13" r="3"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-check-circle" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4m0 4h.01"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M19 12H5m7 7-7-7 7-7"/></symbol>
+    <symbol id="i-rotate" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol>
+    <symbol id="i-bag" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18m-5 4a4 4 0 0 1-8 0"/></symbol>
+    <symbol id="i-thermo" viewBox="0 0 24 24"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M10 6h11M10 12h11M10 18h11M4 6h1v4M4 10h2M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></symbol>
+  </svg>
+
   <header class="topbar">
     <a class="logo" href="#top" aria-label="by HANA"><span>by</span> HANA</a>
-    <span class="powered">شغّالة بـ Llama من Meta</span>
+    <div class="top-actions">
+      <button class="icon-btn lang-btn" id="lang-toggle" type="button" aria-label="English">
+        <svg class="icon"><use href="#i-languages"/></svg><span id="lang-label">EN</span>
+      </button>
+      <button class="icon-btn" id="theme-toggle" type="button" aria-label="الوضع الداكن" data-i18n-aria="theme.toggle">
+        <svg class="icon theme-moon"><use href="#i-moon"/></svg>
+        <svg class="icon theme-sun"><use href="#i-sun"/></svg>
+      </button>
+    </div>
   </header>
 
   <main id="top">
     <section class="hero">
-      <p class="eyebrow">هنو، خبيرة مكياجك الذكية</p>
-      <h1>لوك يناسبك، على بشرتك<br>وجو مدينتك ومن مكياجك</h1>
-      <p class="lead">قولي لهنو عن نفسك ووش عندك من مكياج، وتزبّط لك لوك كامل: الألوان، وكيف تحطينه، وتشيّك إن منتجاتك تركب على بعض (مائي ولا سيليكون).</p>
+      <p class="eyebrow" data-i18n="hero.eyebrow">هنو، خبيرة مكياجك الذكية</p>
+      <h1 data-i18n-html="hero.title">لوك يناسبك، على بشرتك<br>وجو مدينتك ومن مكياجك</h1>
+      <p class="lead" data-i18n="hero.lead">قولي لهنو عن نفسك ووش عندك من مكياج، وتزبّط لك لوك كامل: الألوان، وكيف تحطينه، وتشيّك إن منتجاتك تركب على بعض (مائي ولا سيليكون).</p>
     </section>
 
     <section class="studio">
       <!-- Mirror: the illustrated face, painted live from the form and from the chosen look -->
-      <aside class="mirror-card" aria-label="معاينة اللوك">
+      <aside class="mirror-card" aria-label="المراية">
         <div class="mirror">
           <svg id="face" viewBox="0 0 400 480" role="img" aria-label="وجه توضيحي يعرض اللوك" data-coverage="none" data-lashes="natural">
             <defs>
@@ -50,17 +93,14 @@
               <clipPath id="eye-clip"><path data-part="eye"/></clipPath>
             </defs>
 
-            <!-- Hair (back) and hijab -->
             <path class="hair" d="M200,46 C306,44 356,128 350,232 C346,304 372,366 360,424 C354,452 372,470 384,480 L16,480 C28,470 46,452 40,424 C28,366 54,304 50,232 C44,128 94,48 200,46 Z"/>
             <path class="hair-shine" d="M200,46 C306,44 356,128 350,232 C346,304 372,366 360,424 C354,452 372,470 384,480 L16,480 C28,470 46,452 40,424 C28,366 54,304 50,232 C44,128 94,48 200,46 Z" fill="url(#g-hair-shine)"/>
             <path class="hijab" d="M200,44 C310,44 352,136 346,238 C341,332 308,394 344,480 L56,480 C92,394 59,332 54,238 C48,136 90,44 200,44 Z"/>
 
-            <!-- Neck and face -->
             <path class="skin neck" d="M172,360 L172,410 C126,420 78,440 58,480 L342,480 C322,440 274,420 228,410 L228,360 Z"/>
             <path class="neck" d="M172,360 L228,360 L228,398 C210,406 190,406 172,398 Z" fill="url(#g-shade)"/>
             <path class="skin" data-part="face"/>
 
-            <!-- Cheeks: blush and highlighter (positions follow the face shape) -->
             <ellipse class="blush" data-part="blush" cx="134" cy="282" rx="36" ry="22" fill="url(#g-blush)"/>
             <ellipse class="blush" data-part="blush" cx="266" cy="282" rx="36" ry="22" fill="url(#g-blush)"/>
             <ellipse class="hl" data-part="hl-cheek" cx="144" cy="254" rx="24" ry="7" fill="url(#g-hl)"/>
@@ -104,14 +144,12 @@
               <path class="brow" data-part="brow"/>
             </g>
 
-            <!-- Nose and lips -->
             <path class="nose" data-part="nose"/>
             <path class="lips" data-part="lipU"/>
             <path class="lips" data-part="lipL"/>
             <path class="lip-line" data-part="lipLine"/>
             <ellipse data-part="gloss" cx="200" cy="332" rx="13" ry="3.5" fill="#fff" opacity=".2"/>
 
-            <!-- Hair (front, middle part) and hijab front / niqab -->
             <path class="hair fringe" d="M200,84 C156,84 108,110 98,176 C92,214 96,252 88,292 C108,236 112,172 140,132 C160,104 182,94 200,90 Z"/>
             <path class="hair fringe" transform="translate(400,0) scale(-1,1)" d="M200,84 C156,84 108,110 98,176 C92,214 96,252 88,292 C108,236 112,172 140,132 C160,104 182,94 200,90 Z"/>
             <path class="hijab" d="M96,214 C94,120 146,76 200,76 C254,76 306,120 304,214 C292,144 252,102 200,100 C148,102 108,144 96,214 Z"/>
@@ -122,444 +160,473 @@
         </div>
 
         <div class="palette" id="palette" hidden>
-          <p class="palette-title" id="palette-title">ألوان اللوك</p>
+          <p class="palette-title" id="palette-title"></p>
           <ul id="palette-list"></ul>
-          <button class="btn ghost small" type="button" id="mirror-save">احفظي اللوك</button>
+          <button class="btn soft small full" type="button" id="mirror-save">
+            <svg class="icon"><use href="#i-bookmark"/></svg><span data-i18n="look.save">احفظي اللوك</span>
+          </button>
         </div>
-        <p class="mirror-hint" id="mirror-hint">المراية تتغير على حسب اختياراتك</p>
+        <p class="mirror-hint" id="mirror-hint" data-i18n="mirror.hint">المراية تتغير على حسب اختياراتك</p>
       </aside>
 
       <div class="panel">
-        <nav class="tabs" role="tablist" aria-label="أقسام التطبيق">
-          <button class="tab" role="tab" data-tab="face" aria-selected="false">وجهي</button>
-          <button class="tab active" role="tab" data-tab="design" aria-selected="true">هنو تصمم</button>
-          <button class="tab" role="tab" data-tab="manual" aria-selected="false">جربي بنفسك</button>
-          <button class="tab" role="tab" data-tab="ask" aria-selected="false">اسألي هنو</button>
-          <button class="tab" role="tab" data-tab="saved" aria-selected="false">لوكاتي <span class="count" id="saved-count">0</span></button>
+        <!-- Navigation: two clear steps, plus side sections -->
+        <nav class="flow" aria-label="أقسام التطبيق">
+          <ol class="steps" role="tablist">
+            <li>
+              <button class="step" role="tab" data-tab="face" aria-selected="false">
+                <span class="step-num"><b>1</b><svg class="icon"><use href="#i-check"/></svg></span>
+                <span class="step-text"><strong data-i18n="step1.label">وجهي</strong><small data-i18n="step1.sub">ملامحك ولون بشرتك</small></span>
+              </button>
+            </li>
+            <li class="step-line" aria-hidden="true"></li>
+            <li>
+              <button class="step" role="tab" data-tab="design" aria-selected="true">
+                <span class="step-num"><b>2</b><svg class="icon"><use href="#i-check"/></svg></span>
+                <span class="step-text"><strong data-i18n="step2.label">هنو تصمم</strong><small data-i18n="step2.sub">اللوك والمنتجات</small></span>
+              </button>
+            </li>
+          </ol>
+          <div class="side-links">
+            <button class="side-link" role="tab" data-tab="manual" aria-selected="false">
+              <svg class="icon"><use href="#i-palette"/></svg><span data-i18n="side.manual">جربي بنفسك</span>
+            </button>
+            <button class="side-link" role="tab" data-tab="saved" aria-selected="false">
+              <svg class="icon"><use href="#i-bookmark"/></svg><span data-i18n="side.saved">لوكاتي</span>
+              <span class="count" id="saved-count">0</span>
+            </button>
+          </div>
         </nav>
 
-        <!-- ============ 0) My face (its inputs belong to the look form via form="look-form") ============ -->
+        <!-- ============ Step 1: my face (inputs belong to the look form via form="look-form") ============ -->
         <div class="tab-panel" data-panel="face" hidden>
-          <section class="card" id="face-card">
-            <h2>ارسمي وجهك</h2>
-            <p class="hint">خلّي المراية تشبهك، وهنو بتظبط المكياج على ملامحك. مثلًا العين المبطّنة لها طريقة آيلاينر غير اللوزية.</p>
+          <section class="card">
+            <div class="card-head">
+              <span class="card-icon"><svg class="icon"><use href="#i-scan-face"/></svg></span>
+              <div>
+                <h2 data-i18n="face.h">ارسمي وجهك</h2>
+                <p class="hint" data-i18n="face.hint">خلّي المراية تشبهك، وهنو بتظبط المكياج على ملامحك. مثلًا العين المبطّنة لها طريقة آيلاينر غير اللوزية.</p>
+              </div>
+            </div>
 
             <fieldset class="field" data-field="skin_tone">
-              <legend>لون البشرة <span class="req">*</span></legend>
-              <div class="chips tones">
-                <label><input form="look-form" type="radio" name="skin_tone" value="fair"><span><i style="--c:#F3D9C6"></i>فاتحة جدًا</span></label>
-                <label><input form="look-form" type="radio" name="skin_tone" value="light"><span><i style="--c:#E9C3A3"></i>فاتحة</span></label>
-                <label><input form="look-form" type="radio" name="skin_tone" value="medium"><span><i style="--c:#D1A07A"></i>حنطية</span></label>
-                <label><input form="look-form" type="radio" name="skin_tone" value="tan"><span><i style="--c:#AF7C55"></i>سمراء</span></label>
-                <label><input form="look-form" type="radio" name="skin_tone" value="deep"><span><i style="--c:#7A4E33"></i>داكنة</span></label>
+              <legend><span data-i18n="f.tone">لون البشرة</span> <span class="req">*</span></legend>
+              <div class="chips">
+                <label><input form="look-form" type="radio" name="skin_tone" value="fair"><span><i style="--c:#F3D9C6"></i><em data-i18n="tone.fair">فاتحة جدًا</em></span></label>
+                <label><input form="look-form" type="radio" name="skin_tone" value="light"><span><i style="--c:#E9C3A3"></i><em data-i18n="tone.light">فاتحة</em></span></label>
+                <label><input form="look-form" type="radio" name="skin_tone" value="medium"><span><i style="--c:#D1A07A"></i><em data-i18n="tone.medium">حنطية</em></span></label>
+                <label><input form="look-form" type="radio" name="skin_tone" value="tan"><span><i style="--c:#AF7C55"></i><em data-i18n="tone.tan">سمراء</em></span></label>
+                <label><input form="look-form" type="radio" name="skin_tone" value="deep"><span><i style="--c:#7A4E33"></i><em data-i18n="tone.deep">داكنة</em></span></label>
               </div>
             </fieldset>
 
             <fieldset class="field" data-field="undertone">
-              <legend>درجة بشرتك التحتية <small>(لو عروقك خضرا = دافئة، زرقا = باردة)</small></legend>
+              <legend><span data-i18n="f.under">درجة بشرتك التحتية</span> <small data-i18n="f.under.hint">(لو عروقك خضرا = دافئة، زرقا = باردة)</small></legend>
               <div class="chips">
-                <label><input form="look-form" type="radio" name="undertone" value="warm"><span>دافئة</span></label>
-                <label><input form="look-form" type="radio" name="undertone" value="cool"><span>باردة</span></label>
-                <label><input form="look-form" type="radio" name="undertone" value="neutral"><span>محايدة</span></label>
-                <label><input form="look-form" type="radio" name="undertone" value="unknown" checked><span>ما أدري</span></label>
+                <label><input form="look-form" type="radio" name="undertone" value="warm"><span data-i18n="under.warm">دافئة</span></label>
+                <label><input form="look-form" type="radio" name="undertone" value="cool"><span data-i18n="under.cool">باردة</span></label>
+                <label><input form="look-form" type="radio" name="undertone" value="neutral"><span data-i18n="under.neutral">محايدة</span></label>
+                <label><input form="look-form" type="radio" name="undertone" value="unknown" checked><span data-i18n="under.unknown">ما أدري</span></label>
               </div>
             </fieldset>
 
-            <fieldset class="field" data-field="face_shape">
-              <legend>شكل الوجه</legend>
-              <div class="chips">
-                <label><input form="look-form" type="radio" name="face_shape" value="oval" checked><span>بيضاوي</span></label>
-                <label><input form="look-form" type="radio" name="face_shape" value="round"><span>دائري</span></label>
-                <label><input form="look-form" type="radio" name="face_shape" value="square"><span>مربع</span></label>
-                <label><input form="look-form" type="radio" name="face_shape" value="heart"><span>قلب</span></label>
-                <label><input form="look-form" type="radio" name="face_shape" value="long"><span>طويل</span></label>
-              </div>
-            </fieldset>
-
-            <fieldset class="field" data-field="jaw">
-              <legend>الفك</legend>
-              <div class="chips">
-                <label><input form="look-form" type="radio" name="jaw" value="soft"><span>ناعم</span></label>
-                <label><input form="look-form" type="radio" name="jaw" value="defined" checked><span>واضح</span></label>
-                <label><input form="look-form" type="radio" name="jaw" value="sharp"><span>حاد</span></label>
-              </div>
-            </fieldset>
+            <div class="row">
+              <fieldset class="field" data-field="face_shape">
+                <legend data-i18n="f.shape">شكل الوجه</legend>
+                <div class="chips">
+                  <label><input form="look-form" type="radio" name="face_shape" value="oval" checked><span data-i18n="shape.oval">بيضاوي</span></label>
+                  <label><input form="look-form" type="radio" name="face_shape" value="round"><span data-i18n="shape.round">دائري</span></label>
+                  <label><input form="look-form" type="radio" name="face_shape" value="square"><span data-i18n="shape.square">مربع</span></label>
+                  <label><input form="look-form" type="radio" name="face_shape" value="heart"><span data-i18n="shape.heart">قلب</span></label>
+                  <label><input form="look-form" type="radio" name="face_shape" value="long"><span data-i18n="shape.long">طويل</span></label>
+                </div>
+              </fieldset>
+              <fieldset class="field" data-field="jaw">
+                <legend data-i18n="f.jaw">الفك</legend>
+                <div class="chips">
+                  <label><input form="look-form" type="radio" name="jaw" value="soft"><span data-i18n="jaw.soft">ناعم</span></label>
+                  <label><input form="look-form" type="radio" name="jaw" value="defined" checked><span data-i18n="jaw.defined">واضح</span></label>
+                  <label><input form="look-form" type="radio" name="jaw" value="sharp"><span data-i18n="jaw.sharp">حاد</span></label>
+                </div>
+              </fieldset>
+            </div>
 
             <fieldset class="field" data-field="eye_shape">
-              <legend>شكل العيون</legend>
+              <legend data-i18n="f.eyes">شكل العيون</legend>
               <div class="chips">
-                <label><input form="look-form" type="radio" name="eye_shape" value="almond" checked><span>لوزية</span></label>
-                <label><input form="look-form" type="radio" name="eye_shape" value="round"><span>واسعة</span></label>
-                <label><input form="look-form" type="radio" name="eye_shape" value="narrow"><span>ضيقة</span></label>
-                <label><input form="look-form" type="radio" name="eye_shape" value="upturned"><span>مسحوبة لفوق</span></label>
-                <label><input form="look-form" type="radio" name="eye_shape" value="downturned"><span>مائلة لتحت</span></label>
-                <label><input form="look-form" type="radio" name="eye_shape" value="hooded"><span>جفن مبطّن</span></label>
+                <label><input form="look-form" type="radio" name="eye_shape" value="almond" checked><span data-i18n="eye.almond">لوزية</span></label>
+                <label><input form="look-form" type="radio" name="eye_shape" value="round"><span data-i18n="eye.round">واسعة</span></label>
+                <label><input form="look-form" type="radio" name="eye_shape" value="narrow"><span data-i18n="eye.narrow">ضيقة</span></label>
+                <label><input form="look-form" type="radio" name="eye_shape" value="upturned"><span data-i18n="eye.upturned">مسحوبة لفوق</span></label>
+                <label><input form="look-form" type="radio" name="eye_shape" value="downturned"><span data-i18n="eye.downturned">مائلة لتحت</span></label>
+                <label><input form="look-form" type="radio" name="eye_shape" value="hooded"><span data-i18n="eye.hooded">جفن مبطّن</span></label>
               </div>
             </fieldset>
 
             <fieldset class="field" data-field="eye_color">
-              <legend>لون العيون</legend>
-              <div class="chips tones">
-                <label><input form="look-form" type="radio" name="eye_color" value="dark_brown" checked><span><i style="--c:#2A170F"></i>بني غامق</span></label>
-                <label><input form="look-form" type="radio" name="eye_color" value="brown"><span><i style="--c:#4A2B1A"></i>بني</span></label>
-                <label><input form="look-form" type="radio" name="eye_color" value="honey"><span><i style="--c:#8A5A2B"></i>عسلي</span></label>
-                <label><input form="look-form" type="radio" name="eye_color" value="hazel"><span><i style="--c:#6B5A2E"></i>بندقي</span></label>
-                <label><input form="look-form" type="radio" name="eye_color" value="green"><span><i style="--c:#4F6B4A"></i>أخضر</span></label>
-                <label><input form="look-form" type="radio" name="eye_color" value="grey"><span><i style="--c:#6C7A80"></i>رمادي</span></label>
-                <label><input form="look-form" type="radio" name="eye_color" value="blue"><span><i style="--c:#4A6E8C"></i>أزرق</span></label>
+              <legend data-i18n="f.eyecolor">لون العيون</legend>
+              <div class="chips">
+                <label><input form="look-form" type="radio" name="eye_color" value="dark_brown" checked><span><i style="--c:#2A170F"></i><em data-i18n="c.dark_brown">بني غامق</em></span></label>
+                <label><input form="look-form" type="radio" name="eye_color" value="brown"><span><i style="--c:#4A2B1A"></i><em data-i18n="c.brown">بني</em></span></label>
+                <label><input form="look-form" type="radio" name="eye_color" value="honey"><span><i style="--c:#8A5A2B"></i><em data-i18n="c.honey">عسلي</em></span></label>
+                <label><input form="look-form" type="radio" name="eye_color" value="hazel"><span><i style="--c:#6B5A2E"></i><em data-i18n="c.hazel">بندقي</em></span></label>
+                <label><input form="look-form" type="radio" name="eye_color" value="green"><span><i style="--c:#4F6B4A"></i><em data-i18n="c.green">أخضر</em></span></label>
+                <label><input form="look-form" type="radio" name="eye_color" value="grey"><span><i style="--c:#6C7A80"></i><em data-i18n="c.grey">رمادي</em></span></label>
+                <label><input form="look-form" type="radio" name="eye_color" value="blue"><span><i style="--c:#4A6E8C"></i><em data-i18n="c.blue">أزرق</em></span></label>
               </div>
             </fieldset>
 
             <fieldset class="field" data-field="lens">
-              <legend>عدسات ملونة <small>(لو بتلبسين عدسة، هنو تختار الظلال على لونها)</small></legend>
-              <div class="chips tones">
-                <label><input form="look-form" type="radio" name="lens" value="none" checked><span>بدون عدسة</span></label>
-                <label><input form="look-form" type="radio" name="lens" value="honey"><span><i style="--c:#A87A3E"></i>عسلي</span></label>
-                <label><input form="look-form" type="radio" name="lens" value="hazel"><span><i style="--c:#7E6E3A"></i>بندقي</span></label>
-                <label><input form="look-form" type="radio" name="lens" value="grey"><span><i style="--c:#8A969C"></i>رمادي</span></label>
-                <label><input form="look-form" type="radio" name="lens" value="green"><span><i style="--c:#5E8A5A"></i>أخضر</span></label>
-                <label><input form="look-form" type="radio" name="lens" value="blue"><span><i style="--c:#5A86AE"></i>أزرق</span></label>
+              <legend><span data-i18n="f.lens">عدسات ملونة</span> <small data-i18n="f.lens.hint">(لو بتلبسين عدسة، هنو تختار الظلال على لونها)</small></legend>
+              <div class="chips">
+                <label><input form="look-form" type="radio" name="lens" value="none" checked><span data-i18n="lens.none">بدون عدسة</span></label>
+                <label><input form="look-form" type="radio" name="lens" value="honey"><span><i style="--c:#A87A3E"></i><em data-i18n="c.honey">عسلي</em></span></label>
+                <label><input form="look-form" type="radio" name="lens" value="hazel"><span><i style="--c:#7E6E3A"></i><em data-i18n="c.hazel">بندقي</em></span></label>
+                <label><input form="look-form" type="radio" name="lens" value="grey"><span><i style="--c:#8A969C"></i><em data-i18n="c.grey">رمادي</em></span></label>
+                <label><input form="look-form" type="radio" name="lens" value="green"><span><i style="--c:#5E8A5A"></i><em data-i18n="c.green">أخضر</em></span></label>
+                <label><input form="look-form" type="radio" name="lens" value="blue"><span><i style="--c:#5A86AE"></i><em data-i18n="c.blue">أزرق</em></span></label>
               </div>
             </fieldset>
 
             <div class="row">
               <fieldset class="field" data-field="brow_shape">
-                <legend>شكل الحواجب</legend>
+                <legend data-i18n="f.browshape">شكل الحواجب</legend>
                 <div class="chips">
-                  <label><input form="look-form" type="radio" name="brow_shape" value="arched" checked><span>مقوّسة</span></label>
-                  <label><input form="look-form" type="radio" name="brow_shape" value="soft"><span>ناعمة</span></label>
-                  <label><input form="look-form" type="radio" name="brow_shape" value="straight"><span>مستقيمة</span></label>
+                  <label><input form="look-form" type="radio" name="brow_shape" value="arched" checked><span data-i18n="brow.arched">مقوّسة</span></label>
+                  <label><input form="look-form" type="radio" name="brow_shape" value="soft"><span data-i18n="brow.soft">ناعمة</span></label>
+                  <label><input form="look-form" type="radio" name="brow_shape" value="straight"><span data-i18n="brow.straight">مستقيمة</span></label>
                 </div>
               </fieldset>
               <fieldset class="field" data-field="brow_thickness">
-                <legend>كثافة الحواجب</legend>
+                <legend data-i18n="f.browthick">كثافة الحواجب</legend>
                 <div class="chips">
-                  <label><input form="look-form" type="radio" name="brow_thickness" value="thin"><span>رفيعة</span></label>
-                  <label><input form="look-form" type="radio" name="brow_thickness" value="natural"><span>متوسطة</span></label>
-                  <label><input form="look-form" type="radio" name="brow_thickness" value="thick" checked><span>كثيفة</span></label>
+                  <label><input form="look-form" type="radio" name="brow_thickness" value="thin"><span data-i18n="thick.thin">رفيعة</span></label>
+                  <label><input form="look-form" type="radio" name="brow_thickness" value="natural"><span data-i18n="thick.natural">متوسطة</span></label>
+                  <label><input form="look-form" type="radio" name="brow_thickness" value="thick" checked><span data-i18n="thick.thick">كثيفة</span></label>
                 </div>
               </fieldset>
             </div>
 
             <div class="row">
               <fieldset class="field" data-field="nose">
-                <legend>الأنف</legend>
+                <legend data-i18n="f.nose">الأنف</legend>
                 <div class="chips">
-                  <label><input form="look-form" type="radio" name="nose" value="slim"><span>نحيف</span></label>
-                  <label><input form="look-form" type="radio" name="nose" value="medium" checked><span>متوسط</span></label>
-                  <label><input form="look-form" type="radio" name="nose" value="wide"><span>عريض</span></label>
+                  <label><input form="look-form" type="radio" name="nose" value="slim"><span data-i18n="nose.slim">نحيف</span></label>
+                  <label><input form="look-form" type="radio" name="nose" value="medium" checked><span data-i18n="nose.medium">متوسط</span></label>
+                  <label><input form="look-form" type="radio" name="nose" value="wide"><span data-i18n="nose.wide">عريض</span></label>
                 </div>
               </fieldset>
               <fieldset class="field" data-field="lips_shape">
-                <legend>الشفايف</legend>
+                <legend data-i18n="f.lips">الشفايف</legend>
                 <div class="chips">
-                  <label><input form="look-form" type="radio" name="lips_shape" value="thin"><span>رفيعة</span></label>
-                  <label><input form="look-form" type="radio" name="lips_shape" value="medium"><span>متوسطة</span></label>
-                  <label><input form="look-form" type="radio" name="lips_shape" value="full" checked><span>ممتلئة</span></label>
+                  <label><input form="look-form" type="radio" name="lips_shape" value="thin"><span data-i18n="lips.thin">رفيعة</span></label>
+                  <label><input form="look-form" type="radio" name="lips_shape" value="medium"><span data-i18n="lips.medium">متوسطة</span></label>
+                  <label><input form="look-form" type="radio" name="lips_shape" value="full" checked><span data-i18n="lips.full">ممتلئة</span></label>
                 </div>
               </fieldset>
             </div>
 
             <fieldset class="field" data-field="hair_color">
-              <legend>لون الشعر <small>(نختار لون الحواجب على حسبه)</small></legend>
-              <div class="chips tones">
-                <label><input form="look-form" type="radio" name="hair_color" value="black" checked><span><i style="--c:#1B1412"></i>أسود</span></label>
-                <label><input form="look-form" type="radio" name="hair_color" value="dark_brown"><span><i style="--c:#3A2419"></i>بني غامق</span></label>
-                <label><input form="look-form" type="radio" name="hair_color" value="brown"><span><i style="--c:#5A3825"></i>بني</span></label>
-                <label><input form="look-form" type="radio" name="hair_color" value="caramel"><span><i style="--c:#8A5A34"></i>كراميل</span></label>
-                <label><input form="look-form" type="radio" name="hair_color" value="honey"><span><i style="--c:#A57A45"></i>عسلي</span></label>
-                <label><input form="look-form" type="radio" name="hair_color" value="burgundy"><span><i style="--c:#5A1E26"></i>عنابي</span></label>
+              <legend><span data-i18n="f.hair">لون الشعر</span> <small data-i18n="f.hair.hint">(نختار لون الحواجب على حسبه)</small></legend>
+              <div class="chips">
+                <label><input form="look-form" type="radio" name="hair_color" value="black" checked><span><i style="--c:#1B1412"></i><em data-i18n="hair.black">أسود</em></span></label>
+                <label><input form="look-form" type="radio" name="hair_color" value="dark_brown"><span><i style="--c:#3A2419"></i><em data-i18n="c.dark_brown">بني غامق</em></span></label>
+                <label><input form="look-form" type="radio" name="hair_color" value="brown"><span><i style="--c:#5A3825"></i><em data-i18n="c.brown">بني</em></span></label>
+                <label><input form="look-form" type="radio" name="hair_color" value="caramel"><span><i style="--c:#8A5A34"></i><em data-i18n="hair.caramel">كراميل</em></span></label>
+                <label><input form="look-form" type="radio" name="hair_color" value="honey"><span><i style="--c:#A57A45"></i><em data-i18n="c.honey">عسلي</em></span></label>
+                <label><input form="look-form" type="radio" name="hair_color" value="burgundy"><span><i style="--c:#5A1E26"></i><em data-i18n="hair.burgundy">عنابي</em></span></label>
               </div>
             </fieldset>
 
             <p class="form-error" id="face-error" role="alert" hidden></p>
-            <div class="face-actions">
-              <button class="btn primary inline" type="button" id="save-face">احفظي وجهي</button>
-              <button class="btn ghost" type="button" data-goto="design">كمّلي على اللوك</button>
+            <div class="actions">
+              <button class="btn primary" type="button" id="save-face">
+                <svg class="icon"><use href="#i-bookmark"/></svg><span data-i18n="face.save">احفظي وجهي وكمّلي</span>
+              </button>
+              <button class="btn ghost" type="button" data-goto="design">
+                <span data-i18n="face.skip">كمّلي بدون حفظ</span><svg class="icon flip-ltr"><use href="#i-arrow"/></svg>
+              </button>
             </div>
-            <p class="saved-note" id="face-saved-note" hidden>وجهك محفوظ، وبيطلع لك كل ما فتحتي الموقع.</p>
+            <p class="saved-note" id="face-saved-note" hidden>
+              <svg class="icon"><use href="#i-check-circle"/></svg><span data-i18n="face.saved">وجهك محفوظ، وبيطلع لك كل ما فتحتي الموقع.</span>
+            </p>
           </section>
         </div>
 
-        <!-- ============ 1) Hanu designs a look ============ -->
+        <!-- ============ Step 2: Hanu designs a look ============ -->
         <div class="tab-panel" data-panel="design">
           <form id="look-form" class="card" novalidate>
-            <h2>عرّفينا عليك</h2>
+            <div class="card-head">
+              <span class="card-icon"><svg class="icon"><use href="#i-sparkles"/></svg></span>
+              <div><h2 data-i18n="design.h">عرّفينا عليك</h2></div>
+            </div>
+
+            <p class="face-summary" id="face-summary">
+              <svg class="icon"><use href="#i-scan-face"/></svg>
+              <span id="face-summary-text"></span>
+              <button type="button" class="link-btn" data-goto="face" data-i18n="design.editface">عدّلي وجهك</button>
+            </p>
 
             <fieldset class="field" data-field="skin_type">
-              <legend>نوع البشرة <span class="req">*</span></legend>
+              <legend><span data-i18n="f.skintype">نوع البشرة</span> <span class="req">*</span></legend>
               <div class="chips">
-                <label><input type="radio" name="skin_type" value="dry"><span>جافة</span></label>
-                <label><input type="radio" name="skin_type" value="oily"><span>دهنية</span></label>
-                <label><input type="radio" name="skin_type" value="combination"><span>مختلطة</span></label>
-                <label><input type="radio" name="skin_type" value="normal"><span>عادية</span></label>
-                <label><input type="radio" name="skin_type" value="sensitive"><span>حساسة</span></label>
+                <label><input type="radio" name="skin_type" value="dry"><span data-i18n="skin.dry">جافة</span></label>
+                <label><input type="radio" name="skin_type" value="oily"><span data-i18n="skin.oily">دهنية</span></label>
+                <label><input type="radio" name="skin_type" value="combination"><span data-i18n="skin.combination">مختلطة</span></label>
+                <label><input type="radio" name="skin_type" value="normal"><span data-i18n="skin.normal">عادية</span></label>
+                <label><input type="radio" name="skin_type" value="sensitive"><span data-i18n="skin.sensitive">حساسة</span></label>
               </div>
             </fieldset>
 
-            <p class="face-summary" id="face-summary">
-              <span id="face-summary-text">لون بشرتك وملامحك تحددينها من "وجهي".</span>
-              <button type="button" class="link-btn" data-goto="face">عدّلي وجهك</button>
-            </p>
-
             <div class="row">
               <label class="field select" data-field="city">
-                <span class="legend">المدينة <span class="req">*</span></span>
-                <select name="city">
-                  <option value="" selected disabled>اختاري مدينتك</option>
-                  <option value="riyadh">الرياض</option>
-                  <option value="jeddah">جدة</option>
-                  <option value="dammam">الدمام / الشرقية</option>
-                  <option value="makkah">مكة</option>
-                  <option value="madinah">المدينة</option>
-                  <option value="abha">أبها</option>
-                  <option value="other">مدينة ثانية</option>
-                </select>
+                <span class="legend"><span data-i18n="f.city">المدينة</span> <span class="req">*</span></span>
+                <span class="select-wrap">
+                  <select name="city">
+                    <option value="" selected disabled data-i18n="city.pick">اختاري مدينتك</option>
+                    <option value="riyadh" data-i18n="city.riyadh">الرياض</option>
+                    <option value="jeddah" data-i18n="city.jeddah">جدة</option>
+                    <option value="dammam" data-i18n="city.dammam">الدمام / الشرقية</option>
+                    <option value="makkah" data-i18n="city.makkah">مكة</option>
+                    <option value="madinah" data-i18n="city.madinah">المدينة</option>
+                    <option value="abha" data-i18n="city.abha">أبها</option>
+                    <option value="other" data-i18n="city.other">مدينة ثانية</option>
+                  </select>
+                  <svg class="icon"><use href="#i-chevron"/></svg>
+                </span>
               </label>
               <label class="field select" data-field="occasion">
-                <span class="legend">المناسبة <span class="req">*</span></span>
-                <select name="occasion">
-                  <option value="" selected disabled>اختاري المناسبة</option>
-                  <option value="wedding">زواج</option>
-                  <option value="milka">ملكة</option>
-                  <option value="eid">عيد</option>
-                  <option value="graduation">تخرج</option>
-                  <option value="work">دوام</option>
-                  <option value="daily">يومي</option>
-                  <option value="evening">طلعة بالليل</option>
-                </select>
+                <span class="legend"><span data-i18n="f.occasion">المناسبة</span> <span class="req">*</span></span>
+                <span class="select-wrap">
+                  <select name="occasion">
+                    <option value="" selected disabled data-i18n="occ.pick">اختاري المناسبة</option>
+                    <option value="wedding" data-i18n="occ.wedding">زواج</option>
+                    <option value="milka" data-i18n="occ.milka">ملكة</option>
+                    <option value="eid" data-i18n="occ.eid">عيد</option>
+                    <option value="graduation" data-i18n="occ.graduation">تخرج</option>
+                    <option value="work" data-i18n="occ.work">دوام</option>
+                    <option value="daily" data-i18n="occ.daily">يومي</option>
+                    <option value="evening" data-i18n="occ.evening">طلعة بالليل</option>
+                  </select>
+                  <svg class="icon"><use href="#i-chevron"/></svg>
+                </span>
               </label>
             </div>
 
             <fieldset class="field" data-field="budget">
-              <legend>الميزانية <span class="req">*</span></legend>
+              <legend><span data-i18n="f.budget">الميزانية</span> <span class="req">*</span></legend>
               <div class="chips">
-                <label><input type="radio" name="budget" value="low"><span>اقتصادية</span></label>
-                <label><input type="radio" name="budget" value="medium"><span>متوسطة</span></label>
-                <label><input type="radio" name="budget" value="high"><span>فخمة</span></label>
+                <label><input type="radio" name="budget" value="low"><span data-i18n="budget.low">اقتصادية</span></label>
+                <label><input type="radio" name="budget" value="medium"><span data-i18n="budget.medium">متوسطة</span></label>
+                <label><input type="radio" name="budget" value="high"><span data-i18n="budget.high">فخمة</span></label>
               </div>
             </fieldset>
 
             <fieldset class="field" data-field="coverage">
-              <legend>الحجاب</legend>
+              <legend data-i18n="f.coverage">الحجاب</legend>
               <div class="chips">
-                <label><input type="radio" name="coverage" value="none" checked><span>بدون</span></label>
-                <label><input type="radio" name="coverage" value="hijab"><span>حجاب</span></label>
-                <label><input type="radio" name="coverage" value="niqab"><span>نقاب</span></label>
+                <label><input type="radio" name="coverage" value="none" checked><span data-i18n="cov.none">بدون</span></label>
+                <label><input type="radio" name="coverage" value="hijab"><span data-i18n="cov.hijab">حجاب</span></label>
+                <label><input type="radio" name="coverage" value="niqab"><span data-i18n="cov.niqab">نقاب</span></label>
               </div>
             </fieldset>
 
-            <!-- Extras -->
             <details class="extras" open>
-              <summary>إضافات تكمّل لوكك</summary>
-
+              <summary><svg class="icon"><use href="#i-sparkles"/></svg><span data-i18n="extras.h">إضافات تكمّل لوكك</span><svg class="icon chev"><use href="#i-chevron"/></svg></summary>
               <fieldset class="field" data-field="lashes">
-                <legend>الرموش</legend>
+                <legend data-i18n="f.lashes">الرموش</legend>
                 <div class="chips">
-                  <label><input type="radio" name="lashes" value="none"><span>رموشي الطبيعية</span></label>
-                  <label><input type="radio" name="lashes" value="natural" checked><span>تركيب ناعم</span></label>
-                  <label><input type="radio" name="lashes" value="dramatic"><span>تركيب كثيف</span></label>
+                  <label><input type="radio" name="lashes" value="none"><span data-i18n="lash.none">رموشي الطبيعية</span></label>
+                  <label><input type="radio" name="lashes" value="natural" checked><span data-i18n="lash.natural">تركيب ناعم</span></label>
+                  <label><input type="radio" name="lashes" value="dramatic"><span data-i18n="lash.dramatic">تركيب كثيف</span></label>
                 </div>
               </fieldset>
-
               <fieldset class="field" data-field="finish">
-                <legend>الفنش (ملمس البشرة)</legend>
+                <legend data-i18n="f.finish">الفنش (ملمس البشرة)</legend>
                 <div class="chips">
-                  <label><input type="radio" name="finish" value="any" checked><span>هنو تختار</span></label>
-                  <label><input type="radio" name="finish" value="matte"><span>مطفي</span></label>
-                  <label><input type="radio" name="finish" value="satin"><span>ساتان</span></label>
-                  <label><input type="radio" name="finish" value="dewy"><span>ندي ولامع</span></label>
+                  <label><input type="radio" name="finish" value="any" checked><span data-i18n="finish.any">هنو تختار</span></label>
+                  <label><input type="radio" name="finish" value="matte"><span data-i18n="finish.matte">مطفي</span></label>
+                  <label><input type="radio" name="finish" value="satin"><span data-i18n="finish.satin">ساتان</span></label>
+                  <label><input type="radio" name="finish" value="dewy"><span data-i18n="finish.dewy">ندي ولامع</span></label>
                 </div>
               </fieldset>
             </details>
 
-            <!-- Makeup bag -->
-            <details class="extras bag" open>
-              <summary>شنطة مكياجي <small>(اختياري)</small></summary>
-              <p class="hint">ضيفي المنتجات اللي عندك، وهنو تبني اللوك عليها وما تقترح إلا الناقص.</p>
+            <details class="extras" open>
+              <summary><svg class="icon"><use href="#i-bag"/></svg><span data-i18n="bag.h">شنطة مكياجي</span> <small data-i18n="optional">(اختياري)</small><svg class="icon chev"><use href="#i-chevron"/></svg></summary>
+              <p class="hint" data-i18n="bag.hint">ضيفي المنتجات اللي عندك، وهنو تبني اللوك عليها وما تقترح إلا الناقص.</p>
               <div class="bag-add">
-                <input type="text" id="bag-input" maxlength="100" placeholder="اسم المنتج، مثلًا: Maybelline Fit Me">
-                <button class="btn ghost small" type="button" id="bag-add">ضيفي</button>
+                <input type="text" id="bag-input" maxlength="100" placeholder="اسم المنتج، مثلًا: Maybelline Fit Me" data-i18n-ph="bag.ph">
+                <button class="btn soft small" type="button" id="bag-add"><svg class="icon"><use href="#i-plus"/></svg><span data-i18n="bag.add">ضيفي</span></button>
               </div>
               <div class="photo-btns">
-                <label class="btn ghost small"><input type="file" accept="image/*" capture="environment" id="bag-camera" hidden>صوّري منتجاتك</label>
-                <label class="btn ghost small"><input type="file" accept="image/*" id="bag-album" hidden>من الألبوم</label>
+                <label class="btn ghost small"><input type="file" accept="image/*" capture="environment" id="bag-camera" hidden><svg class="icon"><use href="#i-camera"/></svg><span data-i18n="bag.camera">صوّري منتجاتك</span></label>
+                <label class="btn ghost small"><input type="file" accept="image/*" id="bag-album" hidden><svg class="icon"><use href="#i-image"/></svg><span data-i18n="bag.album">من الألبوم</span></label>
               </div>
               <p class="inline-status" id="bag-status" hidden></p>
               <ul class="bag-list" id="bag-list"></ul>
             </details>
 
             <label class="field" data-field="notes">
-              <span class="legend">ملاحظات <small>(اختياري)</small></span>
-              <textarea name="notes" rows="2" maxlength="300" placeholder="مثلًا: أحب الروج النود، وعندي حساسية من العطور"></textarea>
+              <span class="legend"><span data-i18n="f.notes">ملاحظات</span> <small data-i18n="optional">(اختياري)</small></span>
+              <textarea name="notes" rows="2" maxlength="300" placeholder="مثلًا: أحب الروج النود، وعندي حساسية من العطور" data-i18n-ph="notes.ph"></textarea>
               <span class="counter"><span id="notes-count">0</span>/300</span>
             </label>
 
             <p class="form-error" id="form-error" role="alert" hidden></p>
 
-            <button class="btn primary" type="submit" id="submit">
-              <span class="btn-label">خلّي هنو تزبّط لوكك</span>
+            <button class="btn primary full big" type="submit" id="submit">
+              <svg class="icon"><use href="#i-sparkles"/></svg>
+              <span class="btn-label" data-i18n="design.submit">خلّي هنو تزبّط لوكك</span>
               <span class="spinner" aria-hidden="true"></span>
             </button>
           </form>
 
           <section class="card status" id="loading" hidden aria-live="polite">
             <div class="dots"><span></span><span></span><span></span></div>
-            <p class="status-title" id="loading-stage">هنو تشوف بشرتك...</p>
-            <p class="status-sub">اللوك ياخذ تقريبًا 30 ثانية، خليك معنا</p>
+            <p class="status-title" id="loading-stage"></p>
+            <p class="status-sub" data-i18n="loading.sub">اللوك ياخذ تقريبًا 30 ثانية، خليك معنا</p>
           </section>
 
           <section class="card status error" id="error" hidden role="alert">
-            <p class="status-title">ما قدرنا نزبّط اللوك</p>
+            <span class="status-icon"><svg class="icon"><use href="#i-alert"/></svg></span>
+            <p class="status-title" data-i18n="error.title">ما قدرنا نزبّط اللوك</p>
             <p class="status-sub" id="error-message"></p>
-            <button class="btn ghost" type="button" id="retry">جربي مرة ثانية</button>
+            <button class="btn ghost" type="button" id="retry"><svg class="icon"><use href="#i-rotate"/></svg><span data-i18n="error.retry">جربي مرة ثانية</span></button>
           </section>
 
           <section id="result" hidden>
             <article class="card result-head">
-              <p class="eyebrow">لوكك من هنو</p>
+              <p class="eyebrow" data-i18n="result.eyebrow">لوكك من هنو</p>
               <h2 id="look-name"></h2>
               <p id="look-desc"></p>
             </article>
 
             <article class="card compat" id="compat">
-              <h3 id="compat-title"></h3>
+              <h3><svg class="icon" id="compat-icon"><use href="#i-check-circle"/></svg><span id="compat-title"></span></h3>
               <p id="compat-note"></p>
               <ul id="compat-list"></ul>
             </article>
 
             <article class="card face-tips" id="face-tips-card" hidden>
-              <h3>نصايح على ملامحك</h3>
+              <h3><svg class="icon"><use href="#i-scan-face"/></svg><span data-i18n="result.facetips">نصايح على ملامحك</span></h3>
               <ul class="tips" id="face-tips"></ul>
             </article>
 
             <article class="card">
-              <h3>الخطوات والمنتجات</h3>
-              <ol class="steps" id="steps"></ol>
+              <h3><svg class="icon"><use href="#i-list"/></svg><span data-i18n="result.steps">الخطوات والمنتجات</span></h3>
+              <ol class="steps-list" id="steps"></ol>
             </article>
 
             <article class="card">
-              <h3>نصايح لجو مدينتك</h3>
+              <h3><svg class="icon"><use href="#i-thermo"/></svg><span data-i18n="result.climate">نصايح لجو مدينتك</span></h3>
               <ul class="tips" id="tips"></ul>
             </article>
 
             <div class="result-foot">
               <span class="model-tag" id="model-tag"></span>
-              <div class="foot-btns">
-                <button class="btn primary inline" type="button" id="save-look">احفظي اللوك</button>
-                <button class="btn ghost" type="button" id="again">لوك ثاني</button>
+              <div class="actions">
+                <button class="btn primary" type="button" id="save-look"><svg class="icon"><use href="#i-bookmark"/></svg><span data-i18n="look.save">احفظي اللوك</span></button>
+                <button class="btn ghost" type="button" id="again"><svg class="icon"><use href="#i-rotate"/></svg><span data-i18n="result.again">لوك ثاني</span></button>
               </div>
             </div>
           </section>
         </div>
 
-        <!-- ============ 2) Try it yourself ============ -->
+        <!-- ============ Side: try it yourself ============ -->
         <div class="tab-panel" data-panel="manual" hidden>
           <section class="card">
-            <h2>جربي بنفسك</h2>
-            <p class="hint">اختاري لون لكل منطقة وشوفيه على المراية. لون البشرة والشعر من "وجهي"، والرموش من "هنو تصمم".</p>
-            <div id="manual-areas"><p class="hint">نحمّل الألوان...</p></div>
-            <div class="manual-save">
-              <input type="text" id="manual-name" maxlength="40" placeholder="سمّي لوكك، مثلًا: لوك العيد">
-              <button class="btn primary inline" type="button" id="manual-save">احفظي</button>
+            <div class="card-head">
+              <span class="card-icon"><svg class="icon"><use href="#i-palette"/></svg></span>
+              <div>
+                <h2 data-i18n="side.manual">جربي بنفسك</h2>
+                <p class="hint" data-i18n="manual.hint">اختاري لون لكل منطقة وشوفيه على المراية. لون البشرة والشعر من "وجهي"، والرموش من "هنو تصمم".</p>
+              </div>
+            </div>
+            <div id="manual-areas"><p class="hint" data-i18n="manual.loading">نحمّل الألوان...</p></div>
+            <div class="bag-add">
+              <input type="text" id="manual-name" maxlength="40" placeholder="سمّي لوكك، مثلًا: لوك العيد" data-i18n-ph="manual.ph">
+              <button class="btn primary" type="button" id="manual-save"><svg class="icon"><use href="#i-bookmark"/></svg><span data-i18n="manual.save">احفظي</span></button>
             </div>
           </section>
         </div>
 
-        <!-- ============ 3) Ask Hanu about a product ============ -->
-        <div class="tab-panel" data-panel="ask" hidden>
-          <form class="card" id="ask-form" novalidate>
-            <h2>اسألي هنو عن أي منتج</h2>
-            <p class="hint">بتسوين مكياجك بنفسك؟ اسألي عن أي منتج: سيليكون ولا مائي؟ ينفع مع الفاونديشن حقي؟</p>
-            <label class="field" data-field="question">
-              <span class="legend">سؤالك</span>
-              <textarea id="ask-question" rows="3" maxlength="500" placeholder="مثلًا: برايمر Benefit POREfessional سيليكون ولا مائي؟"></textarea>
-            </label>
-            <div class="photo-btns">
-              <label class="btn ghost small"><input type="file" accept="image/*" capture="environment" id="ask-camera" hidden>صوّري المنتج</label>
-              <label class="btn ghost small"><input type="file" accept="image/*" id="ask-album" hidden>من الألبوم</label>
-            </div>
-            <div class="ask-preview" id="ask-preview" hidden>
-              <img id="ask-img" alt="صورة المنتج">
-              <button type="button" class="remove" id="ask-remove" aria-label="حذف الصورة">×</button>
-            </div>
-            <p class="form-error" id="ask-form-error" role="alert" hidden></p>
-            <button class="btn primary" type="submit" id="ask-submit">
-              <span class="btn-label">اسألي هنو</span>
-              <span class="spinner" aria-hidden="true"></span>
-            </button>
-          </form>
-
-          <section class="card status error" id="ask-error" hidden role="alert">
-            <p class="status-title">ما قدرنا نرد عليك</p>
-            <p class="status-sub" id="ask-error-message"></p>
-          </section>
-
-          <article class="card answer" id="ask-answer" hidden>
-            <div class="answer-head">
-              <h3 id="ans-product"></h3>
-              <div class="answer-tags" id="ans-tags"></div>
-            </div>
-            <p id="ans-text"></p>
-            <p class="ans-check" id="ans-check" hidden></p>
-            <div class="ans-lists">
-              <div id="ans-pairs-box" hidden><h4>يمشي مع</h4><ul id="ans-pairs"></ul></div>
-              <div id="ans-avoid-box" hidden><h4>لا تحطينه مع</h4><ul id="ans-avoid"></ul></div>
-            </div>
-            <p class="model-tag" id="ans-model"></p>
-          </article>
-        </div>
-
-        <!-- ============ 4) Saved looks ============ -->
+        <!-- ============ Side: saved looks ============ -->
         <div class="tab-panel" data-panel="saved" hidden>
           <section class="card">
-            <h2>لوكاتي</h2>
-            <p class="hint">اللوكات اللي عجبتك محفوظة في هالمتصفح. اضغطي "اعرضي" وترجعين لها.</p>
+            <div class="card-head">
+              <span class="card-icon"><svg class="icon"><use href="#i-bookmark"/></svg></span>
+              <div>
+                <h2 data-i18n="side.saved">لوكاتي</h2>
+                <p class="hint" data-i18n="saved.hint">اللوكات اللي عجبتك محفوظة في هالمتصفح. اضغطي "اعرضي" وترجعين لها.</p>
+              </div>
+            </div>
             <ul class="saved-list" id="saved-list"></ul>
-            <p class="empty" id="saved-empty">ما حفظتي ولا لوك للحين. زبّطي لوك مع هنو أو جربي بنفسك، واضغطي "احفظي اللوك".</p>
+            <p class="empty" id="saved-empty" data-i18n="saved.empty">ما حفظتي ولا لوك للحين. زبّطي لوك مع هنو أو جربي بنفسك، واضغطي "احفظي اللوك".</p>
           </section>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- Floating chat with Hanu: fixed in the corner, available from every tab -->
+  <!-- Floating chat with Hanu. Its logo is a powder compact with a red heart; the lid opens with the chat. -->
   <button class="chat-fab" id="chat-open" type="button" aria-controls="chat" aria-expanded="false">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.2 3.6c-.5.4-1.3.1-1.3-.6V16A2.5 2.5 0 0 1 4 13.5z"/></svg>
-    <span>اسألي هنو</span>
+    <svg class="compact" viewBox="0 0 64 64" aria-hidden="true">
+      <defs>
+        <linearGradient id="cmp-mirror" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#D9DEE6"/><stop offset="1" stop-color="#AEB6C2"/>
+        </linearGradient>
+        <radialGradient id="cmp-powder"><stop offset="0" stop-color="#F2C9C4"/><stop offset="1" stop-color="#D9A29C"/></radialGradient>
+      </defs>
+      <g class="cmp-base">
+        <circle cx="32" cy="42" r="19" class="cmp-shell"/>
+        <circle cx="32" cy="42" r="14.5" fill="url(#cmp-powder)"/>
+      </g>
+      <rect x="28" y="21" width="8" height="3" rx="1.5" class="cmp-hinge"/>
+      <g class="cmp-lid">
+        <circle cx="32" cy="42" r="19" class="cmp-shell"/>
+        <g class="cmp-outside">
+          <circle cx="32" cy="42" r="15.5" class="cmp-ring"/>
+          <path class="cmp-heart" d="M32 51.5C21.5 44.5 21.5 34 27.3 34c2.6 0 4 1.6 4.7 3.1.7-1.5 2.1-3.1 4.7-3.1 5.8 0 5.8 10.5-4.7 17.5Z"/>
+        </g>
+        <g class="cmp-inside">
+          <circle cx="32" cy="42" r="15" fill="url(#cmp-mirror)"/>
+          <path d="M24 38l6-6M26 44l11-11" class="cmp-glint"/>
+        </g>
+      </g>
+    </svg>
+    <span class="chat-fab-label" id="chat-fab-label" data-i18n="chat.fab">اسألي هنو</span>
   </button>
 
   <section class="chat" id="chat" aria-label="محادثة هنو" hidden>
     <header class="chat-head">
       <div class="chat-avatar" aria-hidden="true">H</div>
       <div>
-        <strong>هنو</strong>
-        <span>اسأليها عن أي منتج أو مكياج</span>
+        <strong data-i18n="chat.name">هنو</strong>
+        <span data-i18n="chat.sub">اسأليها عن أي منتج أو مكياج</span>
       </div>
-      <button class="chat-close" id="chat-close" type="button" aria-label="سكري المحادثة">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      <button class="chat-close" id="chat-close" type="button" aria-label="سكري المحادثة" data-i18n-aria="chat.close">
+        <svg class="icon"><use href="#i-x"/></svg>
       </button>
     </header>
 
     <ol class="chat-log" id="chat-log" aria-live="polite">
-      <li class="msg hanu">
-        <p>هلا! أنا هنو. اسأليني عن أي منتج: سيليكون ولا مائي؟ ينفع مع الفاونديشن حقك؟ وتقدرين ترسلين لي صورة المنتج.</p>
-      </li>
+      <li class="msg hanu"><p data-i18n="chat.welcome">هلا! أنا هنو. اسأليني عن أي منتج: سيليكون ولا مائي؟ ينفع مع الفاونديشن حقك؟ وتقدرين ترسلين لي صورة المنتج.</p></li>
     </ol>
 
     <div class="chat-attach" id="chat-attach" hidden>
-      <img id="chat-attach-img" alt="الصورة المرفقة">
-      <button type="button" class="remove" id="chat-attach-remove" aria-label="حذف الصورة">×</button>
+      <img id="chat-attach-img" alt="">
+      <button type="button" class="remove" id="chat-attach-remove" aria-label="حذف الصورة" data-i18n-aria="chat.removephoto"><svg class="icon"><use href="#i-x"/></svg></button>
     </div>
 
     <form class="chat-input" id="chat-form" novalidate>
-      <label class="chat-icon-btn" aria-label="ارفقي صورة">
+      <label class="chat-icon-btn" aria-label="ارفقي صورة" data-i18n-aria="chat.attach">
         <input type="file" accept="image/*" id="chat-photo" hidden>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.8l1.2-1.8c.3-.4.7-.7 1.2-.7h2.6c.5 0 .9.3 1.2.7L15.7 6h1.8A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5z"/><circle cx="12" cy="12.5" r="3.2"/></svg>
+        <svg class="icon"><use href="#i-camera"/></svg>
       </label>
-      <input type="text" id="chat-text" maxlength="500" placeholder="اكتبي سؤالك..." autocomplete="off">
-      <button class="chat-send" type="submit" id="chat-send" aria-label="أرسلي">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12L4 4l3 8-3 8z"/></svg>
+      <input type="text" id="chat-text" maxlength="500" placeholder="اكتبي سؤالك..." data-i18n-ph="chat.ph" autocomplete="off">
+      <button class="chat-send" type="submit" id="chat-send" aria-label="أرسلي" data-i18n-aria="chat.send">
+        <svg class="icon flip-rtl"><use href="#i-send"/></svg>
       </button>
     </form>
   </section>
@@ -567,9 +634,11 @@
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
   <footer class="footer">
-    <p>by HANA · هذي نصايح بس، وأي منتج جديد جربيه على جزء صغير من بشرتك قبل لا تستخدمينه.</p>
+    <p data-i18n="footer.note">هذي نصايح بس، وأي منتج جديد جربيه على جزء صغير من بشرتك قبل لا تستخدمينه.</p>
+    <p class="powered" data-i18n="footer.powered">by HANA · شغّالة بـ Llama من Meta</p>
   </footer>
 
+  <script src="i18n.js"></script>
   <script src="face.js"></script>
   <script src="app.js"></script>
 </body>
