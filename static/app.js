@@ -825,6 +825,13 @@ $("chat-form").addEventListener("submit", async (e) => {
   }
 });
 
+// ---------- Header shrinks after scrolling down ----------
+
+const topbar = document.querySelector(".topbar");
+const onScroll = () => topbar.classList.toggle("scrolled", window.scrollY > 40);
+window.addEventListener("scroll", onScroll, { passive: true });
+onScroll();
+
 // ---------- Heart pop on click (mouse only, and not when she prefers less motion) ----------
 
 if (matchMedia("(pointer: fine)").matches && !matchMedia("(prefers-reduced-motion: reduce)").matches) {

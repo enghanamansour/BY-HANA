@@ -715,3 +715,14 @@ html { scroll-padding-top: 100px; }
 @media (max-width: 600px) {
   .topbar { top: 8px; margin-top: 8px; width: calc(100% - 16px); padding: 8px 8px; padding-inline-start: 18px; }
 }
+
+/* Header shrinks into a compact pill once she scrolls down. */
+.topbar { transition: width .45s var(--ease), padding .45s var(--ease), top .45s var(--ease), box-shadow .45s var(--ease); }
+.topbar .logo { transition: font-size .45s var(--ease); }
+.topbar .icon-btn { transition: height .45s var(--ease), min-width .45s var(--ease), border-color .2s var(--ease), color .2s var(--ease); }
+.topbar.scrolled { width: min(560px, calc(100% - 32px)); padding: 6px 8px; padding-inline-start: 20px; top: 8px; box-shadow: 0 10px 34px rgba(59, 37, 53, .16); }
+.topbar.scrolled .logo { font-size: 1.25rem; }
+.topbar.scrolled .icon-btn { height: 36px; min-width: 36px; }
+@media (max-width: 600px) {
+  .topbar.scrolled { width: calc(100% - 48px); }
+}
