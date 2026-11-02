@@ -60,6 +60,7 @@ const state = {
   manual: {},      // area -> { id, hex, name, name_en }
   bag: [],         // products she owns: { name, step?, base? }
   lastPayload: null,
+  manualLens: "none",   // coloured lens chosen in "try it yourself" (part of that look, not of her face)
   stage: 0,
 };
 
@@ -217,9 +218,12 @@ function updateMirrorBase() {
   sync3D();
 }
 
+const lookLens = () => state.current?.lens || null;
+
 /** Mirror the same face and look onto the 3D head. The 3D model has no hijab, so the drawn face covers that case. */
 function sync3D() {
   const portrait = window.Portrait;
+  drawFace(face, { ...faceValues(), ...(lookLens() ? { lens: lookLens() } : {}) });   // the drawn face shows the look's lens too
   const data = new FormData(form);
   const covered = (data.get("coverage") || "none") !== "none";
   const use3D = portrait?.status === "ready" && !covered;
@@ -232,7 +236,8 @@ function sync3D() {
   portrait.update({
     skin: TONE_SKIN[f.skin_tone] || TONE_SKIN.medium,
     hair, brow,
-    iris: (f.lens && f.lens !== "none" ? LENS[f.lens] : IRIS[f.eye_color]) || IRIS.dark_brown,
+    // A lens chosen for the current look wins over the lens or eye colour in "my face".
+    iris: (lookLens() ? LENS[lookLens()] : f.lens && f.lens !== "none" ? LENS[f.lens] : IRIS[f.eye_color]) || IRIS.dark_brown,
     lashes: data.get("lashes") || "natural",
     face: f,   // eye shape, brows, lips, nose, face shape and jaw reshape the portrait
     makeup: state.current ? Object.fromEntries(Object.entries(state.current.colors).map(([k, c]) => [k, c.hex])) : null,
@@ -331,6 +336,7 @@ function saveCurrent(name) {
     colors: state.current.colors,
     mirror: { ...faceValues(), lashes: new FormData(form).get("lashes") },
     look: state.current.look || null,
+    lens: state.current.lens || null,
   });
   if (!store.set(KEYS.looks, looks.slice(0, 30))) return toast(tr("ما قدرنا نحفظ، المتصفح مانع الحفظ.", "Couldn't save: your browser is blocking storage."));
   renderSaved();
@@ -345,10 +351,11 @@ function openSaved(item) {
     $("result").scrollIntoView({ behavior: "smooth", block: "start" });
   } else {
     state.manual = Object.fromEntries(Object.entries(item.colors).map(([k, c]) => [k, { ...c }]));
+    state.manualLens = item.lens || "none";
     showTab("manual");
     $("manual-name").value = item.name;
   }
-  showOnMirror({ source: item.source, name: item.name, colors: item.colors, look: item.look });
+  showOnMirror({ source: item.source, name: item.name, colors: item.colors, look: item.look, lens: item.lens });
 }
 
 function renderSaved() {
@@ -647,7 +654,8 @@ async function openManual() {
 
 function paintManual() {
   const colors = Object.fromEntries(Object.entries(state.manual).map(([k, s]) => [k, { hex: s.hex, name: s.name, name_en: s.name_en }]));
-  showOnMirror({ source: "manual", name: $("manual-name").value.trim(), colors });
+  showOnMirror({ source: "manual", name: $("manual-name").value.trim(), colors,
+                 lens: state.manualLens !== "none" ? state.manualLens : null });
 }
 
 function renderManual() {
@@ -680,12 +688,12 @@ function renderManual() {
   wrap.append(lensPicker());
 }
 
-/** Coloured lenses, shared with the "my face" step: picking one here checks the same option there. */
+/** Coloured lenses for this look (e.g. green for a wedding), separate from her eye colour in "my face". */
 const LENS_AR = { none: ["بدون", "None"], honey: ["عسلي", "Honey"], hazel: ["بندقي", "Hazel"],
                   grey: ["رمادي", "Grey"], green: ["أخضر", "Green"], blue: ["أزرق", "Blue"] };
 function lensPicker() {
   const box = el("div", "area");
-  const current = new FormData(form).get("lens") || "none";
+  const current = state.manualLens;
   const title = el("p", "area-label", tr("العدسات", "Lenses"));
   const chosen = el("span", null, pick(LENS_AR[current]));
   title.append(chosen);
@@ -698,9 +706,10 @@ function lensPicker() {
     b.setAttribute("aria-label", `${tr("العدسات", "Lenses")}: ${pick(label)}`);
     b.setAttribute("aria-pressed", value === current);
     b.addEventListener("click", () => {
-      document.querySelector(`input[name="lens"][value="${value}"]`).click();   // updates the face step and the mirror
+      state.manualLens = value;   // part of this look only; her own eye colour in "my face" stays as it is
       row.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b));
       chosen.textContent = pick(label);
+      paintManual();
     });
     row.append(b);
   }
