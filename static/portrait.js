@@ -53,12 +53,13 @@
     if (f.nose === "slim") scale(400, 565, 46, 54, 0.8, 1);
     if (f.nose === "wide") scale(400, 565, 46, 54, 1.25, 1);
 
-    if (f.face_shape === "round") { sides((s) => shift(400 + s * 125, 600, 62, 100, s * 15, 0)); shift(400, 700, 90, 44, 0, -14); }
-    if (f.face_shape === "square") sides((s) => shift(400 + s * 112, 652, 54, 54, s * 17, 5));
-    if (f.face_shape === "heart") { sides((s) => shift(400 + s * 110, 650, 62, 62, -s * 15, 0)); shift(400, 700, 72, 42, 0, 9); }
-    if (f.face_shape === "long") { shift(400, 690, 128, 100, 0, 26); sides((s) => shift(400 + s * 130, 560, 40, 80, -s * 6, 0)); }
-    if (f.jaw === "sharp") { sides((s) => shift(400 + s * 100, 665, 45, 45, -s * 7, 5)); scale(400, 700, 60, 30, 0.9, 1); }
-    if (f.jaw === "soft") sides((s) => shift(400 + s * 105, 662, 45, 45, s * 4, -2));
+    // Face shape and jaw: one large, gentle stretch of the lower face (small local pulls twisted the features).
+    if (f.face_shape === "round") scale(400, 610, 190, 170, 1.07, 0.97);
+    if (f.face_shape === "square") scale(400, 660, 185, 110, 1.07, 1);
+    if (f.face_shape === "heart") scale(400, 670, 175, 115, 0.92, 1);
+    if (f.face_shape === "long") scale(400, 650, 185, 160, 0.97, 1.07);
+    if (f.jaw === "sharp") scale(400, 690, 140, 70, 0.93, 1.02);
+    if (f.jaw === "soft") scale(400, 680, 145, 75, 1.03, 0.99);
     return ops;
   }
 
