@@ -158,7 +158,11 @@
     const out = new ImageData(new Uint8ClampedArray(base.data), w, h);
     const d = out.data, src = base.data;
     const skin = hexToRgb(look.skin), hair = hexToRgb(look.hair), brow = hexToRgb(look.brow);
-    const ratio = skin.map((v, i) => Math.min(1.5, Math.max(0.3, v / skinRef[i])));
+    // Map the portrait's skin colour onto the chosen tone. Darkening scales the colour down; lightening
+    // works on the distance to white instead, so light tones stay distinct and highlights don't burn out.
+    const tone = skin.map((t, c) => (t <= skinRef[c]
+      ? (v) => v * (t / skinRef[c])
+      : (v) => 255 - (255 - v) * ((255 - t) / (255 - skinRef[c]))));
 
     // Skin tone everywhere except hair; hair takes the chosen colour using its own light and shade.
     for (let p = 0, i = 0; p < w * h; p++, i += 4) {
@@ -167,7 +171,7 @@
         const k = 0.3 + ((src[i] + src[i + 1] + src[i + 2]) / 765) * 1.9;
         d[i] = hair[0] * k; d[i + 1] = hair[1] * k; d[i + 2] = hair[2] * k;
       } else {
-        d[i] = src[i] * ratio[0]; d[i + 1] = src[i + 1] * ratio[1]; d[i + 2] = src[i + 2] * ratio[2];
+        d[i] = tone[0](src[i]); d[i + 1] = tone[1](src[i + 1]); d[i + 2] = tone[2](src[i + 2]);
       }
     }
 
