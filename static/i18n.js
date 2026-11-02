@@ -75,6 +75,8 @@ const EN = {
   "chat.welcome": "Hi! I'm Hanu. Ask me about any product: is it silicone or water-based? Does it work with your foundation? You can send me a photo of it too.",
   "footer.note": "These are suggestions only. Patch-test any new product on a small area of skin first.",
   "footer.powered": "by HANA · Powered by Llama from Meta",
+  "footer.model": "3D face model:", "footer.modified": "(recoloured with makeup)",
+  "mirror.drag": "Drag to turn the face",
 };
 
 const I18N = {

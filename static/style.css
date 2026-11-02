@@ -164,8 +164,26 @@ button { font: inherit; color: inherit; }
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
   box-shadow: var(--shadow); padding: 16px;
 }
-.mirror { border-radius: 16px; overflow: hidden; background: linear-gradient(160deg, var(--mirror-a), var(--mirror-b)); }
+.mirror { position: relative; border-radius: 16px; overflow: hidden; background: linear-gradient(160deg, var(--mirror-a), var(--mirror-b)); }
 #face { display: block; width: 100%; height: auto; }
+/* 3D mirror sits over the drawn face; the SVG keeps the size and is the fallback (and is used with hijab/niqab). */
+.mirror3d { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity .6s var(--ease); cursor: grab; touch-action: pan-y; }
+.mirror3d:active { cursor: grabbing; }
+.mirror3d canvas { display: block; width: 100% !important; height: 100% !important; }
+.mirror.is-3d .mirror3d { opacity: 1; pointer-events: auto; }
+.mirror.is-3d #face { visibility: hidden; }
+.drag-hint {
+  position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 1; margin: 0;
+  font-size: .75rem; color: #fff; background: rgba(42, 31, 39, .55); padding: 3px 12px; border-radius: 999px;
+  pointer-events: none; opacity: 0; transition: opacity .4s var(--ease); white-space: nowrap;
+}
+.mirror.is-3d .drag-hint { opacity: 1; }
+.mirror.scanning::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 18%; pointer-events: none;
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, .35), transparent);
+  animation: mirror-scan 2.2s ease-in-out infinite;
+}
+@keyframes mirror-scan { from { transform: translateY(-100%); } to { transform: translateY(560%); } }
 .mirror-hint { text-align: center; color: var(--muted); font-size: .85rem; margin: 12px 0 0; }
 
 .palette { margin-top: 16px; }
@@ -503,6 +521,7 @@ textarea { resize: vertical; min-height: 64px; }
 .footer { text-align: center; color: var(--muted); font-size: .82rem; padding: 0 24px 40px; }
 .footer p { margin: 0 0 4px; }
 .footer .powered { opacity: .8; }
+.footer a { color: inherit; }
 
 /* ---------- The illustrated face ---------- */
 #face * { transition: fill .9s ease, stroke .9s ease, opacity .9s ease, stop-color .9s ease; }

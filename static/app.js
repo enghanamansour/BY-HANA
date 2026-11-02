@@ -214,7 +214,27 @@ function updateMirrorBase() {
   face.dataset.coverage = data.get("coverage") || "none";
   face.dataset.lashes = data.get("lashes") || "natural";
   updateFaceSummary();
+  sync3D();
 }
+
+/** Mirror the same face and look onto the 3D head. The 3D model has no hijab, so the drawn face covers that case. */
+function sync3D() {
+  const head3d = window.Head3D;
+  const data = new FormData(form);
+  const use3D = head3d?.status === "ready" && (data.get("coverage") || "none") === "none";
+  $("mirror").classList.toggle("is-3d", use3D);
+  if (!use3D) return;
+  const f = faceValues();
+  const [hair, brow] = HAIR[f.hair_color] || HAIR.black;
+  head3d.update({
+    skin: TONE_SKIN[f.skin_tone] || TONE_SKIN.medium,
+    hair, brow,
+    iris: (f.lens && f.lens !== "none" ? LENS[f.lens] : IRIS[f.eye_color]) || IRIS.dark_brown,
+    lashes: data.get("lashes") || "natural",
+    makeup: state.current ? Object.fromEntries(Object.entries(state.current.colors).map(([k, c]) => [k, c.hex])) : null,
+  });
+}
+window.addEventListener("head3d:ready", sync3D);
 
 function updateFaceSummary() {
   const f = faceValues();
@@ -246,6 +266,7 @@ function showOnMirror(look) {
   }
   $("palette").hidden = false;
   $("mirror-hint").hidden = true;
+  sync3D();
 }
 
 function clearMirror() {
@@ -254,6 +275,7 @@ function clearMirror() {
   Object.values(FACE_VARS).forEach((v) => face.style.removeProperty(v));
   $("palette").hidden = true;
   $("mirror-hint").hidden = false;
+  sync3D();
 }
 
 // Face inputs live outside the <form> (form="look-form"), so listen on the whole page.
@@ -467,6 +489,7 @@ function markInvalid(fields) {
 function setLookLoading(on) {
   setBusy($("submit"), on);
   face.classList.toggle("scanning", on);
+  $("mirror").classList.toggle("scanning", on && $("mirror").classList.contains("is-3d"));
   $("loading").hidden = !on;
   clearInterval(stageTimer);
   if (on) {
