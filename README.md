@@ -2,15 +2,15 @@
 
 **An AI makeup artist for women in Saudi Arabia, powered by Meta's Llama.**
 
-Pick your skin type, skin tone, city, occasion, budget and whether you wear a hijab or niqab. Hanu (هنو), the app's makeup artist, designs a complete look: shades, products in application order, how to apply each one, and tips for your city's weather. It paints the look onto an illustrated face and warns you when two products won't layer well together (water-based vs silicone-based).
+Pick your skin type, skin tone, city, occasion, budget and whether you wear a hijab or niqab. Hno (هنو), the app's makeup artist, designs a complete look: shades, products in application order, how to apply each one, and tips for your city's weather. It paints the look onto an illustrated face and warns you when two products won't layer well together (water-based vs silicone-based).
 
 ### Features
 
 | Tab | What it does | Llama model |
 |---|---|---|
-| ✨ **هنو تصمم** (Hanu designs) | Full look from your profile, hair colour, lashes and preferred finish | Llama 3.3 70B |
-| 👜 **شنطة مكياجي** (My makeup bag) | Add products you own by typing or **photographing them**. Hanu builds the look around them and only suggests what's missing | Llama 4 Maverick (vision) |
-| 🔍 **اسألي هنو** (Ask Hanu) | Ask about any product by text or photo, e.g. "is this primer silicone or water-based?" | Llama 3.3 / Llama 4 for photos |
+| ✨ **هنو تصمم** (Hno designs) | Full look from your profile, hair colour, lashes and preferred finish | Llama 3.3 70B |
+| 👜 **شنطة مكياجي** (My makeup bag) | Add products you own by typing or **photographing them**. Hno builds the look around them and only suggests what's missing | Llama 4 Maverick (vision) |
+| 🔍 **اسألي هنو** (Ask Hno) | Ask about any product by text or photo, e.g. "is this primer silicone or water-based?" | Llama 3.3 / Llama 4 for photos |
 | 🎨 **جربي بنفسك** (Try it yourself) | Pick shades by hand from the same palette and see them on the face | No AI needed |
 | 💾 **لوكاتي** (My looks) | Save any look and reopen it later (stored in the browser) | No AI needed |
 
@@ -64,7 +64,7 @@ Empty or invalid input returns `400` with an Arabic message and the list of bad 
 
 ## Frontend
 
-A plain HTML/CSS/JS page served by the same FastAPI app ([`static/`](static/)), with no build step. It has a modern clean design with light and dark themes (it follows the device the first time), Arabic (RTL, Saudi dialect) and English (LTR) versions, and Lucide icons. The flow is two clear steps, **1. My face → 2. Hanu designs**, plus side sections for **Try it yourself** and **My looks**. The chat button is a powder compact with a red heart, and its lid opens when the chat opens. Llama answers in whichever language the page is in. It includes:
+A plain HTML/CSS/JS page served by the same FastAPI app ([`static/`](static/)), with no build step. It has a modern clean design with light and dark themes (it follows the device the first time), Arabic (RTL, Saudi dialect) and English (LTR) versions, and Lucide icons. The flow is two clear steps, **1. My face → 2. Hno designs**, plus side sections for **Try it yourself** and **My looks**. The chat button is a powder compact with a red heart, and its lid opens when the chat opens. Llama answers in whichever language the page is in. It includes:
 
 - A live "mirror": the SVG face updates as you pick skin tone and hijab/niqab, then gets painted with the look.
 - Client-side validation that highlights missing fields.

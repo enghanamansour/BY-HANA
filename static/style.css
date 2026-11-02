@@ -167,17 +167,10 @@ button { font: inherit; color: inherit; }
 .mirror { position: relative; border-radius: 16px; overflow: hidden; background: linear-gradient(160deg, var(--mirror-a), var(--mirror-b)); }
 #face { display: block; width: 100%; height: auto; }
 /* 3D mirror sits over the drawn face; the SVG keeps the size and is the fallback (and is used with hijab/niqab). */
-.mirror3d { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity .6s var(--ease); cursor: grab; touch-action: pan-y; }
-.mirror3d:active { cursor: grabbing; }
+.mirror3d { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity .6s var(--ease); }
 .mirror3d canvas { display: block; width: 100% !important; height: 100% !important; }
-.mirror.is-3d .mirror3d { opacity: 1; pointer-events: auto; }
+.mirror.is-3d .mirror3d { opacity: 1; }
 .mirror.is-3d #face { visibility: hidden; }
-.drag-hint {
-  position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 1; margin: 0;
-  font-size: .75rem; color: #fff; background: rgba(42, 31, 39, .55); padding: 3px 12px; border-radius: 999px;
-  pointer-events: none; opacity: 0; transition: opacity .4s var(--ease); white-space: nowrap;
-}
-.mirror.is-3d .drag-hint { opacity: 1; }
 .mirror.scanning::after {
   content: ""; position: absolute; left: 0; right: 0; top: 0; height: 18%; pointer-events: none;
   background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, .35), transparent);

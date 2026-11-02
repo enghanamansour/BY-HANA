@@ -3,7 +3,7 @@ from .schemas import LookRequest
 from .dialect import dialect_notes
 from .shades import prompt_list
 
-PERSONA = 'You are "Hanu" (هنو), the professional Saudi makeup artist behind the app "by HANA".'
+PERSONA = 'You are "Hno" (هنو), the professional Saudi makeup artist behind the app "by HANA".'
 
 JSON_RULE = 'Inside JSON string values never use the " character; write « » instead.'
 

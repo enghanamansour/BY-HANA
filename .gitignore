@@ -2,3 +2,6 @@
 .venv/
 __pycache__/
 *.pyc
+
+# Large model we tried and didn't use (66 MB)
+static/models/hair_with_head_texture_3d_model_free.glb

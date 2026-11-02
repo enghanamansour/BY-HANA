@@ -1,10 +1,9 @@
-// 3D mirror: the "Angelica" head by NikZava284 (Sketchfab, CC BY 4.0), recoloured and made up live.
-// app.js calls window.Head3D.update(look); this module paints skin, brows, lips and makeup into the
-// head texture, recolours hair and irises, and renders with three.js. If WebGL is missing or the model
-// fails to load, it reports "failed" and the SVG face stays in place.
+// Portrait mirror: the "Angelica" head by NikZava284 (Sketchfab, CC BY 4.0), shown as a still, front-facing
+// portrait with fixed lighting. app.js calls window.Head3D.update(look); this module paints skin, brows, lips
+// and makeup into the head texture, recolours hair and irises, and re-renders the portrait once per change.
+// If WebGL is missing or the model fails to load, it reports "failed" and the SVG face stays in place.
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 
 const MODEL_URL = "models/head.glb";
@@ -21,7 +20,12 @@ const TEX = {
 };
 
 const state = { look: null, ready: false };
-let renderer, scene, camera, controls, mats = {}, head = {}, hair = {}, iris = {};
+let renderer, scene, camera, mats = {}, head = {}, hair = {}, iris = {};
+
+/** The portrait never moves, so we only draw when something changes. */
+function draw() {
+  if (renderer && scene && camera) renderer.render(scene, camera);
+}
 
 function hexToRgb(hex) {
   const n = parseInt(hex.slice(1), 16);
@@ -189,6 +193,7 @@ function apply() {
   paintHair(look.hair);
   paintIris(look.iris);
   if (mats.lashes) mats.lashes.opacity = { none: 0.55, natural: 0.85, dramatic: 1 }[look.lashes] ?? 0.85;
+  draw();
 }
 
 // ---------- Scene ----------
@@ -207,11 +212,8 @@ function frame(root) {
   camera.position.copy(target).addScaledVector(front, dist);
   camera.near = dist / 50;
   camera.far = dist * 10;
+  camera.lookAt(target);
   camera.updateProjectionMatrix();
-  controls.target.copy(target);
-  controls.minDistance = dist * 0.7;
-  controls.maxDistance = dist * 1.3;
-  controls.update();
 }
 
 function resize() {
@@ -220,6 +222,7 @@ function resize() {
   renderer.setSize(w, h, false);
   camera.aspect = w / h;
   camera.updateProjectionMatrix();
+  draw();
 }
 
 async function init() {
@@ -228,7 +231,8 @@ async function init() {
   } catch {
     throw new Error("no WebGL");
   }
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  // A still image is drawn rarely, so render it supersampled for smooth hair edges.
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio * 1.5, 3));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   // No filmic tone mapping: it desaturates reds, and the lipstick must match the palette swatch.
   renderer.toneMapping = THREE.NoToneMapping;
@@ -240,8 +244,8 @@ async function init() {
   scene.add(new THREE.HemisphereLight(0xfff4ee, 0x5a3f4d, 0.35));
 
   camera = new THREE.PerspectiveCamera(22, 1, 0.1, 1000);
-  // Beauty lighting that travels with the camera, so the face stays lit as she turns it (like a vanity mirror):
-  // a warm key from upper front-left, a soft fill from the right, and a rim light from behind for the hair.
+  // Fixed beauty lighting, attached to the camera: a warm key from upper front-left, a soft fill from the
+  // right, and a rim light from behind for the hair.
   const key = new THREE.DirectionalLight(0xffe9dc, 1.25);
   key.position.set(-0.8, 0.9, 1.4);
   const fill = new THREE.DirectionalLight(0xf3e6ff, 0.45);
@@ -253,14 +257,6 @@ async function init() {
     light.target = camera;   // direction comes from the offset alone
   }
   scene.add(camera);
-  controls = new OrbitControls(camera, renderer.domElement);
-  controls.enablePan = false;
-  controls.enableDamping = true;
-  controls.rotateSpeed = 0.6;
-  controls.minPolarAngle = Math.PI * 0.36;
-  controls.maxPolarAngle = Math.PI * 0.6;
-  controls.minAzimuthAngle = -Math.PI * 0.4;
-  controls.maxAzimuthAngle = Math.PI * 0.4;
 
   const gltf = await new GLTFLoader().loadAsync(MODEL_URL);
   const root = gltf.scene;
@@ -286,8 +282,15 @@ async function init() {
   mats.hair.color.set(0xffffff);
   mats.hair.roughness = 0.62;          // the original gloss reads as plastic under our lights
   mats.hair.envMapIntensity = 0.45;
-  mats.hair.alphaTest = 0.22;
-  mats.hair.alphaToCoverage = true;    // with MSAA this softens the jagged edges of the hair cards
+  // Hair in two passes: an alpha-tested core that writes depth, then a blended copy that adds the soft,
+  // wispy edges the cut-out misses.
+  mats.hair.alphaTest = 0.5;
+  const softHair = new THREE.Mesh(hair.mesh.geometry, mats.hair.clone());
+  Object.assign(softHair.material, { alphaTest: 0, transparent: true, depthWrite: false, map: mats.hair.map });
+  softHair.renderOrder = 1;
+  hair.mesh.parent.add(softHair);
+  softHair.matrix.copy(hair.mesh.matrix);
+  softHair.matrixAutoUpdate = false;
   mats.head.roughness = 0.58;          // softer, less waxy skin
   mats.head.envMapIntensity = 0.7;
   Object.assign(iris, canvasFor(mats.iris));
@@ -296,7 +299,7 @@ async function init() {
   frame(root);
   resize();
   new ResizeObserver(resize).observe(container);
-  renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); });
+  draw();
 
   state.ready = true;
   apply();
@@ -310,6 +313,13 @@ window.Head3D = {
   },
   /** Painted textures as images, for checking the makeup placement. */
   debugTextures: () => ({ head: head.canvas?.toDataURL("image/jpeg", 0.8), iris: iris.canvas?.toDataURL() }),
+  /** The rendered portrait as an image, plus how long one render takes (ms). */
+  snapshot() {
+    const t = performance.now();
+    draw();
+    const ms = performance.now() - t;
+    return { ms: Math.round(ms), image: renderer.domElement.toDataURL("image/png") };
+  },
 };
 
 init().then(() => {

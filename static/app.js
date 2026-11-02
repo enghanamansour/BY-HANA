@@ -1,5 +1,5 @@
-// by HANA frontend: two steps (my face -> Hanu designs), side sections (try it yourself, my looks),
-// a floating chat with Hanu, light/dark themes and Arabic/English. All talk to the FastAPI backend.
+// by HANA frontend: two steps (my face -> Hno designs), side sections (try it yourself, my looks),
+// a floating chat with Hno, light/dark themes and Arabic/English. All talk to the FastAPI backend.
 
 const $ = (id) => document.getElementById(id);
 const form = $("look-form");
@@ -47,7 +47,7 @@ const STEP_COLOR = { lips: "lips", blush: "blush", eyeshadow: "eyeshadow_lid", e
 const MANUAL_START = { lips: "nude_rose", blush: "soft_pink", eyeshadow_lid: "champagne",
                        eyeshadow_crease: "soft_peach", eyeliner: "brown", highlighter: "champagne" };
 const STAGES = [
-  ["هنو تشوف بشرتك...", "Hanu is reading your skin..."], ["تشيّك على جو مدينتك...", "Checking your city's weather..."],
+  ["هنو تشوف بشرتك...", "Hno is reading your skin..."], ["تشيّك على جو مدينتك...", "Checking your city's weather..."],
   ["تقلّب في شنطتك...", "Going through your makeup bag..."], ["تختار الألوان...", "Choosing the colours..."],
   ["ترتب الخطوات...", "Ordering the steps..."], ["تشيّك إن منتجاتك تركب على بعض...", "Checking your products layer well..."],
 ];
@@ -357,7 +357,7 @@ function renderSaved() {
     const info = el("div", "saved-info");
     const date = new Date(item.savedAt).toLocaleDateString(I18N.lang === "en" ? "en-GB" : "ar-SA", { day: "numeric", month: "long" });
     info.append(el("strong", null, item.name),
-                el("span", "saved-meta", `${item.source === "ai" ? tr("من هنو", "By Hanu") : tr("تصميمي", "My design")} · ${date}`));
+                el("span", "saved-meta", `${item.source === "ai" ? tr("من هنو", "By Hno") : tr("تصميمي", "My design")} · ${date}`));
     const dots = el("div", "saved-dots");
     for (const key of Object.keys(AREA)) {
       if (!item.colors[key]) continue;
@@ -449,7 +449,7 @@ async function scanPhoto(input) {
   const file = input.files[0];
   input.value = "";
   if (!file) return;
-  bagStatus(tr("هنو تقرأ منتجاتك من الصورة...", "Hanu is reading your products from the photo..."), "busy");
+  bagStatus(tr("هنو تقرأ منتجاتك من الصورة...", "Hno is reading your products from the photo..."), "busy");
   try {
     const image = await resizeImage(file);
     const data = await api("/api/scan", { image }, PHOTO_TIMEOUT_MS);
@@ -464,7 +464,7 @@ async function scanPhoto(input) {
 $("bag-camera").addEventListener("change", (e) => scanPhoto(e.target));
 $("bag-album").addEventListener("change", (e) => scanPhoto(e.target));
 
-// ---------- Step 2: Hanu designs a look ----------
+// ---------- Step 2: Hno designs a look ----------
 
 let stageTimer = null;
 
@@ -680,7 +680,7 @@ $("manual-save").addEventListener("click", () => {
   saveCurrent($("manual-name").value.trim() || tr("تصميمي", "My design"));
 });
 
-// ---------- Floating chat with Hanu ----------
+// ---------- Floating chat with Hno ----------
 
 const chat = { history: [], image: null, busy: false };
 const CHAT_HISTORY_TURNS = 8;
@@ -688,7 +688,7 @@ const CHAT_HISTORY_TURNS = 8;
 function updateChatFab() {
   const open = !$("chat").hidden;
   $("chat-open").setAttribute("aria-expanded", open);
-  $("chat-fab-label").textContent = open ? tr("سكّري", "Close") : tr("اسألي هنو", "Ask Hanu");
+  $("chat-fab-label").textContent = open ? tr("سكّري", "Close") : tr("اسألي هنو", "Ask Hno");
 }
 
 function openChat(open) {
@@ -708,7 +708,7 @@ function chatBubble(who, ...children) {
   return li;
 }
 
-/** Hanu's answer: product, tags, answer, how to check, what pairs well / to avoid. */
+/** Hno's answer: product, tags, answer, how to check, what pairs well / to avoid. */
 function answerBubble(ans) {
   const parts = [];
   if (ans.product_name) parts.push(el("bdi", "msg-product", ans.product_name));
