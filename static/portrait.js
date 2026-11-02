@@ -159,6 +159,11 @@
     const d = out.data, src = base.data;
     const skin = hexToRgb(look.skin), hair = hexToRgb(look.hair), brow = hexToRgb(look.brow);
     const ratio = skin.map((v, i) => Math.min(1.5, Math.max(0.3, v / skinRef[i])));
+    // Tones lighter than the portrait: brighten the light skin toward white (so fair and light differ),
+    // but leave dark features (eyes, brows, lash line) and the eye area on the plain scaling above.
+    const lighten = skin.map((t, c) => (t > skinRef[c] ? (255 - t) / (255 - skinRef[c]) : null));
+    // 1 on the eye, fading to 0 around it, so the protected area has no visible edge.
+    const nearEye = (x, y) => Math.max(...EYES.map(([ex, ey]) => 1 - smooth(0.8, 1.35, Math.hypot((x - ex) / 48, (y - ey) / 30))));
 
     // Skin tone everywhere except hair; hair takes the chosen colour using its own light and shade.
     for (let p = 0, i = 0; p < w * h; p++, i += 4) {
@@ -168,6 +173,14 @@
         d[i] = hair[0] * k; d[i + 1] = hair[1] * k; d[i + 2] = hair[2] * k;
       } else {
         d[i] = src[i] * ratio[0]; d[i + 1] = src[i + 1] * ratio[1]; d[i + 2] = src[i + 2] * ratio[2];
+        if (lighten[0] !== null || lighten[1] !== null || lighten[2] !== null) {
+          const lum = (src[i] + src[i + 1] + src[i + 2]) / 3;
+          const x = p % w, y = (p / w) | 0;
+          const k = (1 - nearEye(x, y)) * smooth(skinLum * 0.55, skinLum * 0.9, lum);
+          if (k) for (let c = 0; c < 3; c++) {
+            if (lighten[c] !== null) d[i + c] = d[i + c] * (1 - k) + (255 - (255 - src[i + c]) * lighten[c]) * k;
+          }
+        }
       }
     }
 
