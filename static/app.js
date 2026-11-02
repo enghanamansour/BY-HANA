@@ -231,6 +231,7 @@ function sync3D() {
     hair, brow,
     iris: (f.lens && f.lens !== "none" ? LENS[f.lens] : IRIS[f.eye_color]) || IRIS.dark_brown,
     lashes: data.get("lashes") || "natural",
+    face: f,   // eye shape, brows, lips, nose, face shape and jaw reshape the portrait
     makeup: state.current ? Object.fromEntries(Object.entries(state.current.colors).map(([k, c]) => [k, c.hex])) : null,
   });
 }

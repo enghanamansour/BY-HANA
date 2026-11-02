@@ -24,6 +24,76 @@
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
   let base = null, hairMask = null, skinRef = null, skinLum = 0, skinRed = 0, lipRed = 0, pending = null;
+  let original = null, originalMask = null, faceKey = "";   // unwarped portrait; base/hairMask hold the warped one
+
+  // ---------- Reshaping the face to match "my face" (a soft liquify) ----------
+  // Each op works inside an ellipse and fades to nothing at its edge: "scale" grows or shrinks around
+  // the centre, "shift" moves the area. Coordinates are on the 800 x 960 portrait.
+  const EYES = [[297, 460, -1], [497, 460, 1]];   // [x, y, outer corner direction]
+  function faceOps(f) {
+    const ops = [];
+    const scale = (cx, cy, rx, ry, sx, sy) => ops.push({ scale: true, cx, cy, rx, ry, sx, sy });
+    const shift = (cx, cy, rx, ry, dx, dy) => ops.push({ scale: false, cx, cy, rx, ry, dx, dy });
+    const sides = (fn) => { fn(-1); fn(1); };
+
+    for (const [x, y, o] of EYES) {
+      if (f.eye_shape === "round") scale(x, y, 60, 46, 1.18, 1.32);
+      if (f.eye_shape === "narrow") scale(x, y, 60, 40, 1.02, 0.7);
+      if (f.eye_shape === "upturned") shift(x + o * 40, y, 28, 24, 0, -10);
+      if (f.eye_shape === "downturned") shift(x + o * 40, y, 28, 24, 0, 10);
+      if (f.eye_shape === "hooded") shift(x, y - 26, 52, 20, 0, 6);
+      // Brows: thickness squeezes or widens the brow band, shape lifts or flattens the arch.
+      if (f.brow_thickness === "thin") scale(x + o * 6, 416, 62, 22, 1, 0.55);
+      if (f.brow_thickness === "thick") scale(x + o * 6, 416, 62, 26, 1, 1.6);
+      if (f.brow_shape === "arched") shift(x + o * 14, 404, 36, 20, 0, -9);
+      if (f.brow_shape === "straight") shift(x + o * 14, 404, 36, 20, 0, 7);
+    }
+    if (f.lips_shape === "thin") scale(400, 631, 64, 40, 1, 0.65);
+    if (f.lips_shape === "full") scale(400, 631, 66, 46, 1.08, 1.4);
+    if (f.nose === "slim") scale(400, 565, 46, 54, 0.8, 1);
+    if (f.nose === "wide") scale(400, 565, 46, 54, 1.25, 1);
+
+    if (f.face_shape === "round") { sides((s) => shift(400 + s * 125, 600, 62, 100, s * 15, 0)); shift(400, 700, 90, 44, 0, -14); }
+    if (f.face_shape === "square") sides((s) => shift(400 + s * 112, 652, 54, 54, s * 17, 5));
+    if (f.face_shape === "heart") { sides((s) => shift(400 + s * 110, 650, 62, 62, -s * 15, 0)); shift(400, 700, 72, 42, 0, 9); }
+    if (f.face_shape === "long") { shift(400, 690, 128, 100, 0, 26); sides((s) => shift(400 + s * 130, 560, 40, 80, -s * 6, 0)); }
+    if (f.jaw === "sharp") { sides((s) => shift(400 + s * 100, 665, 45, 45, -s * 7, 5)); scale(400, 700, 60, 30, 0.9, 1); }
+    if (f.jaw === "soft") sides((s) => shift(400 + s * 105, 662, 45, 45, s * 4, -2));
+    return ops;
+  }
+
+  /** Apply the ops to the original portrait (and its hair mask), sampling backwards with bilinear filtering. */
+  function reshape(ops) {
+    const w = canvas.width, h = canvas.height, src = original.data;
+    const out = new Uint8ClampedArray(src);
+    const mask = new Uint8Array(originalMask);
+    if (ops.length) {
+      const x0 = Math.max(1, Math.min(...ops.map((o) => o.cx - o.rx)) | 0);
+      const x1 = Math.min(w - 2, Math.max(...ops.map((o) => o.cx + o.rx)) | 0);
+      const y0 = Math.max(1, Math.min(...ops.map((o) => o.cy - o.ry)) | 0);
+      const y1 = Math.min(h - 2, Math.max(...ops.map((o) => o.cy + o.ry)) | 0);
+      for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+        let sx = x, sy = y, moved = false;
+        for (let k = ops.length - 1; k >= 0; k--) {
+          const o = ops[k], u = (sx - o.cx) / o.rx, v = (sy - o.cy) / o.ry, d2 = u * u + v * v;
+          if (d2 >= 1) continue;
+          const f = (1 - d2) * (1 - d2);
+          moved = true;
+          if (o.scale) { sx = o.cx + (sx - o.cx) / (1 + (o.sx - 1) * f); sy = o.cy + (sy - o.cy) / (1 + (o.sy - 1) * f); }
+          else { sx -= o.dx * f; sy -= o.dy * f; }
+        }
+        if (!moved) continue;
+        const ix = Math.floor(sx), iy = Math.floor(sy), fx = sx - ix, fy = sy - iy;
+        const i00 = (iy * w + ix) * 4, i10 = i00 + 4, i01 = i00 + w * 4, i11 = i01 + 4, o = (y * w + x) * 4;
+        for (let c = 0; c < 4; c++) {
+          out[o + c] = (src[i00 + c] * (1 - fx) + src[i10 + c] * fx) * (1 - fy) + (src[i01 + c] * (1 - fx) + src[i11 + c] * fx) * fy;
+        }
+        mask[y * w + x] = originalMask[Math.round(sy) * w + Math.round(sx)];
+      }
+    }
+    base = new ImageData(out, w, h);
+    hairMask = mask;
+  }
 
   const hexToRgb = (hex) => { const n = parseInt(hex.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
   const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
@@ -160,7 +230,13 @@
 
   function update(look) {
     pending = look;
-    if (window.Portrait.status === "ready") paint(look);
+    if (window.Portrait.status !== "ready") return;
+    const key = JSON.stringify(look.face || {});
+    if (key !== faceKey) {   // reshape only when the face settings change, not for every makeup change
+      faceKey = key;
+      reshape(faceOps(look.face || {}));
+    }
+    paint(look);
   }
 
   window.Portrait = { status: "loading", update };
@@ -201,9 +277,11 @@
       else hairMask[p] = y > 690 && lum > skinLum * 0.62 ? 0 : 1;
     }
 
+    original = base;
+    originalMask = hairMask;
     container.append(canvas);
     window.Portrait.status = "ready";
-    if (pending) paint(pending);
+    if (pending) update(pending);
     window.dispatchEvent(new Event("portrait:ready"));
   };
   img.onerror = () => {
