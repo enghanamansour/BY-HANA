@@ -699,3 +699,19 @@ select, textarea, input[type=text] { background: var(--glass-strong); border-col
   60% { transform: translateY(-14px) scale(1.15); opacity: .8; }
   100% { transform: translateY(-26px) scale(.9); opacity: 0; }
 }
+
+/* ---------- Floating glass header ---------- */
+.topbar {
+  position: sticky; top: 12px; z-index: 15;
+  width: min(1160px, calc(100% - 32px)); margin: 12px auto 0;
+  padding: 10px 12px; padding-inline-start: 24px;
+  background: var(--glass); border: 1px solid var(--glass-border); border-radius: 999px;
+  backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%);
+  box-shadow: 0 8px 30px rgba(59, 37, 53, .1);
+}
+.topbar .icon-btn { height: 42px; min-width: 42px; }
+html { scroll-padding-top: 100px; }
+.mirror-card { top: 96px; }
+@media (max-width: 600px) {
+  .topbar { top: 8px; margin-top: 8px; width: calc(100% - 16px); padding: 8px 8px; padding-inline-start: 18px; }
+}
