@@ -726,3 +726,9 @@ html { scroll-padding-top: 100px; }
 @media (max-width: 600px) {
   .topbar.scrolled { width: calc(100% - 48px); }
 }
+
+/* Image credit, folded away behind a small "Credits" link. */
+.credits { font-size: .75rem; opacity: .75; margin-top: 2px; }
+.credits summary { cursor: pointer; list-style: none; display: inline; text-decoration: underline; text-underline-offset: 3px; }
+.credits summary::-webkit-details-marker { display: none; }
+.credits[open] summary { margin-inline-end: 6px; }
