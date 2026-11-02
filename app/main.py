@@ -70,7 +70,7 @@ def ask(req: AskRequest):
     if not req.question and not req.image:
         return JSONResponse(status_code=400, content={
             "error": "اكتبي سؤالك أو حطي صورة المنتج.", "fields": ["question"]})
-    answer = ask_product(req.question, req.image)
+    answer = ask_product(req.question, req.image, req.history, req.owned_products)
     return AskResponse(**answer.model_dump(),
                        model=config.LLAMA_VISION_MODEL if req.image else config.LLAMA_MODEL)
 

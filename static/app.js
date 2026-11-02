@@ -193,6 +193,9 @@ $("save-face").addEventListener("click", () => {
   if (!store.set(FACE_KEY, f)) return toast("ما قدرنا نحفظ، المتصفح مانع الحفظ.");
   $("face-saved-note").hidden = false;
   toast("حفظنا وجهك");
+  // Straight on to the next step: designing the look.
+  showTab("design");
+  document.querySelector(".tabs").scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
 /** Paint a look onto the face and list its colours under the mirror. */
@@ -696,6 +699,111 @@ function renderAnswer(ans) {
   $("ask-answer").hidden = false;
   $("ask-answer").scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
+
+// ---------- Floating chat with Hanu ----------
+
+const chat = { history: [], image: null, busy: false };
+const CHAT_HISTORY_TURNS = 8;
+
+function openChat(open) {
+  $("chat").hidden = !open;
+  $("chat-open").setAttribute("aria-expanded", open);
+  if (open) $("chat-text").focus();
+}
+$("chat-open").addEventListener("click", () => openChat(true));
+$("chat-close").addEventListener("click", () => openChat(false));
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("chat").hidden) openChat(false); });
+
+function chatBubble(who, ...children) {
+  const li = el("li", `msg ${who}`);
+  li.append(...children);
+  $("chat-log").append(li);
+  $("chat-log").scrollTop = $("chat-log").scrollHeight;
+  return li;
+}
+
+/** Hanu's answer as a chat bubble: product, tags, answer, how to check, what pairs well / avoid. */
+function answerBubble(ans) {
+  const parts = [];
+  if (ans.product_name) parts.push(el("p", "msg-product", ans.product_name));
+  if (ans.base) {
+    const tags = el("div", "msg-tags");
+    tags.append(el("span", `tag base-${ans.base}`, BASE_AR[ans.base]),
+                el("span", `tag conf-${ans.confidence}`, CONF_AR[ans.confidence]));
+    parts.push(tags);
+  }
+  parts.push(el("p", null, ans.answer));
+  if (ans.how_to_check) parts.push(el("p", "msg-check", `كيف تتأكدين: ${ans.how_to_check}`));
+  for (const [key, cls, title] of [["pairs_well_with", "good", "يمشي مع"], ["avoid_with", "bad", "لا تحطينه مع"]]) {
+    if (!ans[key]?.length) continue;
+    const box = el("div", `msg-list ${cls}`);
+    box.append(el("b", null, title), ans[key].join("، "));
+    parts.push(box);
+  }
+  return chatBubble("hanu", ...parts);
+}
+
+async function attachChatPhoto(input) {
+  const file = input.files[0];
+  input.value = "";
+  if (!file) return;
+  try {
+    chat.image = await resizeImage(file);
+    $("chat-attach-img").src = chat.image;
+    $("chat-attach").hidden = false;
+  } catch (err) {
+    chatBubble("hanu err", el("p", null, err.message));
+  }
+}
+$("chat-photo").addEventListener("change", (e) => attachChatPhoto(e.target));
+$("chat-attach-remove").addEventListener("click", () => {
+  chat.image = null;
+  $("chat-attach").hidden = true;
+});
+
+$("chat-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (chat.busy) return;
+  const question = $("chat-text").value.trim();
+  const image = chat.image;
+  if (!question && !image) return $("chat-text").focus();
+
+  // Show her message right away.
+  const mine = [];
+  if (image) { const img = el("img"); img.src = image; img.alt = "صورة المنتج"; mine.push(img); }
+  if (question) mine.push(el("p", null, question));
+  chatBubble("user", ...mine);
+  $("chat-text").value = "";
+  chat.image = null;
+  $("chat-attach").hidden = true;
+
+  chat.busy = true;
+  $("chat-send").disabled = true;
+  const typing = el("div", "dots");
+  typing.append(el("span"), el("span"), el("span"));
+  const waiting = chatBubble("hanu", typing);
+
+  try {
+    const ans = await api("/api/ask", {
+      question, image,
+      history: chat.history.slice(-CHAT_HISTORY_TURNS),
+      owned_products: state.bag,
+    }, PHOTO_TIMEOUT_MS);
+    waiting.remove();
+    answerBubble(ans);
+    chat.history.push(
+      { role: "user", content: (question || "وش هذا المنتج؟") + (image ? " [مع صورة]" : "") },
+      { role: "assistant", content: ans.answer.slice(0, 1500) },
+    );
+  } catch (err) {
+    waiting.remove();
+    chatBubble("hanu err", el("p", null, err.message));
+  } finally {
+    chat.busy = false;
+    $("chat-send").disabled = false;
+    $("chat-text").focus();
+  }
+});
 
 // ---------- Start ----------
 

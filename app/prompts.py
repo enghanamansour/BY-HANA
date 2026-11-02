@@ -42,7 +42,8 @@ Rules:
   undertone (warm: peach, coral, gold, bronze, brick; cool: rose, berry, plum, mauve, pearl), and fit the
   occasion (soft nudes for work/daily, richer colour for weddings and evenings). Lid and crease must be
   from the same family, e.g. champagne + soft_peach, bronze + deep_brown, burgundy + plum.
-- Write every text field in Arabic using a friendly Saudi (Najdi/Hijazi) tone, never Egyptian dialect. Keep JSON keys and enum values in English.
+- Write every text field in Arabic using a friendly Saudi (Najdi/Hijazi) tone, never Egyptian dialect or formal
+  Arabic. Example tone: "حطي البرايمر على المسام بس، وخليه ينشف دقيقة قبل الفاونديشن." Keep JSON keys and enum values in English.
 
 Return ONLY a JSON object, no markdown, with exactly this shape:
 {
@@ -176,6 +177,10 @@ A woman asks you about a makeup product (by name, by photo, or both). Answer lik
 - If you are not sure of a product's exact formula, say so honestly and set confidence to "low" or "medium".
 - Always tell her how to check the base herself from the ingredients list.
 - If the question is not about makeup or skincare, politely say you only help with makeup, in "answer".
+- "pairs_well_with" must only list things with the SAME base as the product; "avoid_with" lists clashing bases.
+  Never contradict yourself between "answer" and these lists.
+- Talk like a Saudi friend, not formal Arabic. Example tone: "هذا البرايمر سيليكوني، فلا تحطينه تحت فاونديشن
+  مائي لأنه بيتكتّل. شوفي المكونات: لو فيها dimethicone في أولها فهو سيليكوني." Avoid "يمكنك" and "يُفضّل".
 - Write all text in Arabic using a friendly Saudi tone, never Egyptian dialect. Keep JSON keys and enum values in English.
 
 Return ONLY a JSON object, no markdown:
@@ -191,6 +196,11 @@ Return ONLY a JSON object, no markdown:
 }"""
 
 
-def build_ask_prompt(question: str, has_image: bool) -> str:
+def build_ask_prompt(question: str, has_image: bool, owned: list | None = None) -> str:
     q = question or "What is this product, and is it water-based or silicone-based?"
-    return (q + "\n(The product is in the attached photo.)") if has_image else q
+    if has_image:
+        q += "\n(The product is in the attached photo.)"
+    if owned:
+        bag = "; ".join(p.name + (f" ({p.base}-based)" if p.base else "") for p in owned)
+        q += f"\n(Products she owns, if she refers to 'my' products: {bag})"
+    return q

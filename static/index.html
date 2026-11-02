@@ -523,6 +523,47 @@
     </section>
   </main>
 
+  <!-- Floating chat with Hanu: fixed in the corner, available from every tab -->
+  <button class="chat-fab" id="chat-open" type="button" aria-controls="chat" aria-expanded="false">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.2 3.6c-.5.4-1.3.1-1.3-.6V16A2.5 2.5 0 0 1 4 13.5z"/></svg>
+    <span>اسألي هنو</span>
+  </button>
+
+  <section class="chat" id="chat" aria-label="محادثة هنو" hidden>
+    <header class="chat-head">
+      <div class="chat-avatar" aria-hidden="true">H</div>
+      <div>
+        <strong>هنو</strong>
+        <span>اسأليها عن أي منتج أو مكياج</span>
+      </div>
+      <button class="chat-close" id="chat-close" type="button" aria-label="سكري المحادثة">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </header>
+
+    <ol class="chat-log" id="chat-log" aria-live="polite">
+      <li class="msg hanu">
+        <p>هلا! أنا هنو. اسأليني عن أي منتج: سيليكون ولا مائي؟ ينفع مع الفاونديشن حقك؟ وتقدرين ترسلين لي صورة المنتج.</p>
+      </li>
+    </ol>
+
+    <div class="chat-attach" id="chat-attach" hidden>
+      <img id="chat-attach-img" alt="الصورة المرفقة">
+      <button type="button" class="remove" id="chat-attach-remove" aria-label="حذف الصورة">×</button>
+    </div>
+
+    <form class="chat-input" id="chat-form" novalidate>
+      <label class="chat-icon-btn" aria-label="ارفقي صورة">
+        <input type="file" accept="image/*" id="chat-photo" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.8l1.2-1.8c.3-.4.7-.7 1.2-.7h2.6c.5 0 .9.3 1.2.7L15.7 6h1.8A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5z"/><circle cx="12" cy="12.5" r="3.2"/></svg>
+      </label>
+      <input type="text" id="chat-text" maxlength="500" placeholder="اكتبي سؤالك..." autocomplete="off">
+      <button class="chat-send" type="submit" id="chat-send" aria-label="أرسلي">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12L4 4l3 8-3 8z"/></svg>
+      </button>
+    </form>
+  </section>
+
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
   <footer class="footer">

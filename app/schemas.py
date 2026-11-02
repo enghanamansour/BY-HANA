@@ -164,9 +164,17 @@ class ScanResult(BaseModel):
 
 # ---------- 3) Ask about a product ----------
 
+class ChatTurn(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(max_length=1500)
+
+
 class AskRequest(BaseModel):
     question: str = Field(default="", max_length=500)
     image: str | None = None
+    # Chat mode: earlier turns so follow-up questions make sense, and her bag so "my primer" is known.
+    history: list[ChatTurn] = Field(default_factory=list, max_length=12)
+    owned_products: list[OwnedProduct] = Field(default_factory=list, max_length=25)
 
     _image = field_validator("image")(check_image)
 

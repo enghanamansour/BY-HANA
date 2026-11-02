@@ -10,7 +10,7 @@ from pydantic import BaseModel, ValidationError
 
 from . import config
 from .prompts import ASK_PROMPT, LOOK_PROMPT, SCAN_PROMPT, build_ask_prompt, build_look_prompt
-from .schemas import AskAnswer, LlamaLook, LookRequest, ScanResult
+from .schemas import AskAnswer, ChatTurn, LlamaLook, LookRequest, OwnedProduct, ScanResult
 
 log = logging.getLogger("by-hana.llama")
 T = TypeVar("T", bound=BaseModel)
@@ -27,6 +27,14 @@ class LlamaError(Exception):
 
 _client = OpenAI(api_key=config.LLM_API_KEY or "missing", base_url=config.LLM_BASE_URL,
                  timeout=config.LLM_TIMEOUT, max_retries=0)
+
+
+# Llama sometimes slips Cyrillic letters into Arabic words ("سيликوني"). Map them back to Arabic.
+_CYRILLIC_TO_ARABIC = str.maketrans({
+    "и": "ي", "й": "ي", "ы": "ي", "е": "ي", "л": "ل", "к": "ك", "о": "و", "у": "و", "н": "ن", "а": "ا",
+    "р": "ر", "т": "ت", "с": "س", "м": "م", "д": "د", "в": "ف", "ф": "ف", "б": "ب", "п": "ب", "з": "ز",
+    "г": "ج", "х": "خ", "ш": "ش", "ч": "ش", "я": "يا", "ю": "يو", "ь": "", "ъ": "",
+})
 
 
 def _extract_json(text: str) -> dict:
@@ -65,15 +73,16 @@ def _call_llama(model: str, messages: list[dict], max_tokens: int) -> str:
     return content
 
 
-def _ask_json(schema: type[T], model: str, system: str, user: str | list, max_tokens: int = 2000) -> T:
+def _ask_json(schema: type[T], model: str, system: str, user: str | list, max_tokens: int = 2000,
+              history: list[dict] | None = None) -> T:
     """Send a prompt, and keep only a reply that matches `schema`. Retries once with the exact error."""
     if not config.LLM_API_KEY:
         raise LlamaError("التطبيق مو جاهز: مفتاح Llama ناقص.", 500)
 
-    messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
+    messages = [{"role": "system", "content": system}, *(history or []), {"role": "user", "content": user}]
     for attempt in range(config.LLM_MAX_RETRIES + 1):
         try:
-            content = _call_llama(model, messages, max_tokens)
+            content = _call_llama(model, messages, max_tokens).translate(_CYRILLIC_TO_ARABIC)
             return schema.model_validate(_extract_json(content))
         except (ValueError, ValidationError) as e:
             log.warning("Invalid Llama reply (attempt %d): %s", attempt + 1, e)
@@ -98,8 +107,10 @@ def scan_products(image: str) -> ScanResult:
                      _with_image("List the products in this photo.", image), max_tokens=800)
 
 
-def ask_product(question: str, image: str | None) -> AskAnswer:
-    text = build_ask_prompt(question, image is not None)
+def ask_product(question: str, image: str | None, history: list[ChatTurn] = (),
+                owned: list[OwnedProduct] = ()) -> AskAnswer:
+    text = build_ask_prompt(question, image is not None, list(owned))
+    past = [t.model_dump() for t in history]  # earlier chat turns, as plain text
     if image:
-        return _ask_json(AskAnswer, config.LLAMA_VISION_MODEL, ASK_PROMPT, _with_image(text, image), 900)
-    return _ask_json(AskAnswer, config.LLAMA_MODEL, ASK_PROMPT, text, 900)
+        return _ask_json(AskAnswer, config.LLAMA_VISION_MODEL, ASK_PROMPT, _with_image(text, image), 900, past)
+    return _ask_json(AskAnswer, config.LLAMA_MODEL, ASK_PROMPT, text, 900, past)
