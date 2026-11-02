@@ -62,6 +62,14 @@ Coverage = Literal["none", "hijab", "niqab"]
 HairColor = Literal["black", "dark_brown", "brown", "caramel", "honey", "burgundy"]
 Lashes = Literal["none", "natural", "dramatic"]
 Finish = Literal["any", "matte", "satin", "dewy"]
+FaceShape = Literal["oval", "round", "square", "heart", "long"]
+Jaw = Literal["soft", "defined", "sharp"]
+EyeShape = Literal["almond", "round", "narrow", "upturned", "downturned", "hooded"]
+EyeColor = Literal["dark_brown", "brown", "honey", "hazel", "green", "grey"]
+BrowShape = Literal["arched", "soft", "straight"]
+BrowThickness = Literal["thin", "natural", "thick"]
+Nose = Literal["slim", "medium", "wide"]
+LipsShape = Literal["thin", "medium", "full"]
 
 
 class LookRequest(BaseModel):
@@ -75,6 +83,14 @@ class LookRequest(BaseModel):
     hair_color: HairColor = "black"
     lashes: Lashes = "natural"
     finish: Finish = "any"
+    face_shape: FaceShape = "oval"
+    jaw: Jaw = "defined"
+    eye_shape: EyeShape = "almond"
+    eye_color: EyeColor = "dark_brown"
+    brow_shape: BrowShape = "arched"
+    brow_thickness: BrowThickness = "natural"
+    nose: Nose = "medium"
+    lips_shape: LipsShape = "medium"
     owned_products: list[OwnedProduct] = Field(default_factory=list, max_length=25)
     notes: str = Field(default="", max_length=300)
 
@@ -108,6 +124,7 @@ class LlamaLook(BaseModel):
     shades: LookShades
     products: list[Product] = Field(min_length=4, max_length=16)
     climate_tips: list[str] = Field(min_length=1, max_length=5)
+    face_tips: list[str] = Field(default_factory=list, max_length=5)
     compatibility_note: str = ""
 
 

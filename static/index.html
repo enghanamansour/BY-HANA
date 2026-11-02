@@ -47,6 +47,7 @@
                 <stop offset="60%" stop-color="#fff" stop-opacity="0"/>
               </linearGradient>
               <filter id="soft" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
+              <clipPath id="eye-clip"><path data-part="eye"/></clipPath>
             </defs>
 
             <!-- Hair (back) and hijab -->
@@ -57,58 +58,64 @@
             <!-- Neck and face -->
             <path class="skin neck" d="M172,360 L172,410 C126,420 78,440 58,480 L342,480 C322,440 274,420 228,410 L228,360 Z"/>
             <path class="neck" d="M172,360 L228,360 L228,398 C210,406 190,406 172,398 Z" fill="url(#g-shade)"/>
-            <path class="skin" d="M200,90 C270,90 302,146 302,214 C302,292 270,352 224,378 C212,385 188,385 176,378 C130,352 98,292 98,214 C98,146 130,90 200,90 Z"/>
+            <path class="skin" data-part="face"/>
 
-            <!-- Cheeks: blush and highlighter -->
-            <ellipse class="blush" cx="134" cy="282" rx="36" ry="22" fill="url(#g-blush)"/>
-            <ellipse class="blush" cx="266" cy="282" rx="36" ry="22" fill="url(#g-blush)"/>
-            <ellipse class="hl" cx="144" cy="254" rx="24" ry="7" fill="url(#g-hl)" transform="rotate(-14 144 254)"/>
-            <ellipse class="hl" cx="256" cy="254" rx="24" ry="7" fill="url(#g-hl)" transform="rotate(14 256 254)"/>
+            <!-- Cheeks: blush and highlighter (positions follow the face shape) -->
+            <ellipse class="blush" data-part="blush" cx="134" cy="282" rx="36" ry="22" fill="url(#g-blush)"/>
+            <ellipse class="blush" data-part="blush" cx="266" cy="282" rx="36" ry="22" fill="url(#g-blush)"/>
+            <ellipse class="hl" data-part="hl-cheek" cx="144" cy="254" rx="24" ry="7" fill="url(#g-hl)"/>
+            <ellipse class="hl" data-part="hl-cheek" cx="256" cy="254" rx="24" ry="7" fill="url(#g-hl)"/>
             <ellipse class="hl" cx="200" cy="250" rx="4" ry="20" fill="url(#g-hl)"/>
-            <ellipse class="hl" cx="200" cy="300" rx="7" ry="2.5" fill="url(#g-hl)"/>
+            <ellipse class="hl" data-part="hl-cupid" cx="200" cy="300" rx="7" ry="2.5" fill="url(#g-hl)"/>
 
-            <!-- Left eye; the right eye is the same drawing mirrored -->
+            <!-- Left eye; the right eye is the same drawing mirrored. Paths come from face.js -->
             <g class="eye">
-              <path class="crease" filter="url(#soft)" d="M112,209 C122,178 188,172 202,210 C184,188 134,186 112,209 Z"/>
-              <path class="lid" d="M118,213 C126,190 182,186 194,217 Q154,195 118,213 Z"/>
-              <path class="eye-white" d="M124,213 Q152,196 186,219 Q158,234 124,213 Z"/>
-              <circle class="iris" cx="155" cy="215" r="11"/>
-              <circle cx="155" cy="215" r="5" fill="#120B08"/>
-              <circle cx="158.5" cy="211" r="2.4" fill="#fff" opacity=".85"/>
-              <path class="kohl" d="M126,216 Q158,234 184,221"/>
-              <path class="liner" d="M188,219 Q152,194 124,213 L108,203"/>
-              <path class="lash lash-own" d="M132,207 l-3,-5 M142,202 l-2,-6 M153,199 l-1,-6 M164,200 l1,-6 M174,204 l2,-5"/>
-              <path class="lash lash-natural" d="M128,209 l-6,-7 M136,204 l-5,-9 M145,200 l-3,-10 M155,198 l-1,-10 M165,199 l1,-10 M175,203 l3,-9 M183,209 l4,-7"/>
-              <path class="lash lash-dramatic" d="M124,211 l-12,-9 M130,206 l-10,-12 M138,201 l-8,-14 M147,198 l-5,-15 M157,197 l-2,-15 M167,198 l1,-14 M176,202 l4,-12 M184,208 l6,-9"/>
-              <path class="brow" d="M194,184 C192,177 190,174 186,173 C164,166 138,164 110,188 C138,174 164,178 194,184 Z"/>
+              <path class="crease" data-part="crease" filter="url(#soft)"/>
+              <path class="lid" data-part="lid"/>
+              <path class="skin hood" data-part="hood"/>
+              <path class="eye-white" data-part="eye"/>
+              <g clip-path="url(#eye-clip)">
+                <circle class="iris" data-part="iris" cx="155" cy="215" r="11"/>
+                <circle data-part="pupil" cx="155" cy="215" r="5" fill="#120B08"/>
+                <circle data-part="glint" cx="158.5" cy="211" r="2.4" fill="#fff" opacity=".85"/>
+              </g>
+              <path class="kohl" data-part="kohl"/>
+              <path class="liner" data-part="liner"/>
+              <path class="lash lash-own" data-part="lash-own"/>
+              <path class="lash lash-natural" data-part="lash-natural"/>
+              <path class="lash lash-dramatic" data-part="lash-dramatic"/>
+              <path class="brow" data-part="brow"/>
             </g>
             <g class="eye" transform="translate(400,0) scale(-1,1)">
-              <path class="crease" filter="url(#soft)" d="M112,209 C122,178 188,172 202,210 C184,188 134,186 112,209 Z"/>
-              <path class="lid" d="M118,213 C126,190 182,186 194,217 Q154,195 118,213 Z"/>
-              <path class="eye-white" d="M124,213 Q152,196 186,219 Q158,234 124,213 Z"/>
-              <circle class="iris" cx="155" cy="215" r="11"/>
-              <circle cx="155" cy="215" r="5" fill="#120B08"/>
-              <circle cx="151.5" cy="211" r="2.4" fill="#fff" opacity=".85"/>
-              <path class="kohl" d="M126,216 Q158,234 184,221"/>
-              <path class="liner" d="M188,219 Q152,194 124,213 L108,203"/>
-              <path class="lash lash-own" d="M132,207 l-3,-5 M142,202 l-2,-6 M153,199 l-1,-6 M164,200 l1,-6 M174,204 l2,-5"/>
-              <path class="lash lash-natural" d="M128,209 l-6,-7 M136,204 l-5,-9 M145,200 l-3,-10 M155,198 l-1,-10 M165,199 l1,-10 M175,203 l3,-9 M183,209 l4,-7"/>
-              <path class="lash lash-dramatic" d="M124,211 l-12,-9 M130,206 l-10,-12 M138,201 l-8,-14 M147,198 l-5,-15 M157,197 l-2,-15 M167,198 l1,-14 M176,202 l4,-12 M184,208 l6,-9"/>
-              <path class="brow" d="M194,184 C192,177 190,174 186,173 C164,166 138,164 110,188 C138,174 164,178 194,184 Z"/>
+              <path class="crease" data-part="crease" filter="url(#soft)"/>
+              <path class="lid" data-part="lid"/>
+              <path class="skin hood" data-part="hood"/>
+              <path class="eye-white" data-part="eye"/>
+              <g clip-path="url(#eye-clip)">
+                <circle class="iris" data-part="iris" cx="155" cy="215" r="11"/>
+                <circle data-part="pupil" cx="155" cy="215" r="5" fill="#120B08"/>
+                <circle data-part="glint" cx="151.5" cy="211" r="2.4" fill="#fff" opacity=".85"/>
+              </g>
+              <path class="kohl" data-part="kohl"/>
+              <path class="liner" data-part="liner"/>
+              <path class="lash lash-own" data-part="lash-own"/>
+              <path class="lash lash-natural" data-part="lash-natural"/>
+              <path class="lash lash-dramatic" data-part="lash-dramatic"/>
+              <path class="brow" data-part="brow"/>
             </g>
 
             <!-- Nose and lips -->
-            <path class="nose" d="M194,230 Q191,262 184,280 Q192,291 200,288 Q208,291 216,280"/>
-            <path class="lips" d="M162,318 Q178,302 193,306 Q200,310 207,306 Q222,302 238,318 Q200,323 162,318 Z"/>
-            <path class="lips" d="M162,318 Q200,323 238,318 Q224,346 200,348 Q176,346 162,318 Z"/>
-            <path class="lip-line" d="M162,318 Q200,323 238,318"/>
-            <ellipse cx="200" cy="332" rx="13" ry="3.5" fill="#fff" opacity=".2"/>
+            <path class="nose" data-part="nose"/>
+            <path class="lips" data-part="lipU"/>
+            <path class="lips" data-part="lipL"/>
+            <path class="lip-line" data-part="lipLine"/>
+            <ellipse data-part="gloss" cx="200" cy="332" rx="13" ry="3.5" fill="#fff" opacity=".2"/>
 
             <!-- Hair (front, middle part) and hijab front / niqab -->
             <path class="hair fringe" d="M200,84 C156,84 108,110 98,176 C92,214 96,252 88,292 C108,236 112,172 140,132 C160,104 182,94 200,90 Z"/>
             <path class="hair fringe" transform="translate(400,0) scale(-1,1)" d="M200,84 C156,84 108,110 98,176 C92,214 96,252 88,292 C108,236 112,172 140,132 C160,104 182,94 200,90 Z"/>
             <path class="hijab" d="M96,214 C94,120 146,76 200,76 C254,76 306,120 304,214 C292,144 252,102 200,100 C148,102 108,144 96,214 Z"/>
-            <path class="niqab" d="M90,240 C130,248 270,248 310,240 C318,302 324,382 344,480 L56,480 C76,382 82,302 90,240 Z"/>
+            <path class="niqab" data-part="niqab"/>
 
             <rect class="scan" x="0" y="0" width="400" height="60"/>
           </svg>
@@ -124,11 +131,142 @@
 
       <div class="panel">
         <nav class="tabs" role="tablist" aria-label="أقسام التطبيق">
+          <button class="tab" role="tab" data-tab="face" aria-selected="false">👩🏻 وجهي</button>
           <button class="tab active" role="tab" data-tab="design" aria-selected="true">✨ هنو تصمم</button>
           <button class="tab" role="tab" data-tab="manual" aria-selected="false">🎨 جربي بنفسك</button>
           <button class="tab" role="tab" data-tab="ask" aria-selected="false">🔍 اسألي هنو</button>
           <button class="tab" role="tab" data-tab="saved" aria-selected="false">💾 لوكاتي <span class="count" id="saved-count">0</span></button>
         </nav>
+
+        <!-- ============ 0) My face (its inputs belong to the look form via form="look-form") ============ -->
+        <div class="tab-panel" data-panel="face" hidden>
+          <section class="card" id="face-card">
+            <h2>صممي وجهك</h2>
+            <p class="hint">خلي المرآة تشبهك. هنو تعدّل طريقة المكياج على ملامحك: مثلًا العين المبطّنة لها تقنية آيلاينر غير اللوزية.</p>
+
+            <fieldset class="field" data-field="skin_tone">
+              <legend>لون البشرة <span class="req">*</span></legend>
+              <div class="chips tones">
+                <label><input form="look-form" type="radio" name="skin_tone" value="fair"><span><i style="--c:#F3D9C6"></i>فاتحة جدًا</span></label>
+                <label><input form="look-form" type="radio" name="skin_tone" value="light"><span><i style="--c:#E9C3A3"></i>فاتحة</span></label>
+                <label><input form="look-form" type="radio" name="skin_tone" value="medium"><span><i style="--c:#D1A07A"></i>حنطية</span></label>
+                <label><input form="look-form" type="radio" name="skin_tone" value="tan"><span><i style="--c:#AF7C55"></i>سمراء</span></label>
+                <label><input form="look-form" type="radio" name="skin_tone" value="deep"><span><i style="--c:#7A4E33"></i>داكنة</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="field" data-field="undertone">
+              <legend>درجة البشرة التحتية <small>(العروق خضرا = دافئة، زرقا = باردة)</small></legend>
+              <div class="chips">
+                <label><input form="look-form" type="radio" name="undertone" value="warm"><span>دافئة</span></label>
+                <label><input form="look-form" type="radio" name="undertone" value="cool"><span>باردة</span></label>
+                <label><input form="look-form" type="radio" name="undertone" value="neutral"><span>محايدة</span></label>
+                <label><input form="look-form" type="radio" name="undertone" value="unknown" checked><span>ما أعرف</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="field" data-field="face_shape">
+              <legend>شكل الوجه</legend>
+              <div class="chips">
+                <label><input form="look-form" type="radio" name="face_shape" value="oval" checked><span>بيضاوي</span></label>
+                <label><input form="look-form" type="radio" name="face_shape" value="round"><span>دائري</span></label>
+                <label><input form="look-form" type="radio" name="face_shape" value="square"><span>مربع</span></label>
+                <label><input form="look-form" type="radio" name="face_shape" value="heart"><span>قلب</span></label>
+                <label><input form="look-form" type="radio" name="face_shape" value="long"><span>طويل</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="field" data-field="jaw">
+              <legend>الفك</legend>
+              <div class="chips">
+                <label><input form="look-form" type="radio" name="jaw" value="soft"><span>ناعم</span></label>
+                <label><input form="look-form" type="radio" name="jaw" value="defined" checked><span>واضح</span></label>
+                <label><input form="look-form" type="radio" name="jaw" value="sharp"><span>حاد</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="field" data-field="eye_shape">
+              <legend>شكل العيون</legend>
+              <div class="chips">
+                <label><input form="look-form" type="radio" name="eye_shape" value="almond" checked><span>لوزية</span></label>
+                <label><input form="look-form" type="radio" name="eye_shape" value="round"><span>واسعة</span></label>
+                <label><input form="look-form" type="radio" name="eye_shape" value="narrow"><span>ضيقة</span></label>
+                <label><input form="look-form" type="radio" name="eye_shape" value="upturned"><span>مسحوبة لفوق</span></label>
+                <label><input form="look-form" type="radio" name="eye_shape" value="downturned"><span>مائلة لتحت</span></label>
+                <label><input form="look-form" type="radio" name="eye_shape" value="hooded"><span>جفن مبطّن</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="field" data-field="eye_color">
+              <legend>لون العيون</legend>
+              <div class="chips tones">
+                <label><input form="look-form" type="radio" name="eye_color" value="dark_brown" checked><span><i style="--c:#2A170F"></i>بني غامق</span></label>
+                <label><input form="look-form" type="radio" name="eye_color" value="brown"><span><i style="--c:#4A2B1A"></i>بني</span></label>
+                <label><input form="look-form" type="radio" name="eye_color" value="honey"><span><i style="--c:#8A5A2B"></i>عسلي</span></label>
+                <label><input form="look-form" type="radio" name="eye_color" value="hazel"><span><i style="--c:#6B5A2E"></i>بندقي</span></label>
+                <label><input form="look-form" type="radio" name="eye_color" value="green"><span><i style="--c:#4F6B4A"></i>أخضر</span></label>
+                <label><input form="look-form" type="radio" name="eye_color" value="grey"><span><i style="--c:#6C7A80"></i>رمادي</span></label>
+              </div>
+            </fieldset>
+
+            <div class="row">
+              <fieldset class="field" data-field="brow_shape">
+                <legend>شكل الحواجب</legend>
+                <div class="chips">
+                  <label><input form="look-form" type="radio" name="brow_shape" value="arched" checked><span>مقوّسة</span></label>
+                  <label><input form="look-form" type="radio" name="brow_shape" value="soft"><span>ناعمة</span></label>
+                  <label><input form="look-form" type="radio" name="brow_shape" value="straight"><span>مستقيمة</span></label>
+                </div>
+              </fieldset>
+              <fieldset class="field" data-field="brow_thickness">
+                <legend>كثافة الحواجب</legend>
+                <div class="chips">
+                  <label><input form="look-form" type="radio" name="brow_thickness" value="thin"><span>رفيعة</span></label>
+                  <label><input form="look-form" type="radio" name="brow_thickness" value="natural"><span>متوسطة</span></label>
+                  <label><input form="look-form" type="radio" name="brow_thickness" value="thick" checked><span>كثيفة</span></label>
+                </div>
+              </fieldset>
+            </div>
+
+            <div class="row">
+              <fieldset class="field" data-field="nose">
+                <legend>الأنف</legend>
+                <div class="chips">
+                  <label><input form="look-form" type="radio" name="nose" value="slim"><span>نحيف</span></label>
+                  <label><input form="look-form" type="radio" name="nose" value="medium" checked><span>متوسط</span></label>
+                  <label><input form="look-form" type="radio" name="nose" value="wide"><span>عريض</span></label>
+                </div>
+              </fieldset>
+              <fieldset class="field" data-field="lips_shape">
+                <legend>الشفايف</legend>
+                <div class="chips">
+                  <label><input form="look-form" type="radio" name="lips_shape" value="thin"><span>رفيعة</span></label>
+                  <label><input form="look-form" type="radio" name="lips_shape" value="medium"><span>متوسطة</span></label>
+                  <label><input form="look-form" type="radio" name="lips_shape" value="full" checked><span>ممتلئة</span></label>
+                </div>
+              </fieldset>
+            </div>
+
+            <fieldset class="field" data-field="hair_color">
+              <legend>لون الشعر <small>(نختار لون الحواجب على أساسه)</small></legend>
+              <div class="chips tones">
+                <label><input form="look-form" type="radio" name="hair_color" value="black" checked><span><i style="--c:#1B1412"></i>أسود</span></label>
+                <label><input form="look-form" type="radio" name="hair_color" value="dark_brown"><span><i style="--c:#3A2419"></i>بني غامق</span></label>
+                <label><input form="look-form" type="radio" name="hair_color" value="brown"><span><i style="--c:#5A3825"></i>بني</span></label>
+                <label><input form="look-form" type="radio" name="hair_color" value="caramel"><span><i style="--c:#8A5A34"></i>كراميل</span></label>
+                <label><input form="look-form" type="radio" name="hair_color" value="honey"><span><i style="--c:#A57A45"></i>عسلي</span></label>
+                <label><input form="look-form" type="radio" name="hair_color" value="burgundy"><span><i style="--c:#5A1E26"></i>عنابي</span></label>
+              </div>
+            </fieldset>
+
+            <p class="form-error" id="face-error" role="alert" hidden></p>
+            <div class="face-actions">
+              <button class="btn primary inline" type="button" id="save-face">💾 احفظي وجهي</button>
+              <button class="btn ghost" type="button" data-goto="design">التالي: صممي لوكك ←</button>
+            </div>
+            <p class="saved-note" id="face-saved-note" hidden>✓ وجهك محفوظ، وبيطلع لك كل ما فتحتي الموقع.</p>
+          </section>
+        </div>
 
         <!-- ============ 1) Hanu designs a look ============ -->
         <div class="tab-panel" data-panel="design">
@@ -146,26 +284,10 @@
               </div>
             </fieldset>
 
-            <fieldset class="field" data-field="skin_tone">
-              <legend>لون البشرة <span class="req">*</span></legend>
-              <div class="chips tones">
-                <label><input type="radio" name="skin_tone" value="fair"><span><i style="--c:#F3D9C6"></i>فاتحة جدًا</span></label>
-                <label><input type="radio" name="skin_tone" value="light"><span><i style="--c:#E9C3A3"></i>فاتحة</span></label>
-                <label><input type="radio" name="skin_tone" value="medium"><span><i style="--c:#D1A07A"></i>حنطية</span></label>
-                <label><input type="radio" name="skin_tone" value="tan"><span><i style="--c:#AF7C55"></i>سمراء</span></label>
-                <label><input type="radio" name="skin_tone" value="deep"><span><i style="--c:#7A4E33"></i>داكنة</span></label>
-              </div>
-            </fieldset>
-
-            <fieldset class="field" data-field="undertone">
-              <legend>درجة البشرة التحتية <small>(اختياري)</small></legend>
-              <div class="chips">
-                <label><input type="radio" name="undertone" value="warm"><span>دافئة</span></label>
-                <label><input type="radio" name="undertone" value="cool"><span>باردة</span></label>
-                <label><input type="radio" name="undertone" value="neutral"><span>محايدة</span></label>
-                <label><input type="radio" name="undertone" value="unknown" checked><span>ما أعرف</span></label>
-              </div>
-            </fieldset>
+            <p class="face-summary" id="face-summary">
+              <span id="face-summary-text">لون بشرتك وملامحك من تبويب "وجهي".</span>
+              <button type="button" class="link-btn" data-goto="face">عدّلي وجهك</button>
+            </p>
 
             <div class="row">
               <label class="field select" data-field="city">
@@ -217,18 +339,6 @@
             <!-- Extras -->
             <details class="extras" open>
               <summary>✨ إضافات تكمّل لوكك</summary>
-
-              <fieldset class="field" data-field="hair_color">
-                <legend>لون الشعر <small>(نختار لون الحواجب على أساسه)</small></legend>
-                <div class="chips tones">
-                  <label><input type="radio" name="hair_color" value="black" checked><span><i style="--c:#1B1412"></i>أسود</span></label>
-                  <label><input type="radio" name="hair_color" value="dark_brown"><span><i style="--c:#3A2419"></i>بني غامق</span></label>
-                  <label><input type="radio" name="hair_color" value="brown"><span><i style="--c:#5A3825"></i>بني</span></label>
-                  <label><input type="radio" name="hair_color" value="caramel"><span><i style="--c:#8A5A34"></i>كراميل</span></label>
-                  <label><input type="radio" name="hair_color" value="honey"><span><i style="--c:#A57A45"></i>عسلي</span></label>
-                  <label><input type="radio" name="hair_color" value="burgundy"><span><i style="--c:#5A1E26"></i>عنابي</span></label>
-                </div>
-              </fieldset>
 
               <fieldset class="field" data-field="lashes">
                 <legend>الرموش</legend>
@@ -303,6 +413,11 @@
               <h3 id="compat-title"></h3>
               <p id="compat-note"></p>
               <ul id="compat-list"></ul>
+            </article>
+
+            <article class="card face-tips" id="face-tips-card" hidden>
+              <h3>👩🏻 نصايح لملامحك</h3>
+              <ul class="tips" id="face-tips"></ul>
             </article>
 
             <article class="card">
@@ -401,6 +516,7 @@
     <p>by HANA · الاقتراحات إرشادية، جربي أي منتج جديد على جزء صغير من بشرتك قبل استخدامه.</p>
   </footer>
 
+  <script src="face.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

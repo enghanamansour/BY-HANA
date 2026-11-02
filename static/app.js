@@ -7,6 +7,13 @@ const face = $("face");
 // ---------- Vocabularies ----------
 
 const REQUIRED = ["skin_type", "skin_tone", "city", "occasion", "budget"];
+// Everything that describes her face; saved together as "my face".
+const FACE_FIELDS = ["skin_tone", "undertone", "hair_color", "face_shape", "jaw", "eye_shape", "eye_color",
+                     "brow_shape", "brow_thickness", "nose", "lips_shape", "coverage"];
+const FACE_KEY = "byhana.face";
+const TONE_AR = { fair: "فاتحة جدًا", light: "فاتحة", medium: "حنطية", tan: "سمراء", deep: "داكنة" };
+const EYE_AR = { almond: "لوزية", round: "واسعة", narrow: "ضيقة", upturned: "مسحوبة لفوق", downturned: "مائلة لتحت", hooded: "جفن مبطّن" };
+const HAIR_AR = { black: "أسود", dark_brown: "بني غامق", brown: "بني", caramel: "كراميل", honey: "عسلي", burgundy: "عنابي" };
 const LOOK_TIMEOUT_MS = 150000;
 const PHOTO_TIMEOUT_MS = 90000;
 
@@ -142,18 +149,51 @@ function showTab(name) {
   if (name === "manual") openManual();
 }
 document.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => showTab(t.dataset.tab)));
+document.querySelectorAll("[data-goto]").forEach((b) => b.addEventListener("click", () => {
+  showTab(b.dataset.goto);
+  document.querySelector(".tabs").scrollIntoView({ behavior: "smooth", block: "start" });
+}));
 
 // ---------- Mirror ----------
 
+function faceValues() {
+  const data = new FormData(form);
+  return Object.fromEntries(FACE_FIELDS.map((k) => [k, data.get(k) || ""]));
+}
+
 function updateMirrorBase() {
   const data = new FormData(form);
+  drawFace(face, faceValues());
   face.style.setProperty("--skin", TONE_SKIN[data.get("skin_tone")] || TONE_SKIN.medium);
   const [hair, brow] = HAIR[data.get("hair_color")] || HAIR.black;
   face.style.setProperty("--hair", hair);
   face.style.setProperty("--brow", brow);
   face.dataset.coverage = data.get("coverage") || "none";
   face.dataset.lashes = data.get("lashes") || "natural";
+  face.dataset.eye = data.get("eye_shape") || "almond";
+  updateFaceSummary();
 }
+
+function updateFaceSummary() {
+  const f = faceValues();
+  $("face-summary-text").textContent = f.skin_tone
+    ? `وجهك: بشرة ${TONE_AR[f.skin_tone]} · عيون ${EYE_AR[f.eye_shape]} · شعر ${HAIR_AR[f.hair_color]}`
+    : "ما حددتي لون بشرتك وملامحك للحين.";
+}
+
+$("save-face").addEventListener("click", () => {
+  const f = faceValues();
+  if (!f.skin_tone) {
+    $("face-error").textContent = "اختاري لون بشرتك أول.";
+    $("face-error").hidden = false;
+    document.querySelector('.field[data-field="skin_tone"]').classList.add("invalid");
+    return;
+  }
+  $("face-error").hidden = true;
+  if (!store.set(FACE_KEY, f)) return toast("ما قدرنا نحفظ. المتصفح مانع التخزين.");
+  $("face-saved-note").hidden = false;
+  toast("انحفظ وجهك 👩🏻");
+});
 
 /** Paint a look onto the face and list its colours under the mirror. */
 function showOnMirror(look) {
@@ -187,9 +227,12 @@ function clearMirror() {
   $("mirror-hint").hidden = false;
 }
 
-form.addEventListener("change", (e) => {
+// Face inputs live outside the <form> (form="look-form"), so listen on the whole page.
+document.addEventListener("change", (e) => {
+  if (e.target.form !== form) return;
   updateMirrorBase();
   e.target.closest(".field")?.classList.remove("invalid");
+  if (FACE_FIELDS.includes(e.target.name)) $("face-saved-note").hidden = true;
 });
 form.notes.addEventListener("input", () => { $("notes-count").textContent = form.notes.value.length; });
 
@@ -198,11 +241,7 @@ form.notes.addEventListener("input", () => { $("notes-count").textContent = form
 const SAVED_KEY = "byhana.looks";
 
 function mirrorSettings() {
-  const data = new FormData(form);
-  return {
-    skin_tone: data.get("skin_tone") || "", hair_color: data.get("hair_color"),
-    lashes: data.get("lashes"), coverage: data.get("coverage"),
-  };
+  return { ...faceValues(), lashes: new FormData(form).get("lashes") };
 }
 
 function saveCurrent(name) {
@@ -227,7 +266,7 @@ function saveCurrent(name) {
 
 function applyMirrorSettings(m) {
   for (const [name, value] of Object.entries(m || {})) {
-    const input = form.querySelector(`input[name="${name}"][value="${value}"]`);
+    const input = document.querySelector(`input[name="${name}"][value="${value}"]`);
     if (input) input.checked = true;
   }
   updateMirrorBase();
@@ -379,13 +418,21 @@ function readForm() {
     hair_color: data.get("hair_color") || "black",
     lashes: data.get("lashes") || "natural",
     finish: data.get("finish") || "any",
+    face_shape: data.get("face_shape") || "oval",
+    jaw: data.get("jaw") || "defined",
+    eye_shape: data.get("eye_shape") || "almond",
+    eye_color: data.get("eye_color") || "dark_brown",
+    brow_shape: data.get("brow_shape") || "arched",
+    brow_thickness: data.get("brow_thickness") || "natural",
+    nose: data.get("nose") || "medium",
+    lips_shape: data.get("lips_shape") || "medium",
     owned_products: state.bag,
     notes: (data.get("notes") || "").trim(),
   };
 }
 
 function markInvalid(fields) {
-  form.querySelectorAll(".field").forEach((f) => f.classList.toggle("invalid", fields.includes(f.dataset.field)));
+  document.querySelectorAll(".field[data-field]").forEach((f) => f.classList.toggle("invalid", fields.includes(f.dataset.field)));
 }
 
 function setLookLoading(on) {
@@ -434,10 +481,19 @@ form.addEventListener("submit", (e) => {
   const err = $("form-error");
   err.hidden = !missing.length;
   if (missing.length) {
-    err.textContent = "فضلًا اختاري الخانات المعلّمة بالأحمر.";
-    form.querySelector(".field.invalid")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (missing.includes("skin_tone")) {
+      // Skin tone lives in the "my face" tab: take her there.
+      err.textContent = missing.length === 1
+        ? "حددي لون بشرتك من تبويب وجهي أول."
+        : "حددي لون بشرتك من تبويب وجهي، وعبّي الخانات المعلّمة بالأحمر.";
+      $("face-summary").classList.add("invalid");
+    } else {
+      err.textContent = "فضلًا اختاري الخانات المعلّمة بالأحمر.";
+    }
+    form.querySelector(".field.invalid, .face-summary.invalid")?.scrollIntoView({ behavior: "smooth", block: "center" });
     return;
   }
+  $("face-summary").classList.remove("invalid");
   requestLook(payload);
 });
 
@@ -502,6 +558,9 @@ function renderResult(look) {
   renderCompatibility(look);
   renderSteps(look.products, look.colors);
   $("tips").replaceChildren(...look.climate_tips.map((t) => el("li", null, t)));
+  const faceTips = look.face_tips || [];
+  $("face-tips-card").hidden = !faceTips.length;
+  $("face-tips").replaceChildren(...faceTips.map((t) => el("li", null, t)));
   $("model-tag").textContent = `Powered by ${look.model.split("/").pop()}`;
   $("error").hidden = true;
   $("result").hidden = false;
@@ -639,7 +698,13 @@ function renderAnswer(ans) {
 
 // ---------- Start ----------
 
+const savedFace = store.get(FACE_KEY, null);
+if (savedFace) {
+  applyMirrorSettings(savedFace);
+  $("face-saved-note").hidden = false;
+}
 state.bag = store.get(BAG_KEY, []);
 renderBag();
 renderSaved();
 updateMirrorBase();
+showTab(savedFace ? "design" : "face");  // first visit: start by drawing her face

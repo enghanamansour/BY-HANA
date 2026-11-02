@@ -29,6 +29,8 @@ Rules:
 - Match brow products to her hair colour. Respect her lash choice: "none" = mascara only, "natural" = natural
   strip or individual lashes, "dramatic" = full volume strip lashes (add a "lashes" step with lash glue advice).
 - Respect her preferred finish (matte / satin / dewy) unless the climate makes it a bad idea; then explain why.
+- Adapt the TECHNIQUE to her features: follow every "Technique for her features" line in her profile,
+  write it into the matching product's how_to_apply, and summarise them in "face_tips".
 - Respect the budget: low = drugstore brands, medium = mid-range, high = luxury.
 - Recommend real, widely available products in Saudi Arabia.
 - If she listed products she already owns, BUILD THE LOOK AROUND THEM: use each one where it fits and set
@@ -62,6 +64,7 @@ Return ONLY a JSON object, no markdown, with exactly this shape:
     }
   ],
   "climate_tips": ["2-4 short Arabic tips for her city's weather"],
+  "face_tips": ["2-4 short Arabic tips on how this look is adapted to her eyes, face shape, lips and brows"],
   "compatibility_note": "one Arabic sentence about the bases of the face products"
 }
 List products in application order, 6 to 12 items. Every text field must be filled. Keep every text short.""".replace(
@@ -78,6 +81,36 @@ LABELS = {
 }
 
 
+# Professional technique per facial feature. Only the lines that match her face are sent to Llama,
+# so they are short, specific and hard to ignore.
+TECHNIQUE = {
+    ("eye_shape", "hooded"): "Hooded eyes: blend shadow ABOVE the natural crease with eyes open so it shows; "
+                             "keep the mobile lid light; thin tight-lined liner, no thick liner on the lid.",
+    ("eye_shape", "narrow"): "Narrow eyes: light shimmer in the centre of the lid to open the eye; tight-line the "
+                             "upper lash line; avoid thick liner on the lower lid.",
+    ("eye_shape", "round"): "Round eyes: elongate with a winged liner and a deeper outer-corner shade.",
+    ("eye_shape", "downturned"): "Downturned eyes: angle the wing upward and keep the lower outer corner clean.",
+    ("eye_shape", "upturned"): "Upturned eyes: balance with soft shadow on the outer lower lash line.",
+    ("eye_shape", "almond"): "Almond eyes: most techniques work; a classic wing follows the natural lift.",
+    ("eye_color", "green"): "Green eyes pop with plum, burgundy or bronze shadow: prefer those for the lid.",
+    ("eye_color", "hazel"): "Hazel eyes pop with bronze, gold or plum shadow.",
+    ("eye_color", "honey"): "Honey eyes pop with bronze, copper or plum shadow.",
+    ("eye_color", "grey"): "Grey eyes pop with smoky grey, plum or copper shadow.",
+    ("face_shape", "round"): "Round face: contour the sides of the face and under the cheekbones; sweep blush "
+                             "upward toward the temples.",
+    ("face_shape", "square"): "Square face: soften the jaw corners with contour; blush on the apples blended back.",
+    ("face_shape", "long"): "Long face: blush horizontally across the cheeks; contour the hairline and chin.",
+    ("face_shape", "heart"): "Heart face: contour the temples; blush slightly lower on the cheek.",
+    ("jaw", "sharp"): "Sharp jaw: soften the jaw angles with light contour; highlight the centre of the chin.",
+    ("lips_shape", "thin"): "Thin lips: overline slightly with a liner one shade deeper; lighter or glossy shades "
+                            "add volume; gloss in the centre.",
+    ("lips_shape", "full"): "Full lips: define with a liner in the same shade; any lip colour works.",
+    ("brow_thickness", "thin"): "Thin brows: fill and extend the tail with a fine pencil, then set with gel.",
+    ("brow_thickness", "thick"): "Thick brows: brush up and set with a clear or tinted gel; only fill gaps.",
+    ("nose", "wide"): "Wide nose: soft contour along the sides of the nose and a thin highlight down the bridge.",
+}
+
+
 def build_look_prompt(req: LookRequest) -> str:
     lines = [
         f"Skin type: {req.skin_type}",
@@ -90,7 +123,14 @@ def build_look_prompt(req: LookRequest) -> str:
         f"Hair colour: {req.hair_color.replace('_', ' ')}",
         f"Lashes: {req.lashes}",
         f"Preferred finish: {LABELS['finish'][req.finish]}",
+        f"Face shape: {req.face_shape}, jaw: {req.jaw}",
+        f"Eyes: {req.eye_shape}, eye colour: {req.eye_color.replace('_', ' ')}",
+        f"Brows: {req.brow_shape}, {req.brow_thickness}",
+        f"Nose: {req.nose}, lips: {req.lips_shape}",
     ]
+    techniques = [tip for (field, value), tip in TECHNIQUE.items() if getattr(req, field) == value]
+    if techniques:
+        lines.append("Technique for her features (MUST be applied):\n" + "\n".join(f"  - {t}" for t in techniques))
     if req.owned_products:
         owned = "\n".join(
             f"  - {p.name}" + (f" ({p.step}" + (f", {p.base}-based" if p.base else "") + ")" if p.step else "")

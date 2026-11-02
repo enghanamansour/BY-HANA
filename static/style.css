@@ -93,7 +93,7 @@ button { font: inherit; }
 
 /* ---------- Tabs ---------- */
 .tabs {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;
   background: var(--surface); border-radius: 999px; box-shadow: var(--shadow); padding: 6px;
 }
 .tab {
@@ -145,6 +145,20 @@ textarea { resize: vertical; min-height: 64px; }
   background: #FCEBEE; color: var(--danger); border-radius: 12px;
   padding: 10px 14px; font-size: .92rem; margin: 0 0 16px;
 }
+
+/* "My face" summary inside the look form, and face tab actions */
+.face-summary {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;
+  background: var(--accent-soft); border-radius: 12px; padding: 10px 14px; margin: 0 0 20px; font-size: .92rem;
+  border: 1.5px solid transparent;
+}
+.face-summary.invalid { border-color: #E7A9B3; background: #FCEBEE; color: var(--danger); }
+.link-btn {
+  border: 0; background: none; padding: 0; cursor: pointer; color: var(--accent);
+  font-weight: 600; text-decoration: underline; text-underline-offset: 3px;
+}
+.face-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.saved-note { color: var(--ok); font-size: .9rem; margin: 12px 0 0; }
 
 /* Collapsible extras and makeup bag */
 .extras {
@@ -261,6 +275,7 @@ textarea { resize: vertical; min-height: 64px; }
 .conf-low { background: #FCEBEE; color: var(--danger); }
 
 .tips { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; }
+.face-tips { background: linear-gradient(160deg, #FFF8F6, #F9EDEF); }
 
 .result-foot { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
 .foot-btns { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -335,7 +350,9 @@ textarea { resize: vertical; min-height: 64px; }
 #face .hair { fill: var(--hair); }
 #face .hijab, #face .niqab { fill: var(--veil); }
 #face .eye-white { fill: #FBF7F4; }
-#face .iris { fill: #3B2418; }
+#face .iris { fill: var(--iris, #2A170F); }
+#face .hood { stroke: rgba(80, 45, 35, .35); stroke-width: 1.3; }
+#face path { transition: d .5s ease, fill .9s ease, stroke .9s ease, opacity .9s ease; }
 #face .brow { fill: var(--brow); }
 #face .lash { fill: none; stroke: #120B08; stroke-linecap: round; }
 #face .lash-own { stroke-width: 1.4; }
@@ -396,7 +413,9 @@ textarea { resize: vertical; min-height: 64px; }
   .studio { padding: 0 16px 48px; gap: 20px; }
   .card { padding: 20px 16px; }
   .row { grid-template-columns: 1fr; }
-  .tabs { grid-template-columns: 1fr 1fr; border-radius: 20px; }
+  .tabs { grid-template-columns: repeat(6, 1fr); border-radius: 20px; }
+  .tab { grid-column: span 2; }
+  .tab:nth-child(n+4) { grid-column: span 3; }
   .tab { border-radius: 14px; }
   .extras { padding: 4px 14px; }
   .ans-lists { grid-template-columns: 1fr; }
