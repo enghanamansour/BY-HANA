@@ -96,6 +96,7 @@ TECHNIQUE = {
     ("eye_color", "hazel"): "Hazel eyes pop with bronze, gold or plum shadow.",
     ("eye_color", "honey"): "Honey eyes pop with bronze, copper or plum shadow.",
     ("eye_color", "grey"): "Grey eyes pop with smoky grey, plum or copper shadow.",
+    ("eye_color", "blue"): "Blue eyes pop with bronze, copper, peach or gold shadow.",
     ("face_shape", "round"): "Round face: contour the sides of the face and under the cheekbones; sweep blush "
                              "upward toward the temples.",
     ("face_shape", "square"): "Square face: soften the jaw corners with contour; blush on the apples blended back.",
@@ -111,6 +112,11 @@ TECHNIQUE = {
 }
 
 
+LENS_TIP = ("Coloured contact lenses: put the lenses in BEFORE makeup; never line the waterline (product sticks to "
+            "the lens); use fibre-free, ophthalmologist-tested mascara; avoid loose or chunky glitter near the eyes; "
+            "remove lenses before removing makeup. Mention this in face_tips.")
+
+
 def build_look_prompt(req: LookRequest) -> str:
     lines = [
         f"Skin type: {req.skin_type}",
@@ -124,11 +130,16 @@ def build_look_prompt(req: LookRequest) -> str:
         f"Lashes: {req.lashes}",
         f"Preferred finish: {LABELS['finish'][req.finish]}",
         f"Face shape: {req.face_shape}, jaw: {req.jaw}",
-        f"Eyes: {req.eye_shape}, eye colour: {req.eye_color.replace('_', ' ')}",
+        f"Eyes: {req.eye_shape}, eye colour: {req.eye_color.replace('_', ' ')}"
+        + (f", wearing {req.lens} coloured contact lenses" if req.lens != "none" else ""),
         f"Brows: {req.brow_shape}, {req.brow_thickness}",
         f"Nose: {req.nose}, lips: {req.lips_shape}",
     ]
-    techniques = [tip for (field, value), tip in TECHNIQUE.items() if getattr(req, field) == value]
+    # With coloured lenses, the colour people see is the lens, so shadow choices follow the lens.
+    seen = {"eye_color": req.lens if req.lens != "none" else req.eye_color}
+    techniques = [tip for (field, value), tip in TECHNIQUE.items() if seen.get(field, getattr(req, field)) == value]
+    if req.lens != "none":
+        techniques.append(LENS_TIP)
     if techniques:
         lines.append("Technique for her features (MUST be applied):\n" + "\n".join(f"  - {t}" for t in techniques))
     if req.owned_products:

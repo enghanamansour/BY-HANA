@@ -8,7 +8,7 @@ const face = $("face");
 
 const REQUIRED = ["skin_type", "skin_tone", "city", "occasion", "budget"];
 // Everything that describes her face; saved together as "my face".
-const FACE_FIELDS = ["skin_tone", "undertone", "hair_color", "face_shape", "jaw", "eye_shape", "eye_color",
+const FACE_FIELDS = ["skin_tone", "undertone", "hair_color", "face_shape", "jaw", "eye_shape", "eye_color", "lens",
                      "brow_shape", "brow_thickness", "nose", "lips_shape", "coverage"];
 const FACE_KEY = "byhana.face";
 const TONE_AR = { fair: "فاتحة جدًا", light: "فاتحة", medium: "حنطية", tan: "سمراء", deep: "داكنة" };
@@ -177,7 +177,7 @@ function updateMirrorBase() {
 function updateFaceSummary() {
   const f = faceValues();
   $("face-summary-text").textContent = f.skin_tone
-    ? `وجهك: بشرة ${TONE_AR[f.skin_tone]} · عيون ${EYE_AR[f.eye_shape]} · شعر ${HAIR_AR[f.hair_color]}`
+    ? `وجهك: بشرة ${TONE_AR[f.skin_tone]} · عيون ${EYE_AR[f.eye_shape]}${f.lens && f.lens !== "none" ? " بعدسة" : ""} · شعر ${HAIR_AR[f.hair_color]}`
     : "ما حددتي لون بشرتك وملامحك للحين.";
 }
 
@@ -422,6 +422,7 @@ function readForm() {
     jaw: data.get("jaw") || "defined",
     eye_shape: data.get("eye_shape") || "almond",
     eye_color: data.get("eye_color") || "dark_brown",
+    lens: data.get("lens") || "none",
     brow_shape: data.get("brow_shape") || "arched",
     brow_thickness: data.get("brow_thickness") || "natural",
     nose: data.get("nose") || "medium",

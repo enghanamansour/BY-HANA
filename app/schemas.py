@@ -65,7 +65,8 @@ Finish = Literal["any", "matte", "satin", "dewy"]
 FaceShape = Literal["oval", "round", "square", "heart", "long"]
 Jaw = Literal["soft", "defined", "sharp"]
 EyeShape = Literal["almond", "round", "narrow", "upturned", "downturned", "hooded"]
-EyeColor = Literal["dark_brown", "brown", "honey", "hazel", "green", "grey"]
+EyeColor = Literal["dark_brown", "brown", "honey", "hazel", "green", "grey", "blue"]
+Lens = Literal["none", "honey", "hazel", "grey", "green", "blue"]  # coloured contact lenses
 BrowShape = Literal["arched", "soft", "straight"]
 BrowThickness = Literal["thin", "natural", "thick"]
 Nose = Literal["slim", "medium", "wide"]
@@ -87,6 +88,7 @@ class LookRequest(BaseModel):
     jaw: Jaw = "defined"
     eye_shape: EyeShape = "almond"
     eye_color: EyeColor = "dark_brown"
+    lens: Lens = "none"
     brow_shape: BrowShape = "arched"
     brow_thickness: BrowThickness = "natural"
     nose: Nose = "medium"

@@ -8,7 +8,10 @@ const FACE_DEFAULTS = {
 
 const IRIS = {
   dark_brown: "#2A170F", brown: "#4A2B1A", hazel: "#6B5A2E", honey: "#8A5A2B", green: "#4F6B4A", grey: "#6C7A80",
+  blue: "#4A6E8C",
 };
+// Coloured contact lenses are brighter than natural irises.
+const LENS = { honey: "#A87A3E", hazel: "#7E6E3A", grey: "#8A969C", green: "#5E8A5A", blue: "#5A86AE" };
 
 // Half-widths and heights of the face outline. tw = forehead, w = cheekbones, jw = jaw corner.
 const SHAPES = {
@@ -168,5 +171,5 @@ function drawFace(svg, features) {
     e.setAttribute("transform", `rotate(${i ? 14 : -14} ${x} 254)`);
   });
 
-  svg.style.setProperty("--iris", IRIS[f.eye_color] || IRIS.dark_brown);
+  svg.style.setProperty("--iris", LENS[f.lens] || IRIS[f.eye_color] || IRIS.dark_brown);
 }
