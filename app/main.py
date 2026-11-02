@@ -1,4 +1,4 @@
-"""by HANA API: receives the user's profile, asks Llama for a look, and returns a checked result."""
+"""by HANA API: designs looks, reads products from photos, and answers product questions with Llama."""
 import logging
 from pathlib import Path
 
@@ -9,9 +9,9 @@ from fastapi.staticfiles import StaticFiles
 
 from . import config
 from .compatibility import check_compatibility
-from .llama import LlamaError, generate_look
-from .schemas import LookRequest, LookResponse
-from .shades import to_colors
+from .llama import LlamaError, ask_product, generate_look, scan_products
+from .schemas import AskRequest, AskResponse, LookRequest, LookResponse, ScanRequest, ScanResult
+from .shades import SHADES, to_colors
 
 logging.basicConfig(level=logging.INFO)
 
@@ -21,10 +21,9 @@ app = FastAPI(title="by HANA", description="Saudi AI makeup artist powered by Ll
 @app.exception_handler(RequestValidationError)
 async def invalid_input(request: Request, exc: RequestValidationError):
     fields = sorted({str(err["loc"][-1]) for err in exc.errors()})
-    return JSONResponse(status_code=400, content={
-        "error": "فضلًا عبّي كل الخانات المطلوبة بشكل صحيح.",
-        "fields": fields,
-    })
+    message = ("الصورة لازم تكون JPG أو PNG وحجمها أقل من 4 ميقا." if "image" in fields
+               else "فضلًا عبّي كل الخانات المطلوبة بشكل صحيح.")
+    return JSONResponse(status_code=400, content={"error": message, "fields": fields})
 
 
 @app.exception_handler(LlamaError)
@@ -34,7 +33,15 @@ async def llama_failed(request: Request, exc: LlamaError):
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "model": config.LLAMA_MODEL, "llama_configured": bool(config.LLM_API_KEY)}
+    return {"status": "ok", "model": config.LLAMA_MODEL, "vision_model": config.LLAMA_VISION_MODEL,
+            "llama_configured": bool(config.LLM_API_KEY)}
+
+
+@app.get("/api/shades")
+def shades():
+    """The curated palette, so the manual 'try it yourself' mode uses exactly the same colours as Llama."""
+    return {area: [{"id": k, "hex": hex_, "name": name} for k, (hex_, name) in items.items()]
+            for area, items in SHADES.items()}
 
 
 @app.post("/api/look", response_model=LookResponse)
@@ -48,6 +55,24 @@ def create_look(req: LookRequest):
         compatibility_warnings=warnings,
         model=config.LLAMA_MODEL,
     )
+
+
+@app.post("/api/scan", response_model=ScanResult)
+def scan(req: ScanRequest):
+    result = scan_products(req.image)
+    if not result.products:
+        raise LlamaError("ما لقينا منتجات مكياج في الصورة. جربي صورة أوضح يبان فيها اسم المنتج.", 422)
+    return result
+
+
+@app.post("/api/ask", response_model=AskResponse)
+def ask(req: AskRequest):
+    if not req.question and not req.image:
+        return JSONResponse(status_code=400, content={
+            "error": "اكتبي سؤالك أو أرفقي صورة المنتج.", "fields": ["question"]})
+    answer = ask_product(req.question, req.image)
+    return AskResponse(**answer.model_dump(),
+                       model=config.LLAMA_VISION_MODEL if req.image else config.LLAMA_MODEL)
 
 
 # The frontend (static/index.html) is served from the same app, so one deploy covers everything.

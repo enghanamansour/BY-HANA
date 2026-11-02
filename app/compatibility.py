@@ -20,7 +20,7 @@ BASE_AR = {"water": "مائي", "silicone": "سيليكوني", "oil": "زيتي
 
 
 def check_compatibility(products: list[Product]) -> list[CompatibilityWarning]:
-    face = [p for p in products if p.step in FACE_STEPS]
+    face = [p for p in products if p.step in FACE_STEPS and p.base]
     counts = Counter(p.base for p in face)
 
     # Blame the product whose base is the odd one out, so one swap fixes all of its clashes.

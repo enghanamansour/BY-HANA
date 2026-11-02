@@ -13,3 +13,5 @@ services:
         value: https://openrouter.ai/api/v1
       - key: LLAMA_MODEL
         value: meta-llama/llama-3.3-70b-instruct
+      - key: LLAMA_VISION_MODEL
+        value: meta-llama/llama-4-maverick

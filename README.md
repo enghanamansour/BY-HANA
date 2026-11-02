@@ -2,7 +2,17 @@
 
 **An AI makeup artist for women in Saudi Arabia, powered by Meta's Llama.**
 
-Pick your skin type, skin tone, city, occasion, budget and whether you wear a hijab or niqab. by HANA designs a complete look: shades, products in application order, how to apply each one, and tips for your city's weather. It paints the look onto an illustrated face and warns you when two products won't layer well together (water-based vs silicone-based).
+Pick your skin type, skin tone, city, occasion, budget and whether you wear a hijab or niqab. Hanu (هنو), the app's makeup artist, designs a complete look: shades, products in application order, how to apply each one, and tips for your city's weather. It paints the look onto an illustrated face and warns you when two products won't layer well together (water-based vs silicone-based).
+
+### Features
+
+| Tab | What it does | Llama model |
+|---|---|---|
+| ✨ **هنو تصمم** (Hanu designs) | Full look from your profile, hair colour, lashes and preferred finish | Llama 3.3 70B |
+| 👜 **شنطة مكياجي** (My makeup bag) | Add products you own by typing or **photographing them**. Hanu builds the look around them and only suggests what's missing | Llama 4 Maverick (vision) |
+| 🔍 **اسألي هنو** (Ask Hanu) | Ask about any product by text or photo, e.g. "is this primer silicone or water-based?" | Llama 3.3 / Llama 4 for photos |
+| 🎨 **جربي بنفسك** (Try it yourself) | Pick shades by hand from the same palette and see them on the face | No AI needed |
+| 💾 **لوكاتي** (My looks) | Save any look and reopen it later (stored in the browser) | No AI needed |
 
 ---
 
@@ -43,7 +53,10 @@ Each part of the work goes to whoever does it best:
 
 | Method | Route | Description |
 |---|---|---|
-| `POST` | `/api/look` | Body: `skin_type`, `skin_tone`, `undertone`, `city`, `occasion`, `budget`, `coverage`, `notes`. Returns the look. |
+| `POST` | `/api/look` | Body: `skin_type`, `skin_tone`, `undertone`, `city`, `occasion`, `budget`, `coverage`, `hair_color`, `lashes`, `finish`, `owned_products[]`, `notes`. Returns the look. |
+| `POST` | `/api/scan` | Body: `image` (data URL). Returns the products Llama 4 reads from the photo. |
+| `POST` | `/api/ask` | Body: `question` and/or `image`. Returns the product, its base, a confidence level and advice. |
+| `GET` | `/api/shades` | The curated palette (used by "try it yourself"). |
 | `GET` | `/api/health` | Shows whether the server is up and Llama is configured. |
 
 Empty or invalid input returns `400` with an Arabic message and the list of bad fields. Interactive docs are at `/docs`.
@@ -94,7 +107,8 @@ Open http://127.0.0.1:8000
 |---|---|---|
 | `LLM_API_KEY` | — | API key for the Llama provider (required) |
 | `LLM_BASE_URL` | `https://openrouter.ai/api/v1` | Any OpenAI-compatible endpoint that serves Llama |
-| `LLAMA_MODEL` | `meta-llama/llama-3.3-70b-instruct` | Model ID |
+| `LLAMA_MODEL` | `meta-llama/llama-3.3-70b-instruct` | Text model |
+| `LLAMA_VISION_MODEL` | `meta-llama/llama-4-maverick` | Model used for photos |
 | `LLM_TIMEOUT` | `90` | Seconds to wait for Llama |
 | `LLM_MAX_RETRIES` | `1` | Extra attempts when the reply is invalid |
 

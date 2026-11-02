@@ -1,17 +1,19 @@
-"""Talks to Llama and turns its reply into a validated LlamaLook, or raises a clear LlamaError."""
+"""Talks to Llama and turns its replies into validated objects, or raises a clear LlamaError."""
 import json
 import logging
 import re
+from typing import TypeVar
 
 import openai
 from openai import OpenAI
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError
 
 from . import config
-from .prompts import SYSTEM_PROMPT, build_user_prompt
-from .schemas import LlamaLook, LookRequest
+from .prompts import ASK_PROMPT, LOOK_PROMPT, SCAN_PROMPT, build_ask_prompt, build_look_prompt
+from .schemas import AskAnswer, LlamaLook, LookRequest, ScanResult
 
 log = logging.getLogger("by-hana.llama")
+T = TypeVar("T", bound=BaseModel)
 
 
 class LlamaError(Exception):
@@ -35,18 +37,18 @@ def _extract_json(text: str) -> dict:
     return json.loads(match.group(0))
 
 
-def _call_llama(messages: list[dict]) -> str:
+def _call_llama(model: str, messages: list[dict], max_tokens: int) -> str:
     try:
         response = _client.chat.completions.create(
-            model=config.LLAMA_MODEL,
+            model=model,
             messages=messages,
-            temperature=0.7,
-            max_tokens=2000,
+            temperature=0.6,
+            max_tokens=max_tokens,
         )
     except openai.AuthenticationError:
         raise LlamaError("مفتاح خدمة الذكاء الاصطناعي غير صحيح. تواصلي مع مسؤول التطبيق.", 500)
     except openai.APITimeoutError:
-        raise LlamaError("Llama تأخر في الرد. حاولي مرة ثانية بعد شوي.", 504)
+        raise LlamaError("هنو تأخرت في الرد. حاولي مرة ثانية بعد شوي.", 504)
     except openai.RateLimitError:
         raise LlamaError("فيه ضغط على الخدمة حاليًا. انتظري دقيقة وحاولي مرة ثانية.", 429)
     except openai.APIStatusError as e:
@@ -63,20 +65,16 @@ def _call_llama(messages: list[dict]) -> str:
     return content
 
 
-def generate_look(req: LookRequest) -> LlamaLook:
+def _ask_json(schema: type[T], model: str, system: str, user: str | list, max_tokens: int = 2000) -> T:
+    """Send a prompt, and keep only a reply that matches `schema`. Retries once with the exact error."""
     if not config.LLM_API_KEY:
         raise LlamaError("التطبيق غير مهيأ: مفتاح Llama غير موجود.", 500)
 
-    messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": build_user_prompt(req)},
-    ]
-
-    # If Llama returns missing or malformed JSON, tell it what was wrong and let it try again.
+    messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
     for attempt in range(config.LLM_MAX_RETRIES + 1):
         try:
-            content = _call_llama(messages)
-            return LlamaLook.model_validate(_extract_json(content))
+            content = _call_llama(model, messages, max_tokens)
+            return schema.model_validate(_extract_json(content))
         except (ValueError, ValidationError) as e:
             log.warning("Invalid Llama reply (attempt %d): %s", attempt + 1, e)
             if attempt < config.LLM_MAX_RETRIES:
@@ -84,4 +82,24 @@ def generate_look(req: LookRequest) -> LlamaLook:
                                  f"Your previous reply was not valid ({str(e)[:300]}). "
                                  "Return ONLY the JSON object with the exact shape requested."})
 
-    raise LlamaError("Llama رجّع رد غير مكتمل. حاولي مرة ثانية.", 502)
+    raise LlamaError("هنو رجّعت رد غير مكتمل. حاولي مرة ثانية.", 502)
+
+
+def _with_image(text: str, image: str) -> list[dict]:
+    return [{"type": "text", "text": text}, {"type": "image_url", "image_url": {"url": image}}]
+
+
+def generate_look(req: LookRequest) -> LlamaLook:
+    return _ask_json(LlamaLook, config.LLAMA_MODEL, LOOK_PROMPT, build_look_prompt(req))
+
+
+def scan_products(image: str) -> ScanResult:
+    return _ask_json(ScanResult, config.LLAMA_VISION_MODEL, SCAN_PROMPT,
+                     _with_image("List the products in this photo.", image), max_tokens=800)
+
+
+def ask_product(question: str, image: str | None) -> AskAnswer:
+    text = build_ask_prompt(question, image is not None)
+    if image:
+        return _ask_json(AskAnswer, config.LLAMA_VISION_MODEL, ASK_PROMPT, _with_image(text, image), 900)
+    return _ask_json(AskAnswer, config.LLAMA_MODEL, ASK_PROMPT, text, 900)
