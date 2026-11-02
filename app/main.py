@@ -22,7 +22,7 @@ app = FastAPI(title="by HANA", description="Saudi AI makeup artist powered by Ll
 async def invalid_input(request: Request, exc: RequestValidationError):
     fields = sorted({str(err["loc"][-1]) for err in exc.errors()})
     message = ("الصورة لازم تكون JPG أو PNG وحجمها أقل من 4 ميقا." if "image" in fields
-               else "فضلًا عبّي كل الخانات المطلوبة بشكل صحيح.")
+               else "عبّي الخانات المطلوبة صح لو سمحتي.")
     return JSONResponse(status_code=400, content={"error": message, "fields": fields})
 
 
@@ -69,7 +69,7 @@ def scan(req: ScanRequest):
 def ask(req: AskRequest):
     if not req.question and not req.image:
         return JSONResponse(status_code=400, content={
-            "error": "اكتبي سؤالك أو أرفقي صورة المنتج.", "fields": ["question"]})
+            "error": "اكتبي سؤالك أو حطي صورة المنتج.", "fields": ["question"]})
     answer = ask_product(req.question, req.image)
     return AskResponse(**answer.model_dump(),
                        model=config.LLAMA_VISION_MODEL if req.image else config.LLAMA_MODEL)

@@ -46,18 +46,18 @@ def _call_llama(model: str, messages: list[dict], max_tokens: int) -> str:
             max_tokens=max_tokens,
         )
     except openai.AuthenticationError:
-        raise LlamaError("مفتاح خدمة الذكاء الاصطناعي غير صحيح. تواصلي مع مسؤول التطبيق.", 500)
+        raise LlamaError("فيه مشكلة في إعدادات التطبيق. كلمي المسؤول عنه.", 500)
     except openai.APITimeoutError:
-        raise LlamaError("هنو تأخرت في الرد. حاولي مرة ثانية بعد شوي.", 504)
+        raise LlamaError("هنو طوّلت في الرد. جربي مرة ثانية بعد شوي.", 504)
     except openai.RateLimitError:
-        raise LlamaError("فيه ضغط على الخدمة حاليًا. انتظري دقيقة وحاولي مرة ثانية.", 429)
+        raise LlamaError("فيه زحمة على الخدمة الحين. انتظري دقيقة وجربي مرة ثانية.", 429)
     except openai.APIStatusError as e:
         log.warning("Llama provider error %s: %s", e.status_code, e.message)
         if e.status_code == 402:
-            raise LlamaError("رصيد خدمة الذكاء الاصطناعي خلص. تواصلي مع مسؤول التطبيق.", 503)
-        raise LlamaError("خدمة Llama غير متاحة حاليًا. حاولي مرة ثانية بعد شوي.", 503)
+            raise LlamaError("رصيد خدمة الذكاء الاصطناعي خلص. كلمي المسؤول عن التطبيق.", 503)
+        raise LlamaError("خدمة Llama واقفة الحين. جربي بعد شوي.", 503)
     except openai.APIConnectionError:
-        raise LlamaError("ما قدرنا نتصل بخدمة Llama. تأكدي من الاتصال وحاولي مرة ثانية.", 503)
+        raise LlamaError("ما قدرنا نوصل لـ Llama. تأكدي من النت وجربي مرة ثانية.", 503)
 
     content = response.choices[0].message.content if response.choices else None
     if not content or not content.strip():
@@ -68,7 +68,7 @@ def _call_llama(model: str, messages: list[dict], max_tokens: int) -> str:
 def _ask_json(schema: type[T], model: str, system: str, user: str | list, max_tokens: int = 2000) -> T:
     """Send a prompt, and keep only a reply that matches `schema`. Retries once with the exact error."""
     if not config.LLM_API_KEY:
-        raise LlamaError("التطبيق غير مهيأ: مفتاح Llama غير موجود.", 500)
+        raise LlamaError("التطبيق مو جاهز: مفتاح Llama ناقص.", 500)
 
     messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
     for attempt in range(config.LLM_MAX_RETRIES + 1):
@@ -82,7 +82,7 @@ def _ask_json(schema: type[T], model: str, system: str, user: str | list, max_to
                                  f"Your previous reply was not valid ({str(e)[:300]}). "
                                  "Return ONLY the JSON object with the exact shape requested."})
 
-    raise LlamaError("هنو رجّعت رد غير مكتمل. حاولي مرة ثانية.", 502)
+    raise LlamaError("رد هنو طلع ناقص. جربي مرة ثانية.", 502)
 
 
 def _with_image(text: str, image: str) -> list[dict]:

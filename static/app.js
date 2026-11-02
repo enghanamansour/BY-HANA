@@ -28,7 +28,7 @@ const STEP_AR = {
   mascara: "ماسكارا", lashes: "رموش", brows: "الحواجب", lips: "الشفايف", setting_spray: "مثبت المكياج",
 };
 const BASE_AR = { water: "مائي", silicone: "سيليكون", oil: "زيتي", powder: "بودرة" };
-const CONF_AR = { high: "متأكدة", medium: "غالبًا", low: "غير متأكدة" };
+const CONF_AR = { high: "متأكدة", medium: "غالبًا", low: "مو متأكدة" };
 const AREA_AR = {
   lips: "الشفايف", blush: "البلشر", eyeshadow_lid: "الجفن",
   eyeshadow_crease: "الطيّة", eyeliner: "الآيلاينر", highlighter: "الهايلايتر",
@@ -43,7 +43,7 @@ const MANUAL_START = {
   lips: "nude_rose", blush: "soft_pink", eyeshadow_lid: "champagne",
   eyeshadow_crease: "soft_peach", eyeliner: "brown", highlighter: "champagne",
 };
-const STAGES = ["هنو تحلل بشرتك...", "تشيّك على جو مدينتك...", "تقلّب في شنطتك...", "تختار الألوان...", "ترتب الخطوات...", "تتأكد من توافق المنتجات..."];
+const STAGES = ["هنو تشوف بشرتك...", "تشيّك على جو مدينتك...", "تقلّب في شنطتك...", "تختار الألوان...", "ترتب الخطوات...", "تشيّك إن منتجاتك تركب على بعض..."];
 
 // ---------- State ----------
 
@@ -102,15 +102,15 @@ async function api(path, body, timeoutMs) {
     });
     const data = await res.json().catch(() => null);
     if (!res.ok) {
-      const err = new Error(data?.error || "صار خطأ غير متوقع. حاولي مرة ثانية.");
+      const err = new Error(data?.error || "صار شي غلط. جربي مرة ثانية.");
       err.fields = data?.fields || [];
       throw err;
     }
-    if (!data) throw new Error("وصلنا رد غير مكتمل. حاولي مرة ثانية.");
+    if (!data) throw new Error("الرد وصل ناقص. جربي مرة ثانية.");
     return data;
   } catch (err) {
-    if (err.name === "AbortError") throw new Error("الطلب أخذ وقت أطول من المتوقع. حاولي مرة ثانية.");
-    if (err instanceof TypeError) throw new Error("ما قدرنا نتصل بالسيرفر. تأكدي من الإنترنت وحاولي مرة ثانية.");
+    if (err.name === "AbortError") throw new Error("الطلب طوّل زيادة. جربي مرة ثانية.");
+    if (err instanceof TypeError) throw new Error("ما قدرنا نوصل للموقع. تأكدي من النت وجربي مرة ثانية.");
     throw err;
   } finally {
     clearTimeout(timer);
@@ -120,7 +120,7 @@ async function api(path, body, timeoutMs) {
 /** Shrink a photo in the browser before upload: faster for Llama and well under the size limit. */
 function resizeImage(file, maxSide = 1024) {
   return new Promise((resolve, reject) => {
-    if (!file.type.startsWith("image/")) return reject(new Error("اختاري ملف صورة."));
+    if (!file.type.startsWith("image/")) return reject(new Error("اختاري صورة."));
     const img = new Image();
     const url = URL.createObjectURL(file);
     img.onload = () => {
@@ -190,9 +190,9 @@ $("save-face").addEventListener("click", () => {
     return;
   }
   $("face-error").hidden = true;
-  if (!store.set(FACE_KEY, f)) return toast("ما قدرنا نحفظ. المتصفح مانع التخزين.");
+  if (!store.set(FACE_KEY, f)) return toast("ما قدرنا نحفظ، المتصفح مانع الحفظ.");
   $("face-saved-note").hidden = false;
-  toast("انحفظ وجهك 👩🏻");
+  toast("حفظنا وجهك");
 });
 
 /** Paint a look onto the face and list its colours under the mirror. */
@@ -257,11 +257,11 @@ function saveCurrent(name) {
     look: state.current.look || null,
   });
   if (!store.set(SAVED_KEY, looks.slice(0, 30))) {
-    toast("ما قدرنا نحفظ. المتصفح مانع التخزين.");
+    toast("ما قدرنا نحفظ، المتصفح مانع الحفظ.");
     return;
   }
   renderSaved();
-  toast("انحفظ في لوكاتي 💾");
+  toast("حفظنا اللوك في لوكاتي");
 }
 
 function applyMirrorSettings(m) {
@@ -393,7 +393,7 @@ async function scanPhoto(input) {
     const image = await resizeImage(file);
     const data = await api("/api/scan", { image }, PHOTO_TIMEOUT_MS);
     const added = addToBag(data.products);
-    bagStatus(added ? `✓ أضفنا ${added} منتج من الصورة. تأكدي من الأسماء واحذفي الغلط.` : "المنتجات اللي في الصورة موجودة في شنطتك من قبل.");
+    bagStatus(added ? `ضفنا ${added} منتج من الصورة. شيكي على الأسماء واحذفي الغلط.` : "المنتجات اللي بالصورة موجودة في شنطتك من قبل.");
   } catch (err) {
     bagStatus(err.message, "error");
   }
@@ -437,7 +437,7 @@ function markInvalid(fields) {
 }
 
 function setLookLoading(on) {
-  setBusy($("submit"), on, on ? "هنو تشتغل على لوكك..." : "خلّي هنو تزبّط لوكك ✨");
+  setBusy($("submit"), on, on ? "هنو تشتغل على لوكك..." : "خلّي هنو تزبّط لوكك");
   face.classList.toggle("scanning", on);
   $("loading").hidden = !on;
   clearInterval(stageTimer);
@@ -460,7 +460,7 @@ async function requestLook(payload) {
   $("loading").scrollIntoView({ behavior: "smooth", block: "center" });
   try {
     const look = await api("/api/look", payload, LOOK_TIMEOUT_MS);
-    if (!look.colors || !Array.isArray(look.products)) throw new Error("وصلنا رد غير مكتمل. حاولي مرة ثانية.");
+    if (!look.colors || !Array.isArray(look.products)) throw new Error("الرد وصل ناقص. جربي مرة ثانية.");
     renderResult(look);
     showOnMirror({ source: "ai", name: look.look_name, colors: look.colors, look });
     $("result").scrollIntoView({ behavior: "smooth", block: "start" });
@@ -486,10 +486,10 @@ form.addEventListener("submit", (e) => {
       // Skin tone lives in the "my face" tab: take her there.
       err.textContent = missing.length === 1
         ? "حددي لون بشرتك من تبويب وجهي أول."
-        : "حددي لون بشرتك من تبويب وجهي، وعبّي الخانات المعلّمة بالأحمر.";
+        : "حددي لون بشرتك من تبويب وجهي، وعبّي الخانات اللي باللون الأحمر.";
       $("face-summary").classList.add("invalid");
     } else {
-      err.textContent = "فضلًا اختاري الخانات المعلّمة بالأحمر.";
+      err.textContent = "عبّي الخانات اللي باللون الأحمر لو سمحتي.";
     }
     form.querySelector(".field.invalid, .face-summary.invalid")?.scrollIntoView({ behavior: "smooth", block: "center" });
     return;
@@ -510,11 +510,11 @@ function renderCompatibility(look) {
   box.classList.toggle("ok", look.compatibility_ok);
   box.classList.toggle("bad", !look.compatibility_ok);
   $("compat-title").textContent = look.compatibility_ok
-    ? "✓ منتجات القاعدة متوافقة"
-    : "⚠ انتبهي: فيه منتجات ما تتوافق مع بعض";
+    ? "منتجات القاعدة تركب على بعض"
+    : "انتبهي: فيه منتجات ما تركب على بعض";
   $("compat-note").textContent = look.compatibility_ok
-    ? "البرايمر والفاونديشن والكونسيلر والمثبت من نفس القاعدة، فما راح يتكتل المكياج."
-    : "لقينا تعارض في قاعدة المنتجات. استبدلي المنتج التالي بمنتج من نفس قاعدة الباقي:";
+    ? "البرايمر والفاونديشن والكونسيلر والمثبت من نفس القاعدة، يعني مكياجك ما راح يتكتّل."
+    : "فيه منتج قاعدته غير عن الباقي. بدّليه بمنتج من نفس قاعدتهم:";
   const list = $("compat-list");
   list.replaceChildren();
   for (const w of look.compatibility_warnings) {
@@ -522,7 +522,7 @@ function renderCompatibility(look) {
     li.append(
       el("strong", null, `${w.product} ${w.base}`),
       el("bdi", "compat-name", w.product_name),
-      el("span", "compat-with", `يتعارض مع: ${w.conflicts_with.join("، ")}`),
+      el("span", "compat-with", `ما يركب مع: ${w.conflicts_with.join("، ")}`),
       el("span", "compat-why", w.message),
     );
     list.append(li);
@@ -545,7 +545,7 @@ function renderSteps(products, colors) {
     }
     top.append(el("span", "step-name", p.name), el("span", "step-cat", STEP_AR[p.step] || p.step));
     if (p.base) top.append(el("span", `tag base-${p.base}`, BASE_AR[p.base]));
-    if (p.owned) top.append(el("span", "tag tag-owned", "👜 من شنطتك"));
+    if (p.owned) top.append(el("span", "tag tag-owned", "من شنطتك"));
     body.append(top, el("p", "step-how", p.how_to_apply));
     if (p.budget_alternative && !p.owned) body.append(el("p", "step-alt", `بديل أوفر: ${p.budget_alternative}`));
     li.append(body);
@@ -576,7 +576,7 @@ async function openManual() {
       if (!res.ok) throw new Error();
       state.palette = await res.json();
     } catch {
-      $("manual-areas").replaceChildren(el("p", "form-error", "ما قدرنا نحمّل الألوان. حدّثي الصفحة وحاولي مرة ثانية."));
+      $("manual-areas").replaceChildren(el("p", "form-error", "ما قدرنا نحمّل الألوان. حدّثي الصفحة وجربي مرة ثانية."));
       return;
     }
   }
@@ -657,7 +657,7 @@ $("ask-form").addEventListener("submit", async (e) => {
   const question = $("ask-question").value.trim();
   const formErr = $("ask-form-error");
   if (!question && !state.askImage) {
-    formErr.textContent = "اكتبي سؤالك أو أرفقي صورة المنتج.";
+    formErr.textContent = "اكتبي سؤالك أو حطي صورة المنتج.";
     formErr.hidden = false;
     $("ask-question").closest(".field").classList.add("invalid");
     return;
@@ -679,7 +679,7 @@ $("ask-form").addEventListener("submit", async (e) => {
 });
 
 function renderAnswer(ans) {
-  $("ans-product").textContent = ans.product_name || "جواب هنو";
+  $("ans-product").textContent = ans.product_name || "رد هنو";
   const tags = $("ans-tags");
   tags.replaceChildren();
   if (ans.step) tags.append(el("span", "tag base-powder", STEP_AR[ans.step] || ans.step));
@@ -687,7 +687,7 @@ function renderAnswer(ans) {
   if (ans.base) tags.append(el("span", `tag conf-${ans.confidence}`, CONF_AR[ans.confidence]));
   $("ans-text").textContent = ans.answer;
   $("ans-check").hidden = !ans.how_to_check;
-  $("ans-check").textContent = ans.how_to_check ? `🔎 كيف تتأكدين: ${ans.how_to_check}` : "";
+  $("ans-check").textContent = ans.how_to_check ? `كيف تتأكدين: ${ans.how_to_check}` : "";
   for (const [key, boxId, listId] of [["pairs_well_with", "ans-pairs-box", "ans-pairs"], ["avoid_with", "ans-avoid-box", "ans-avoid"]]) {
     $(boxId).hidden = !ans[key].length;
     $(listId).replaceChildren(...ans[key].map((t) => el("li", null, t)));

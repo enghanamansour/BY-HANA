@@ -11,8 +11,8 @@ from .schemas import CompatibilityWarning, Product
 FACE_STEPS = ["primer", "foundation", "concealer", "setting_spray"]
 
 CONFLICTS = {
-    frozenset({"water", "silicone"}): "المائي والسيليكوني ما يمتزجون، وممكن يسببون تكتّل وتقشّر بالمكياج.",
-    frozenset({"water", "oil"}): "المائي والزيتي ما يمتزجون، وممكن يتفكك المكياج ويختفي بسرعة.",
+    frozenset({"water", "silicone"}): "المائي والسيليكوني ما يركبون على بعض، ويكتّلون المكياج ويقشّرونه.",
+    frozenset({"water", "oil"}): "المائي والزيتي ما يركبون على بعض، والمكياج يتكسّر ويروح بسرعة.",
 }
 
 STEP_AR = {"primer": "البرايمر", "foundation": "الفاونديشن", "concealer": "الكونسيلر", "setting_spray": "مثبت المكياج"}
