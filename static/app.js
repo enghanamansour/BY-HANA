@@ -825,6 +825,18 @@ $("chat-form").addEventListener("submit", async (e) => {
   }
 });
 
+// ---------- Heart pop on click (mouse only, and not when she prefers less motion) ----------
+
+if (matchMedia("(pointer: fine)").matches && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  document.addEventListener("pointerdown", (e) => {
+    const heart = el("span", "heart-pop");
+    heart.style.left = `${e.clientX}px`;
+    heart.style.top = `${e.clientY}px`;
+    document.body.append(heart);
+    heart.addEventListener("animationend", () => heart.remove());
+  });
+}
+
 // ---------- Start ----------
 
 const savedFace = store.get(KEYS.face, null);
