@@ -19,6 +19,15 @@ logging.basicConfig(level=logging.INFO)
 app = FastAPI(title="by HANA", description="Saudi AI makeup artist powered by Llama")
 
 
+@app.middleware("http")
+async def always_fresh_frontend(request: Request, call_next):
+    """Make browsers re-check the page, scripts and styles on every visit, so updates show without a hard refresh."""
+    response = await call_next(request)
+    if not request.url.path.startswith("/api"):
+        response.headers["Cache-Control"] = "no-cache"
+    return response
+
+
 @app.exception_handler(RequestValidationError)
 async def invalid_input(request: Request, exc: RequestValidationError):
     fields = sorted({str(err["loc"][-1]) for err in exc.errors()})

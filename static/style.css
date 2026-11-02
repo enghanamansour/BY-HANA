@@ -170,7 +170,16 @@ button { font: inherit; color: inherit; }
 .mirror3d { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity .6s var(--ease); }
 .mirror3d canvas { display: block; width: 100% !important; height: 100% !important; }
 .mirror.is-3d .mirror3d { opacity: 1; }
-.mirror.is-3d #face { visibility: hidden; }
+/* The drawn face only shows with a hijab/niqab or if the portrait fails; it still sizes the mirror. */
+.mirror #face { visibility: hidden; }
+.mirror.use-svg #face { visibility: visible; }
+/* While the portrait loads: a soft shimmer instead of a face. */
+.mirror:not(.is-3d):not(.use-svg)::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, .35) 50%, transparent 70%);
+  background-size: 250% 100%; animation: mirror-wait 1.4s linear infinite;
+}
+@keyframes mirror-wait { from { background-position: 150% 0; } to { background-position: -100% 0; } }
 .mirror.scanning::after {
   content: ""; position: absolute; left: 0; right: 0; top: 0; height: 18%; pointer-events: none;
   background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, .35), transparent);

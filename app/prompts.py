@@ -48,7 +48,8 @@ Rules:
 - If she listed products she already owns, BUILD THE LOOK AROUND THEM: use each one where it fits and set
   "owned": true. Only add new products ("owned": false) for steps she is missing. Pick new face products
   with the same base as her owned face products so nothing clashes. Never rename her products.
-- Pick ONE shade name per area, only from this list (exact spelling):
+- Pick ONE shade name per area, only from this list (exact English spelling, never translated, even when
+  writing in Arabic):
 {SHADE_LIST}
   Choose like a professional: the shades must harmonise with each other, flatter her skin tone and
   undertone (warm: peach, coral, gold, bronze, brick; cool: rose, berry, plum, mauve, pearl), and fit the

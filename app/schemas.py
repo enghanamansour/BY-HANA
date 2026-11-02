@@ -121,12 +121,33 @@ LookShades = create_model("LookShades", **{
     area: (Literal[tuple(names)], ...) for area, names in SHADES.items()
 })
 
+# Llama sometimes translates shade names into Arabic ("توتي") or writes them as words ("Nude Rose").
+# Map every spelling we know back to the shade id before validating.
+SHADE_ALIASES = {
+    area: {alias: sid for sid, (_, ar) in names.items()
+           for alias in (sid, ar, sid.replace("_", " "), sid.replace("_", "-"))}
+    for area, names in SHADES.items()
+}
+
+
+def shade_ids(value):
+    if not isinstance(value, dict):
+        return value
+    fixed = {}
+    for area, name in value.items():
+        if isinstance(name, str) and area in SHADE_ALIASES:
+            name = SHADE_ALIASES[area].get(name.strip().lower(), SHADE_ALIASES[area].get(name.strip(), name))
+        fixed[area] = name
+    return fixed
+
 
 class LlamaLook(BaseModel):
     look_name: str = Field(min_length=2)
     description: str = Field(min_length=10)
     shades: LookShades
     products: list[Product] = Field(min_length=4, max_length=16)
+
+    _shades = field_validator("shades", mode="before")(shade_ids)
     climate_tips: list[str] = Field(min_length=1, max_length=5)
     face_tips: list[str] = Field(default_factory=list, max_length=5)
     compatibility_note: str = ""

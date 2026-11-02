@@ -221,8 +221,11 @@ function updateMirrorBase() {
 function sync3D() {
   const portrait = window.Portrait;
   const data = new FormData(form);
-  const use3D = portrait?.status === "ready" && (data.get("coverage") || "none") === "none";
+  const covered = (data.get("coverage") || "none") !== "none";
+  const use3D = portrait?.status === "ready" && !covered;
   $("mirror").classList.toggle("is-3d", use3D);
+  // The drawn face is only for hijab/niqab, or if the portrait couldn't load. While loading: neither.
+  $("mirror").classList.toggle("use-svg", covered || portrait?.status === "failed");
   if (!use3D) return;
   const f = faceValues();
   const [hair, brow] = HAIR[f.hair_color] || HAIR.black;
@@ -236,6 +239,7 @@ function sync3D() {
   });
 }
 window.addEventListener("portrait:ready", sync3D);
+window.addEventListener("portrait:failed", sync3D);
 
 function updateFaceSummary() {
   const f = faceValues();
