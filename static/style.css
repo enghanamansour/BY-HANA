@@ -594,3 +594,85 @@ textarea { resize: vertical; min-height: 64px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* ==========================================================================
+   Soft glass layer: gradient background, frosted cards, big rounded pills
+   (inspired by soft "glass" app UIs, in the by HANA rose/plum palette)
+   ========================================================================== */
+:root {
+  --glass: rgba(255, 255, 255, .62);
+  --glass-strong: rgba(255, 255, 255, .8);
+  --glass-border: rgba(255, 255, 255, .75);
+  --chip-on-bg: #3B2535;
+  --chip-on-ink: #FFFFFF;
+  --page-bg:
+    radial-gradient(900px 520px at 0% -5%, rgba(240, 186, 205, .55), transparent 70%),
+    radial-gradient(800px 520px at 100% 0%, rgba(252, 214, 196, .55), transparent 70%),
+    radial-gradient(700px 600px at 50% 110%, rgba(222, 190, 220, .45), transparent 70%),
+    linear-gradient(180deg, #FCF4F6 0%, #F9EEF1 100%);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --glass: rgba(42, 30, 42, .62); --glass-strong: rgba(48, 34, 48, .82); --glass-border: rgba(255, 255, 255, .08);
+    --chip-on-bg: #E58AA5; --chip-on-ink: #2A0F1A;
+    --page-bg:
+      radial-gradient(900px 520px at 0% -5%, rgba(176, 70, 106, .28), transparent 70%),
+      radial-gradient(800px 520px at 100% 0%, rgba(120, 70, 110, .3), transparent 70%),
+      linear-gradient(180deg, #171117 0%, #120E13 100%);
+  }
+}
+:root[data-theme="dark"] {
+  --glass: rgba(42, 30, 42, .62); --glass-strong: rgba(48, 34, 48, .82); --glass-border: rgba(255, 255, 255, .08);
+  --chip-on-bg: #E58AA5; --chip-on-ink: #2A0F1A;
+  --page-bg:
+    radial-gradient(900px 520px at 0% -5%, rgba(176, 70, 106, .28), transparent 70%),
+    radial-gradient(800px 520px at 100% 0%, rgba(120, 70, 110, .3), transparent 70%),
+    linear-gradient(180deg, #171117 0%, #120E13 100%);
+}
+
+body { background: var(--page-bg); background-attachment: fixed; }
+.topbar { background: transparent; border-bottom-color: transparent; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+
+/* Frosted cards */
+.card, .mirror-card, .flow, .chat {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border-radius: 28px;
+}
+.card { padding: 28px; }
+.extras { background: var(--glass-strong); border-color: var(--glass-border); border-radius: 22px; }
+.steps-list li, .saved-list li { background: var(--glass-strong); border-color: var(--glass-border); border-radius: 20px; }
+.compat li { border-radius: 16px; }
+
+/* Big, confident headings */
+.hero h1 { font-size: clamp(2rem, 5vw, 3.1rem); font-weight: 700; letter-spacing: -.01em; line-height: 1.25; }
+.card-head h2 { font-size: 1.5rem; font-weight: 700; }
+.result-head h2 { font-size: 1.9rem; }
+
+/* Round icon buttons */
+.icon-btn { height: 46px; min-width: 46px; background: var(--glass-strong); border-color: var(--glass-border); box-shadow: var(--shadow-sm); }
+.card-icon { width: 46px; height: 46px; border-radius: 50%; }
+
+/* Large pill chips; the chosen one turns solid (plum on light, rose on dark) */
+.chips { gap: 10px; }
+.chips span { padding: 10px 20px; background: var(--glass-strong); border-color: var(--glass-border); font-size: .93rem; }
+.chips input:checked + span { background: var(--chip-on-bg); border-color: var(--chip-on-bg); color: var(--chip-on-ink); }
+.extras .chips span { background: var(--surface); }
+select, textarea, input[type=text] { background: var(--glass-strong); border-color: var(--glass-border); border-radius: 18px; padding: 13px 16px; }
+
+/* Steps: the active step becomes a solid pill */
+.flow { padding: 10px; }
+.step { border-radius: 999px; }
+.step[aria-selected="true"] { background: var(--chip-on-bg); }
+.step[aria-selected="true"] .step-text strong, .step[aria-selected="true"] .step-text small { color: var(--chip-on-ink); }
+.step[aria-selected="true"] .step-num { background: var(--chip-on-ink); border-color: var(--chip-on-ink); color: var(--chip-on-bg); }
+.side-link { border-radius: 999px; }
+.side-link[aria-selected="true"] { background: var(--chip-on-bg); color: var(--chip-on-ink); }
+
+/* Buttons */
+.btn { padding: 13px 24px; }
+.btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent-hover)); box-shadow: 0 8px 20px rgba(176, 70, 106, .25); }
+.btn.ghost, .btn.soft { background: var(--glass-strong); }
+.mirror { border-radius: 22px; }
