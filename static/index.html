@@ -90,16 +90,82 @@
                 <stop offset="60%" stop-color="#fff" stop-opacity="0"/>
               </linearGradient>
               <filter id="soft" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
+              <filter id="blur6" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+              <filter id="blur10" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter>
               <clipPath id="eye-clip"><path data-part="eye"/></clipPath>
+              <clipPath id="face-clip"><path data-part="face"/></clipPath>
+              <!-- Soft 3D shading: darker edges, light centre -->
+              <radialGradient id="g-face-shade" cx=".5" cy=".42" r=".62">
+                <stop offset=".55" stop-color="#3C1A10" stop-opacity="0"/>
+                <stop offset="1" stop-color="#3C1A10" stop-opacity=".32"/>
+              </radialGradient>
+              <!-- Ombre hair: darker roots, lighter ends -->
+              <linearGradient id="g-ombre" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0" stop-color="#000" stop-opacity=".38"/>
+                <stop offset=".35" stop-color="#000" stop-opacity="0"/>
+                <stop offset=".7" stop-color="#fff" stop-opacity=".08"/>
+                <stop offset="1" stop-color="#fff" stop-opacity=".18"/>
+              </linearGradient>
+              <radialGradient id="g-iris" cx=".5" cy=".5" r=".5">
+                <stop offset=".45" stop-color="#000" stop-opacity="0"/>
+                <stop offset=".85" stop-color="#000" stop-opacity=".25"/>
+                <stop offset="1" stop-color="#000" stop-opacity=".6"/>
+              </radialGradient>
+              <linearGradient id="g-eye-white" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0" stop-color="#7A5A50" stop-opacity=".55"/>
+                <stop offset=".5" stop-color="#7A5A50" stop-opacity="0"/>
+                <stop offset=".85" stop-color="#7A5A50" stop-opacity="0"/>
+                <stop offset="1" stop-color="#7A5A50" stop-opacity=".2"/>
+              </linearGradient>
+              <linearGradient id="g-brow" x1="1" x2="0" y1="0" y2="0">
+                <stop offset="0" class="stop-brow" stop-opacity=".45"/>
+                <stop offset=".4" class="stop-brow" stop-opacity="1"/>
+              </linearGradient>
+              <linearGradient id="g-lip-top" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0" stop-color="#000" stop-opacity=".05"/>
+                <stop offset="1" stop-color="#000" stop-opacity=".28"/>
+              </linearGradient>
+              <linearGradient id="g-lip-bottom" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0" stop-color="#000" stop-opacity=".18"/>
+                <stop offset=".45" stop-color="#000" stop-opacity="0"/>
+                <stop offset="1" stop-color="#000" stop-opacity=".22"/>
+              </linearGradient>
             </defs>
 
-            <path class="hair" d="M200,46 C306,44 356,128 350,232 C346,304 372,366 360,424 C354,452 372,470 384,480 L16,480 C28,470 46,452 40,424 C28,366 54,304 50,232 C44,128 94,48 200,46 Z"/>
-            <path class="hair-shine" d="M200,46 C306,44 356,128 350,232 C346,304 372,366 360,424 C354,452 372,470 384,480 L16,480 C28,470 46,452 40,424 C28,366 54,304 50,232 C44,128 94,48 200,46 Z" fill="url(#g-hair-shine)"/>
+            <!-- Hair (back): long waves with an ombre -->
+            <path class="hair" id="hair-back" d="M200,40 C128,40 76,92 70,170 C66,214 70,240 58,268 C46,296 60,318 50,346 C40,372 56,398 44,424 C36,444 46,462 40,480 L360,480 C354,462 364,444 356,424 C344,398 360,372 350,346 C340,318 354,296 342,268 C330,240 334,214 330,170 C324,92 272,40 200,40 Z"/>
+            <use class="hair-shine" href="#hair-back" fill="url(#g-ombre)"/>
+            <g class="hair-shine strands">
+              <g>
+                <path fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="1.6" stroke-linecap="round"d="M186,46 C120,60 80,120 78,180 C76,230 66,270 64,300 C60,340 70,380 60,420"/>
+                <path fill="none" stroke="#000" stroke-opacity=".2" stroke-width="1.6" stroke-linecap="round"d="M172,50 C112,66 90,124 88,184 C86,232 76,272 74,304 C70,344 80,382 72,424"/>
+                <path fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="1.6" stroke-linecap="round"d="M158,54 C104,72 98,130 96,190 C94,236 86,276 84,308 C80,346 88,386 82,430"/>
+                <path fill="none" stroke="#000" stroke-opacity=".2" stroke-width="1.6" stroke-linecap="round"d="M190,44 C130,56 72,112 68,176 C64,222 56,262 54,296 C48,336 60,376 50,414"/>
+              </g>
+              <g transform="translate(400,0) scale(-1,1)">
+                <path fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="1.6" stroke-linecap="round"d="M186,46 C120,60 80,120 78,180 C76,230 66,270 64,300 C60,340 70,380 60,420"/>
+                <path fill="none" stroke="#000" stroke-opacity=".2" stroke-width="1.6" stroke-linecap="round"d="M172,50 C112,66 90,124 88,184 C86,232 76,272 74,304 C70,344 80,382 72,424"/>
+                <path fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="1.6" stroke-linecap="round"d="M158,54 C104,72 98,130 96,190 C94,236 86,276 84,308 C80,346 88,386 82,430"/>
+                <path fill="none" stroke="#000" stroke-opacity=".2" stroke-width="1.6" stroke-linecap="round"d="M190,44 C130,56 72,112 68,176 C64,222 56,262 54,296 C48,336 60,376 50,414"/>
+              </g>
+            </g>
             <path class="hijab" d="M200,44 C310,44 352,136 346,238 C341,332 308,394 344,480 L56,480 C92,394 59,332 54,238 C48,136 90,44 200,44 Z"/>
 
             <path class="skin neck" d="M172,360 L172,410 C126,420 78,440 58,480 L342,480 C322,440 274,420 228,410 L228,360 Z"/>
             <path class="neck" d="M172,360 L228,360 L228,398 C210,406 190,406 172,398 Z" fill="url(#g-shade)"/>
             <path class="skin" data-part="face"/>
+
+            <!-- Shading and light on the skin (clipped to the face) -->
+            <g clip-path="url(#face-clip)" class="shading">
+              <path data-part="face" fill="url(#g-face-shade)"/>
+              <ellipse cx="200" cy="146" rx="46" ry="26" fill="#fff" opacity=".2" filter="url(#blur10)"/>
+              <ellipse data-part="contour" cx="120" cy="290" rx="32" ry="11" fill="#3C1A10" opacity=".16" filter="url(#blur6)"/>
+              <ellipse data-part="contour" cx="280" cy="290" rx="32" ry="11" fill="#3C1A10" opacity=".16" filter="url(#blur6)"/>
+              <path data-part="nose-shade" fill="none" stroke="#3C1A10" stroke-width="7" stroke-linecap="round" opacity=".14" filter="url(#blur6)"/>
+              <ellipse data-part="nose-tip" cx="200" cy="270" rx="8" ry="6" fill="#fff" opacity=".28" filter="url(#soft)"/>
+              <ellipse data-part="chin-hl" cx="200" cy="362" rx="16" ry="9" fill="#fff" opacity=".16" filter="url(#blur6)"/>
+              <ellipse data-part="under-lip" cx="200" cy="352" rx="22" ry="5" fill="#3C1A10" opacity=".16" filter="url(#soft)"/>
+            </g>
 
             <ellipse class="blush" data-part="blush" cx="134" cy="282" rx="36" ry="22" fill="url(#g-blush)"/>
             <ellipse class="blush" data-part="blush" cx="266" cy="282" rx="36" ry="22" fill="url(#g-blush)"/>
@@ -116,9 +182,15 @@
               <path class="eye-white" data-part="eye"/>
               <g clip-path="url(#eye-clip)">
                 <circle class="iris" data-part="iris" cx="155" cy="215" r="11"/>
+                <circle data-part="iris" cx="155" cy="215" r="11" fill="url(#g-iris)"/>
+                <circle data-part="iris-light" cx="155" cy="218" r="5.5" fill="#fff" opacity=".14"/>
                 <circle data-part="pupil" cx="155" cy="215" r="5" fill="#120B08"/>
                 <circle data-part="glint" cx="158.5" cy="211" r="2.4" fill="#fff" opacity=".85"/>
+                <circle data-part="glint2" cx="152" cy="219" r="1.1" fill="#fff" opacity=".6"/>
               </g>
+              <path data-part="eye" fill="url(#g-eye-white)"/>
+              <path class="eye-crease" data-part="crease-line"/>
+              <path class="lower-lid" data-part="lower-lid"/>
               <path class="kohl" data-part="kohl"/>
               <path class="liner" data-part="liner"/>
               <path class="lash lash-own" data-part="lash-own"/>
@@ -133,9 +205,15 @@
               <path class="eye-white" data-part="eye"/>
               <g clip-path="url(#eye-clip)">
                 <circle class="iris" data-part="iris" cx="155" cy="215" r="11"/>
+                <circle data-part="iris" cx="155" cy="215" r="11" fill="url(#g-iris)"/>
+                <circle data-part="iris-light" cx="155" cy="218" r="5.5" fill="#fff" opacity=".14"/>
                 <circle data-part="pupil" cx="155" cy="215" r="5" fill="#120B08"/>
                 <circle data-part="glint" cx="151.5" cy="211" r="2.4" fill="#fff" opacity=".85"/>
+                <circle data-part="glint2" cx="158" cy="219" r="1.1" fill="#fff" opacity=".6"/>
               </g>
+              <path data-part="eye" fill="url(#g-eye-white)"/>
+              <path class="eye-crease" data-part="crease-line"/>
+              <path class="lower-lid" data-part="lower-lid"/>
               <path class="kohl" data-part="kohl"/>
               <path class="liner" data-part="liner"/>
               <path class="lash lash-own" data-part="lash-own"/>
@@ -145,13 +223,32 @@
             </g>
 
             <path class="nose" data-part="nose"/>
+            <ellipse class="nostril" data-part="nostril" cx="192" cy="282" rx="3.5" ry="2"/>
+            <ellipse class="nostril" data-part="nostril" cx="208" cy="282" rx="3.5" ry="2"/>
             <path class="lips" data-part="lipU"/>
             <path class="lips" data-part="lipL"/>
+            <path data-part="lipU" fill="url(#g-lip-top)"/>
+            <path data-part="lipL" fill="url(#g-lip-bottom)"/>
             <path class="lip-line" data-part="lipLine"/>
-            <ellipse data-part="gloss" cx="200" cy="332" rx="13" ry="3.5" fill="#fff" opacity=".2"/>
+            <ellipse data-part="gloss" cx="200" cy="332" rx="13" ry="3.5" fill="#fff" opacity=".35" filter="url(#soft)"/>
 
-            <path class="hair fringe" d="M200,84 C156,84 108,110 98,176 C92,214 96,252 88,292 C108,236 112,172 140,132 C160,104 182,94 200,90 Z"/>
-            <path class="hair fringe" transform="translate(400,0) scale(-1,1)" d="M200,84 C156,84 108,110 98,176 C92,214 96,252 88,292 C108,236 112,172 140,132 C160,104 182,94 200,90 Z"/>
+            <!-- Hair (front): curtain bangs from a middle part, flicking out at the cheekbones -->
+            <g class="hair fringe">
+              <path id="curtain" d="M200,64 C178,70 156,90 144,120 C132,150 124,186 118,212 C112,236 100,252 82,262 C70,268 56,266 48,258 C62,258 72,250 78,236 C86,212 84,172 90,140 C100,94 138,56 200,52 Z"/>
+              <use href="#curtain" transform="translate(400,0) scale(-1,1)"/>
+            </g>
+            <g class="hair-shine fringe">
+              <use href="#curtain" fill="url(#g-ombre)"/>
+              <use href="#curtain" fill="url(#g-ombre)" transform="translate(400,0) scale(-1,1)"/>
+              <g class="strands">
+                <g id="curtain-strands">
+                  <path fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="1.6" stroke-linecap="round"d="M196,60 C172,68 150,92 138,124 C126,156 118,192 112,218 C106,240 92,254 72,262"/>
+                  <path fill="none" stroke="#000" stroke-opacity=".2" stroke-width="1.6" stroke-linecap="round"d="M188,58 C164,68 140,96 128,130 C118,160 110,196 104,222 C98,240 86,252 66,256"/>
+                  <path fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="1.6" stroke-linecap="round"d="M198,64 C178,74 160,96 150,126 C140,156 132,190 126,212"/>
+                </g>
+                <use href="#curtain-strands" transform="translate(400,0) scale(-1,1)"/>
+              </g>
+            </g>
             <path class="hijab" d="M96,214 C94,120 146,76 200,76 C254,76 306,120 304,214 C292,144 252,102 200,100 C148,102 108,144 96,214 Z"/>
             <path class="niqab" data-part="niqab"/>
 
