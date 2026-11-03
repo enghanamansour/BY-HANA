@@ -1,4 +1,5 @@
 """Data contracts: what the user sends us, and exactly what Llama must send back."""
+import difflib
 import re
 from typing import Literal, get_args
 
@@ -136,7 +137,11 @@ def shade_ids(value):
     fixed = {}
     for area, name in value.items():
         if isinstance(name, str) and area in SHADE_ALIASES:
-            name = SHADE_ALIASES[area].get(name.strip().lower(), SHADE_ALIASES[area].get(name.strip(), name))
+            aliases = SHADE_ALIASES[area]
+            name = aliases.get(name.strip().lower(), aliases.get(name.strip(), name))
+            if name not in SHADES[area]:  # an invented shade ("soft_brown"): use the closest real one instead of retrying
+                close = difflib.get_close_matches(str(name).lower(), list(SHADES[area]), n=1, cutoff=0)
+                name = close[0] if close else name
         fixed[area] = name
     return fixed
 

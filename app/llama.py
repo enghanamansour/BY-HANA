@@ -81,6 +81,7 @@ def _call_llama(model: str, messages: list[dict], max_tokens: int) -> str:
             messages=messages,
             temperature=0.6,
             max_tokens=max_tokens,
+            extra_body={"provider": {"sort": "throughput"}},  # OpenRouter: route to the fastest Llama host
         )
     except openai.AuthenticationError:
         raise LlamaError("bad_key", 500)
