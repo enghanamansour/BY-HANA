@@ -183,7 +183,8 @@ $("lang-toggle").addEventListener("click", () => setLanguage(I18N.lang === "en" 
 // ---------- Navigation: steps and side sections ----------
 
 function showTab(name) {
-  document.querySelectorAll("[data-tab]").forEach((t) => t.setAttribute("aria-selected", t.dataset.tab === name));
+  // aria-current marks the open step/section (they are plain buttons, not an ARIA tab widget).
+  document.querySelectorAll("[data-tab]").forEach((t) => (t.dataset.tab === name ? t.setAttribute("aria-current", "page") : t.removeAttribute("aria-current")));
   document.querySelectorAll(".tab-panel").forEach((p) => { p.hidden = p.dataset.panel !== name; });
   if (name === "manual") openManual();
 }

@@ -270,26 +270,26 @@
       <div class="panel">
         <!-- Navigation: two clear steps, plus side sections -->
         <nav class="flow" aria-label="أقسام التطبيق">
-          <ol class="steps" role="tablist">
+          <ol class="steps">
             <li>
-              <button class="step" role="tab" data-tab="face" aria-selected="false">
+              <button class="step" data-tab="face">
                 <span class="step-num"><b>1</b><svg class="icon"><use href="#i-check"/></svg></span>
                 <span class="step-text"><strong data-i18n="step1.label">وجهي</strong><small data-i18n="step1.sub">ملامحك ولون بشرتك</small></span>
               </button>
             </li>
             <li class="step-line" aria-hidden="true"></li>
             <li>
-              <button class="step" role="tab" data-tab="design" aria-selected="true">
+              <button class="step" data-tab="design" aria-current="page">
                 <span class="step-num"><b>2</b><svg class="icon"><use href="#i-check"/></svg></span>
                 <span class="step-text"><strong data-i18n="step2.label">هنو تصمم</strong><small data-i18n="step2.sub">اللوك والمنتجات</small></span>
               </button>
             </li>
           </ol>
           <div class="side-links">
-            <button class="side-link" role="tab" data-tab="manual" aria-selected="false">
+            <button class="side-link" data-tab="manual">
               <svg class="icon"><use href="#i-palette"/></svg><span data-i18n="side.manual">جربي بنفسك</span>
             </button>
-            <button class="side-link" role="tab" data-tab="saved" aria-selected="false">
+            <button class="side-link" data-tab="saved">
               <svg class="icon"><use href="#i-bookmark"/></svg><span data-i18n="side.saved">لوكاتي</span>
               <span class="count" id="saved-count">0</span>
             </button>
