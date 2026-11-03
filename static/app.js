@@ -773,6 +773,20 @@ function answerBubble(ans) {
   return chatBubble("hanu", ...parts);
 }
 
+// The message box grows with the text (up to ~5 lines). Enter sends, Shift+Enter starts a new line.
+function fitChatBox() {
+  const box = $("chat-text");
+  box.style.height = "auto";
+  box.style.height = `${Math.min(box.scrollHeight, 130)}px`;
+}
+$("chat-text").addEventListener("input", fitChatBox);
+$("chat-text").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey && !e.isComposing) {
+    e.preventDefault();
+    $("chat-form").requestSubmit();
+  }
+});
+
 $("chat-photo").addEventListener("change", async (e) => {
   const file = e.target.files[0];
   e.target.value = "";
@@ -799,6 +813,7 @@ $("chat-form").addEventListener("submit", async (e) => {
   if (question) mine.push(el("p", null, question));
   chatBubble("user", ...mine);
   $("chat-text").value = "";
+  fitChatBox();
   chat.image = null;
   $("chat-attach").hidden = true;
 
