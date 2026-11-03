@@ -86,4 +86,5 @@ def ask(req: AskRequest, request: Request):
 
 # The frontend (static/index.html) is served from the same app, so one deploy covers everything.
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
-app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
+if STATIC_DIR.is_dir():  # on Vercel the CDN serves static/ and the function only handles /api
+    app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
