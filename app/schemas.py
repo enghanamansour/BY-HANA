@@ -225,3 +225,4 @@ class AskAnswer(BaseModel):
 
 class AskResponse(AskAnswer):
     model: str
+    dialect_model: str | None = None  # set when ALLaM rewrote the answer in Saudi dialect

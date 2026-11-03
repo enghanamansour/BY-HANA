@@ -117,6 +117,7 @@ Open http://127.0.0.1:8000
 | `LLAMA_VISION_MODEL` | `meta-llama/llama-4-maverick` | Model used for photos |
 | `LLM_TIMEOUT` | `90` | Seconds to wait for Llama |
 | `LLM_MAX_RETRIES` | `1` | Extra attempts when the reply is invalid |
+| `ALLAM_API_KEY` | — | Optional. A [Groq](https://console.groq.com/keys) key for **ALLaM** (SDAIA's Arabic model, `allam-2-7b`). When set, ALLaM rewrites Hno's Arabic chat answers in Saudi dialect; if it fails or drifts, Llama's answer is kept. |
 
 The provider is just configuration. Llama providers change which models they offer (Groq, for example, dropped its Llama chat models), so you can switch to another one by editing two variables, without touching the code.
 

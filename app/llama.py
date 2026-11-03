@@ -143,3 +143,31 @@ def ask_product(question: str, image: str | None, history: list[ChatTurn] = (),
     if image:
         return _ask_json(AskAnswer, config.LLAMA_VISION_MODEL, ASK_PROMPT, _with_image(text, image), 900, past)
     return _ask_json(AskAnswer, config.LLAMA_MODEL, ASK_PROMPT, text, 900, past)
+
+
+SAUDI_PROMPT = (
+    "أنت تعيد صياغة النصوص باللهجة السعودية البيضاء، بأسلوب بنت سعودية تكلم صديقتها عن المكياج. "
+    "حافظ على المعنى بالضبط، ولا تضف ولا تحذف معلومات. "
+    "اترك أسماء المنتجات والماركات والمكونات والكلمات الإنجليزية كما هي. "
+    "أرجع النص المعاد صياغته فقط، بدون مقدمة ولا شرح ولا علامات تنصيص."
+)
+
+
+def to_saudi(text: str) -> str | None:
+    """Rewrite one Arabic text in Saudi dialect with ALLaM. Returns None on any failure, so the caller keeps Llama's text."""
+    if not config.ALLAM_API_KEY or not text:
+        return None
+    try:
+        response = OpenAI(api_key=config.ALLAM_API_KEY, base_url=config.ALLAM_BASE_URL,
+                          timeout=config.ALLAM_TIMEOUT, max_retries=0).chat.completions.create(
+            model=config.ALLAM_MODEL, max_tokens=600, temperature=0.3,
+            messages=[{"role": "system", "content": SAUDI_PROMPT}, {"role": "user", "content": text}])
+        out = (response.choices[0].message.content or "").strip().strip('"«»')
+    except Exception as exc:  # ALLaM is a bonus: never let it break the answer
+        log.warning("ALLaM failed, keeping Llama's text: %s", exc)
+        return None
+    # Reject replies that drifted: no Arabic, or far shorter/longer than the original.
+    if not re.search(r"[؀-ۿ]", out) or not 0.5 <= len(out) / len(text) <= 1.8:
+        log.warning("ALLaM reply rejected (length %d vs %d)", len(out), len(text))
+        return None
+    return out

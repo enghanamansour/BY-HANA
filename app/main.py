@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 
 from . import config
 from .compatibility import check_compatibility
-from .llama import LlamaError, ask_product, generate_look, scan_products
+from .llama import LlamaError, ask_product, generate_look, scan_products, to_saudi
 from .schemas import AskRequest, AskResponse, LookRequest, LookResponse, ScanRequest, ScanResult
 from .i18n import msg, request_lang
 from .shades import SHADES, english_name, to_colors
@@ -43,7 +43,7 @@ async def llama_failed(request: Request, exc: LlamaError):
 @app.get("/api/health")
 def health():
     return {"status": "ok", "model": config.LLAMA_MODEL, "vision_model": config.LLAMA_VISION_MODEL,
-            "llama_configured": bool(config.LLM_API_KEY)}
+            "llama_configured": bool(config.LLM_API_KEY), "allam_configured": bool(config.ALLAM_API_KEY)}
 
 
 @app.get("/api/shades")
@@ -80,8 +80,12 @@ def ask(req: AskRequest, request: Request):
         return JSONResponse(status_code=400, content={
             "error": msg("empty_question", request_lang(request)), "fields": ["question"]})
     answer = ask_product(req.question, req.image, req.history, req.owned_products, req.lang)
+    saudi = to_saudi(answer.answer) if req.lang == "ar" else None
+    if saudi:
+        answer.answer = saudi
     return AskResponse(**answer.model_dump(),
-                       model=config.LLAMA_VISION_MODEL if req.image else config.LLAMA_MODEL)
+                       model=config.LLAMA_VISION_MODEL if req.image else config.LLAMA_MODEL,
+                       dialect_model=config.ALLAM_MODEL if saudi else None)
 
 
 # The frontend (static/index.html) is served from the same app, so one deploy covers everything.
