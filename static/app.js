@@ -527,6 +527,7 @@ async function requestLook(payload) {
     if (!look.colors || !Array.isArray(look.products)) throw new Error(tr("الرد وصل ناقص. جربي مرة ثانية.", "The reply came back incomplete. Please try again."));
     renderResult(look);
     showOnMirror({ source: "ai", name: look.look_name, colors: look.colors, look });
+    sparkle();
     $("result").scrollIntoView({ behavior: "smooth", block: "start" });
   } catch (err) {
     if (err.fields?.length) markInvalid(err.fields);
@@ -825,6 +826,33 @@ $("chat-form").addEventListener("submit", async (e) => {
     $("chat-text").focus();
   }
 });
+
+// ---------- Magic touches: hero chat button, sparkles, scroll reveal ----------
+
+$("hero-chat").addEventListener("click", () => openChat(true));
+
+/** A burst of sparkles around the mirror when a new look lands on it. */
+function sparkle() {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const mirror = $("mirror");
+  for (let i = 0; i < 12; i++) {
+    const s = el("span", "sparkle");
+    s.style.left = `${8 + Math.random() * 84}%`;
+    s.style.top = `${10 + Math.random() * 70}%`;
+    s.style.animationDelay = `${Math.random() * 0.4}s`;
+    mirror.append(s);
+    s.addEventListener("animationend", () => s.remove());
+  }
+}
+
+// Cards fade up the first time they scroll into view.
+if ("IntersectionObserver" in window) {
+  document.documentElement.classList.add("js-reveal");
+  const seen = new IntersectionObserver((entries) => entries.forEach((e) => {
+    if (e.isIntersecting) { e.target.classList.add("in"); seen.unobserve(e.target); }
+  }), { threshold: 0.08 });
+  document.querySelectorAll(".panel .card").forEach((c) => { c.classList.add("reveal"); seen.observe(c); });
+}
 
 // ---------- Header shrinks after scrolling down ----------
 
