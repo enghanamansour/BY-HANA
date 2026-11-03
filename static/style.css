@@ -830,3 +830,5 @@ html { scroll-padding-top: 100px; }
 .btn.primary:hover::after { transition: transform .8s var(--ease); transform: translateX(120%); }
 
 .chips label:hover span, .side-link:hover, .swatches button:hover { transform: translateY(-1px); }
+
+.hero-cta + .hero-pills { margin-top: 20px; }
