@@ -862,3 +862,39 @@ html { scroll-padding-top: 100px; }
 /* Live weather line above the climate tips */
 .weather-now { margin: 0 0 .6rem; padding: .45rem .8rem; border-radius: 999px; display: inline-block;
   background: color-mix(in srgb, var(--rose, #e8a0b4) 18%, transparent); font-size: .9rem; font-weight: 600; }
+
+
+/* ---------- Vanity mirror: bulbs round the frame, a defog opening and a slow gloss ---------- */
+/* Vanity bulbs: warm lights around the mirror frame, softly breathing */
+.mirror-card { padding: 22px; }
+.bulbs { position: absolute; inset: 4px; border-radius: 26px; pointer-events: none; z-index: 1;
+  /* one bulb per 18px tile, spaced evenly round the whole frame band (the 18px padding ring) */
+  background: radial-gradient(circle, #FFFDF6 0 2.6px, rgba(236, 160, 110, .85) 3.4px, rgba(236, 160, 110, 0) 6px) 0 0 / 18px 18px space;
+  padding: 18px; -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: bulbs 4s ease-in-out infinite alternate; }
+@keyframes bulbs { from { opacity: .55; } to { opacity: 1; } }
+.mirror-card .mirror, .mirror-card .palette, .mirror-card .mirror-hint { position: relative; z-index: 2; }
+
+/* Opening: the mirror starts fogged and clears */
+.mirror::before {
+  content: ""; position: absolute; inset: 0; z-index: 4; pointer-events: none; opacity: 0;
+  background: radial-gradient(120% 90% at 50% 40%, rgba(255, 255, 255, .92), rgba(255, 240, 246, .75));
+  animation: defog 1.8s var(--ease) .35s backwards;
+}
+@keyframes defog { from { opacity: 1; } }
+/* A slow gloss glide across the glass */
+.mirror .gloss {
+  position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; border-radius: inherit;
+}
+.mirror .gloss::after {
+  content: ""; position: absolute; inset: -20% auto -20% -60%; width: 40%; transform: skewX(-18deg) translateX(0);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .28), transparent);
+  animation: gloss 9s ease-in-out 2.2s infinite;
+}
+@keyframes gloss { 0%, 70% { transform: skewX(-18deg) translateX(0); } 100% { transform: skewX(-18deg) translateX(420%); } }
+/* Phones: a smaller mirror so the first screen shows the start button and the face */
+@media (max-width: 600px) {
+  .mirror-card { max-width: 300px; padding: 16px; }
+  .bulbs { inset: 2px; padding: 14px; background-size: 14px 14px; }
+}
