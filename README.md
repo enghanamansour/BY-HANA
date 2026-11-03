@@ -123,7 +123,7 @@ The provider is just configuration. Llama providers change which models they off
 ## Deploy
 
 **Vercel (recommended):** import the GitHub repo at vercel.com and add these environment variables:
-`LLM_API_KEY`, and `LLM_TIMEOUT=55` (so Llama calls finish inside the 60-second function limit). [`vercel.json`](vercel.json) serves `static/` from the CDN and sends `/api/*` to the FastAPI app in [`api/index.py`](api/index.py). Every push to `main` redeploys.
+`LLM_API_KEY`, and `LLM_TIMEOUT=55` (so Llama calls finish inside the 60-second function limit). Vercel detects the FastAPI app in [`app/main.py`](app/main.py), which serves both the API and the frontend; [`vercel.json`](vercel.json) only raises the time limit to 60 seconds. Every push to `main` redeploys.
 
 **Render (alternative):**
 
