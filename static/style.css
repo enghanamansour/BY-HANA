@@ -862,3 +862,123 @@ html { scroll-padding-top: 100px; }
 /* Live weather line above the climate tips */
 .weather-now { margin: 0 0 .6rem; padding: .45rem .8rem; border-radius: 999px; display: inline-block;
   background: color-mix(in srgb, var(--rose, #e8a0b4) 18%, transparent); font-size: .9rem; font-weight: 600; }
+
+/* ==========================================================================
+   Vanity layer (redesign): a lit vanity mirror, powder-pan swatches, a brush-stroke
+   loader and gentle motion. Every animation rests in its finished state, so reduced
+   motion (which switches animations off above) simply shows the final look.
+   ========================================================================== */
+
+/* Scroll progress: a thin lipstick line along the bottom of the header */
+
+.topbar::after {
+  content: ""; position: absolute; inset-inline: 22px; bottom: 0; height: 2px; border-radius: 2px;
+  background: linear-gradient(90deg, #F4A9C0, #B0466A); transform-origin: left;
+  transform: scaleX(var(--progress, 0)); opacity: .85; pointer-events: none;
+}
+[dir="rtl"] .topbar::after { transform-origin: right; }
+
+/* Aurora drifts a little slower than the page (parallax), driven by --sy from JS */
+.aurora { transform: translate3d(0, calc(var(--sy, 0) * -0.12px), 0); }
+
+/* Headline is "applied" like a swatch: a soft reveal along the reading direction */
+.hero h1 {
+  -webkit-mask-image: linear-gradient(90deg, #000 45%, transparent 55%);
+  mask-image: linear-gradient(90deg, #000 45%, transparent 55%);
+  -webkit-mask-size: 260% 100%; mask-size: 260% 100%;
+  -webkit-mask-position: 0 0; mask-position: 0 0;
+  animation: apply-ltr 1.4s var(--ease) .15s backwards;
+}
+[dir="rtl"] .hero h1 {
+  -webkit-mask-image: linear-gradient(270deg, #000 45%, transparent 55%);
+  mask-image: linear-gradient(270deg, #000 45%, transparent 55%);
+  -webkit-mask-position: 100% 0; mask-position: 100% 0;
+  animation-name: apply-rtl;
+}
+@keyframes apply-ltr { from { -webkit-mask-position: 100% 0; mask-position: 100% 0; } }
+@keyframes apply-rtl { from { -webkit-mask-position: 0 0; mask-position: 0 0; } }
+.hero .eyebrow, .hero .lead, .hero-cta { animation: rise .7s var(--ease) backwards; }
+.hero .lead { animation-delay: .45s; } .hero-cta { animation-delay: .6s; }
+
+/* Vanity bulbs: warm lights around the mirror frame, softly breathing */
+.mirror-card { padding: 22px; }
+.bulbs { position: absolute; inset: 4px; border-radius: 26px; pointer-events: none; z-index: 1;
+  /* one bulb per 18px tile, spaced evenly round the whole frame band (the 18px padding ring) */
+  background: radial-gradient(circle, #FFFDF6 0 2.6px, rgba(236, 160, 110, .85) 3.4px, rgba(236, 160, 110, 0) 6px) 0 0 / 18px 18px space;
+  padding: 18px; -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: bulbs 4s ease-in-out infinite alternate; }
+@keyframes bulbs { from { opacity: .55; } to { opacity: 1; } }
+.mirror-card .mirror, .mirror-card .palette, .mirror-card .mirror-hint { position: relative; z-index: 2; }
+
+/* Opening: the mirror starts fogged and clears */
+.mirror::before {
+  content: ""; position: absolute; inset: 0; z-index: 4; pointer-events: none; opacity: 0;
+  background: radial-gradient(120% 90% at 50% 40%, rgba(255, 255, 255, .92), rgba(255, 240, 246, .75));
+  animation: defog 1.8s var(--ease) .35s backwards;
+}
+@keyframes defog { from { opacity: 1; } }
+/* A slow gloss glide across the glass */
+.mirror .gloss {
+  position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; border-radius: inherit;
+}
+.mirror .gloss::after {
+  content: ""; position: absolute; inset: -20% auto -20% -60%; width: 40%; transform: skewX(-18deg) translateX(0);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .28), transparent);
+  animation: gloss 9s ease-in-out 2.2s infinite;
+}
+@keyframes gloss { 0%, 70% { transform: skewX(-18deg) translateX(0); } 100% { transform: skewX(-18deg) translateX(420%); } }
+
+/* Powder-pan swatches: a pressed-powder highlight and a soft rim */
+.chips i, .palette li i {
+  background: radial-gradient(circle at 34% 30%, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 46%), var(--c);
+  box-shadow: inset 0 -2px 4px rgba(0, 0, 0, .22), inset 0 0 0 1px rgba(0, 0, 0, .1), 0 1px 2px rgba(60, 20, 40, .18);
+}
+.chips input:checked + span i { animation: press .45s var(--ease); }
+@keyframes press { 40% { transform: scale(.78); } 70% { transform: scale(1.12); } }
+.chips span { transition: transform .2s var(--ease), background-color .2s, border-color .2s, color .2s; }
+.chips label:active span { transform: scale(.96); }
+
+/* Step panels slide in from the reading direction */
+.tab-panel.enter { animation: panel-in .45s var(--ease); }
+@keyframes panel-in { from { opacity: 0; transform: translateX(-16px); } }
+[dir="rtl"] .tab-panel.enter { animation-name: panel-in-rtl; }
+@keyframes panel-in-rtl { from { opacity: 0; transform: translateX(16px); } }
+
+/* Loading: a brush stroke being drawn, instead of bouncing dots */
+.status .dots { display: block; width: min(240px, 70%); height: 14px; margin: 0 auto 6px; border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent); position: relative; overflow: hidden; }
+.status .dots span { display: none; }
+.status .dots::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; transform-origin: left;
+  background: linear-gradient(90deg, #F4A9C0, #C8557F 55%, #8E3A6B);
+  animation: stroke 2.4s var(--ease) infinite;
+}
+[dir="rtl"] .status .dots::before { transform-origin: right; background: linear-gradient(270deg, #F4A9C0, #C8557F 55%, #8E3A6B); }
+@keyframes stroke { 0% { transform: scaleX(0); opacity: 1; } 70% { transform: scaleX(1); opacity: 1; } 100% { transform: scaleX(1); opacity: 0; } }
+/* ...and a soft blush brush sweeping over the mirror while Hno works */
+.mirror.applying::after {
+  content: ""; position: absolute; z-index: 3; width: 46%; aspect-ratio: 1; top: 30%; left: -50%; border-radius: 50%;
+  background: radial-gradient(circle, rgba(236, 120, 160, .45), rgba(236, 120, 160, 0) 65%); pointer-events: none;
+  animation: brush 2.6s ease-in-out infinite;
+}
+@keyframes brush { 0% { transform: translate(0, 0); } 50% { transform: translate(260%, -30%); } 100% { transform: translate(0, 0); } }
+
+/* Compatibility verdict: the warning gives one gentle nudge so it isn't missed */
+.compat.bad h3 .icon { animation: nudge .7s var(--ease) .5s 2; }
+@keyframes nudge { 25% { transform: rotate(-12deg); } 75% { transform: rotate(12deg); } }
+
+/* Product steps lift slightly under the pointer */
+@media (hover: hover) {
+  #result .card { transition: transform .3s var(--ease), box-shadow .3s var(--ease); }
+  #result .card:hover { transform: translateY(-2px); }
+}
+
+/* Magnetic primary buttons move via --mx/--my set in JS (mouse only) */
+.btn.primary.big { transform: translate(var(--mx, 0), var(--my, 0)); transition: transform .25s var(--ease), box-shadow .25s; }
+
+/* Phones: a smaller mirror so the first screen shows the start button and the face */
+@media (max-width: 600px) {
+  .mirror-card { max-width: 300px; padding: 16px; }
+  .bulbs { inset: 2px; padding: 14px; background-size: 14px 14px; }
+}

@@ -185,7 +185,11 @@ $("lang-toggle").addEventListener("click", () => setLanguage(I18N.lang === "en" 
 function showTab(name) {
   // aria-current marks the open step/section (they are plain buttons, not an ARIA tab widget).
   document.querySelectorAll("[data-tab]").forEach((t) => (t.dataset.tab === name ? t.setAttribute("aria-current", "page") : t.removeAttribute("aria-current")));
-  document.querySelectorAll(".tab-panel").forEach((p) => { p.hidden = p.dataset.panel !== name; });
+  document.querySelectorAll(".tab-panel").forEach((p) => {
+    const show = p.dataset.panel === name;
+    if (show && p.hidden) { p.classList.remove("enter"); void p.offsetWidth; p.classList.add("enter"); }
+    p.hidden = !show;
+  });
   if (name === "manual") openManual();
 }
 function goTo(name) {
@@ -503,6 +507,7 @@ function setLookLoading(on) {
   setBusy($("submit"), on);
   face.classList.toggle("scanning", on);
   $("mirror").classList.toggle("scanning", on && $("mirror").classList.contains("is-3d"));
+  $("mirror").classList.toggle("applying", on);
   $("loading").hidden = !on;
   clearInterval(stageTimer);
   if (on) {
@@ -875,8 +880,28 @@ if ("IntersectionObserver" in window) {
 
 // ---------- Header shrinks after scrolling down ----------
 
+const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// Magnetic main buttons: they lean a little toward the mouse (mouse only, not with reduced motion).
+if (!calm && matchMedia("(pointer: fine)").matches) {
+  document.querySelectorAll(".btn.primary.big").forEach((b) => {
+    b.addEventListener("pointermove", (e) => {
+      const r = b.getBoundingClientRect();
+      b.style.setProperty("--mx", `${((e.clientX - r.left) / r.width - 0.5) * 10}px`);
+      b.style.setProperty("--my", `${((e.clientY - r.top) / r.height - 0.5) * 8}px`);
+    });
+    b.addEventListener("pointerleave", () => { b.style.removeProperty("--mx"); b.style.removeProperty("--my"); });
+  });
+}
+
 const topbar = document.querySelector(".topbar");
-const onScroll = () => topbar.classList.toggle("scrolled", window.scrollY > 40);
+const onScroll = () => {
+  topbar.classList.toggle("scrolled", window.scrollY > 40);
+  // Scroll progress line in the header, and the aurora's slow parallax.
+  const max = document.documentElement.scrollHeight - innerHeight;
+  topbar.style.setProperty("--progress", max > 0 ? (scrollY / max).toFixed(3) : 0);
+  if (!calm) document.documentElement.style.setProperty("--sy", Math.round(scrollY));
+};
 window.addEventListener("scroll", onScroll, { passive: true });
 onScroll();
 

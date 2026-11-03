@@ -77,7 +77,9 @@
     <section class="studio">
       <!-- Mirror: the illustrated face, painted live from the form and from the chosen look -->
       <aside class="mirror-card" aria-label="المراية">
+        <span class="bulbs" aria-hidden="true"></span>
         <div class="mirror" id="mirror">
+          <span class="gloss" aria-hidden="true"></span>
           <div class="mirror3d" id="mirror3d" aria-hidden="true"></div>
           <svg id="face" viewBox="0 0 400 480" role="img" aria-label="وجه توضيحي يعرض اللوك" data-coverage="none" data-lashes="natural">
             <defs>
@@ -677,7 +679,7 @@
   </main>
 
   <!-- Floating chat with Hno. Its logo is a powder compact with a red heart; the lid opens with the chat. -->
-  <button class="chat-fab" id="chat-open" type="button" aria-controls="chat" aria-expanded="false">
+  <button class="chat-fab" id="chat-open" type="button" aria-controls="chat" aria-expanded="false" aria-label="اسألي هنو" data-i18n-aria="cta.ask">
     <svg class="compact" viewBox="0 0 64 64" aria-hidden="true">
       <defs>
         <linearGradient id="cmp-mirror" x1="0" x2="1" y1="0" y2="1">
@@ -740,7 +742,7 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-  <section class="trust">
+  <section class="trust" aria-label="ليش by HANA" data-i18n-aria="trust.label">
 <div class="hero-pills">
         <span><svg class="icon"><use href="#i-sparkles"/></svg><em data-i18n="pill.llama">مدعومة بـ Llama 3.3</em></span>
         <span><svg class="icon"><use href="#i-palette"/></svg><em data-i18n="pill.shades">48 لون احترافي</em></span>
