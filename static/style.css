@@ -858,3 +858,7 @@ html { scroll-padding-top: 100px; }
 .trust .hero-pills { margin: 0; }
 .hero h1 { font-family: var(--font); font-weight: 700; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.3; }
 [dir="ltr"] .hero h1 { font-family: var(--font); font-style: normal; font-weight: 700; }
+
+/* Live weather line above the climate tips */
+.weather-now { margin: 0 0 .6rem; padding: .45rem .8rem; border-radius: 999px; display: inline-block;
+  background: color-mix(in srgb, var(--rose, #e8a0b4) 18%, transparent); font-size: .9rem; font-weight: 600; }

@@ -12,6 +12,7 @@ from .compatibility import check_compatibility
 from .llama import LlamaError, ask_product, generate_look, scan_products, to_saudi
 from .schemas import AskRequest, AskResponse, LookRequest, LookResponse, ScanRequest, ScanResult
 from .i18n import msg, request_lang
+from .weather import current_weather
 from .shades import SHADES, english_name, to_colors
 
 logging.basicConfig(level=logging.INFO)
@@ -55,7 +56,8 @@ def shades():
 
 @app.post("/api/look", response_model=LookResponse)
 def create_look(req: LookRequest):
-    look = generate_look(req)
+    weather = current_weather(req.city)
+    look = generate_look(req, weather)
     warnings = check_compatibility(look.products, req.lang)
     return LookResponse(
         **look.model_dump(),
@@ -63,6 +65,7 @@ def create_look(req: LookRequest):
         compatibility_ok=not warnings,
         compatibility_warnings=warnings,
         model=config.LLAMA_MODEL,
+        weather=weather,
     )
 
 

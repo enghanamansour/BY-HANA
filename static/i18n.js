@@ -46,7 +46,7 @@ const EN = {
   "f.skintype": "Skin type",
   "skin.dry": "Dry", "skin.oily": "Oily", "skin.combination": "Combination", "skin.normal": "Normal", "skin.sensitive": "Sensitive",
   "f.city": "City", "city.pick": "Choose your city", "city.riyadh": "Riyadh", "city.jeddah": "Jeddah",
-  "city.dammam": "Dammam / Eastern Province", "city.makkah": "Makkah", "city.madinah": "Madinah", "city.abha": "Abha",
+  "city.dammam": "Dammam / Eastern Province", "city.makkah": "Makkah", "city.madinah": "Madinah", "city.abha": "Abha", "city.taif": "Taif",
   "city.other": "Another city",
   "f.occasion": "Occasion", "occ.pick": "Choose the occasion", "occ.wedding": "Wedding", "occ.milka": "Milka (engagement)",
   "occ.eid": "Eid", "occ.graduation": "Graduation", "occ.work": "Work", "occ.daily": "Everyday", "occ.evening": "Night out",

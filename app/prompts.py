@@ -32,7 +32,8 @@ You design one complete makeup look for a woman in Saudi Arabia based on her pro
 
 Rules:
 - Consider the city's climate: Jeddah/Makkah/Dammam are hot and humid (long-wear, oil control, sweat-proof);
-  Riyadh/Madinah are hot and dry (hydration, no cakey texture); Abha is mild and cooler.
+  Riyadh/Madinah are hot and dry (hydration, no cakey texture); Abha and Taif are mild, cooler and higher up (Taif is drier: hydrate, avoid flaking).
+  When "Weather now" is given, base the climate tips on those real numbers (heat, humidity, UV) and mention them.
 - Consider the occasion: she is always a GUEST, never the bride. Weddings and milka are glam and photographed
   (bold lips or a defined eye); Eid and graduation are polished; work and daily are soft and light.
 - The look_name must match her actual occasion and must not mention a bride.
@@ -85,7 +86,7 @@ List products in application order, 6 to 12 items. Every text field must be fill
 
 LABELS = {
     "city": {"riyadh": "Riyadh", "jeddah": "Jeddah", "dammam": "Dammam", "makkah": "Makkah",
-             "madinah": "Madinah", "abha": "Abha", "other": "another Saudi city"},
+             "madinah": "Madinah", "abha": "Abha", "taif": "Taif", "other": "another Saudi city"},
     "occasion": {"wedding": "a wedding, as a guest (زواج)", "milka": "a milka / engagement party, as a guest (ملكة)",
                  "eid": "Eid", "graduation": "a graduation", "work": "work / office", "daily": "everyday",
                  "evening": "an evening outing"},
@@ -130,12 +131,13 @@ LENS_TIP = ("Coloured contact lenses: put the lenses in BEFORE makeup; never lin
             "remove lenses before removing makeup. Mention this in face_tips.")
 
 
-def build_look_prompt(req: LookRequest) -> str:
+def build_look_prompt(req: LookRequest, weather=None) -> str:
     lines = [
         f"Skin type: {req.skin_type}",
         f"Skin tone: {req.skin_tone}",
         f"Undertone: {req.undertone}",
         f"City: {LABELS['city'][req.city]}",
+        *([f"Weather now: {weather.temp_c}°C, humidity {weather.humidity}%, UV index {weather.uv}"] if weather else []),
         f"Occasion: {LABELS['occasion'][req.occasion]}",
         f"Budget: {req.budget}",
         f"Coverage: {LABELS['coverage'][req.coverage]}",

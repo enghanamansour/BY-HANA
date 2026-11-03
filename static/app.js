@@ -625,6 +625,10 @@ function renderResult(look) {
   $("look-desc").textContent = look.description;
   renderCompatibility(look);
   renderSteps(look.products, look.colors);
+  const w = look.weather;
+  $("weather-now").hidden = !w;
+  if (w) $("weather-now").textContent = pick([`جو مدينتك الحين: ${w.temp_c}° · رطوبة ${w.humidity}% · UV ${w.uv}`,
+                                              `Your city right now: ${w.temp_c}° · humidity ${w.humidity}% · UV ${w.uv}`]);
   $("tips").replaceChildren(...look.climate_tips.map((t) => el("li", null, t)));
   const faceTips = look.face_tips || [];
   $("face-tips-card").hidden = !faceTips.length;

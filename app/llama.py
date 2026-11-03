@@ -127,8 +127,8 @@ def _with_image(text: str, image: str) -> list[dict]:
     return [{"type": "text", "text": text}, {"type": "image_url", "image_url": {"url": image}}]
 
 
-def generate_look(req: LookRequest) -> LlamaLook:
-    return _ask_json(LlamaLook, config.LLAMA_MODEL, LOOK_PROMPT, build_look_prompt(req))
+def generate_look(req: LookRequest, weather=None) -> LlamaLook:
+    return _ask_json(LlamaLook, config.LLAMA_MODEL, LOOK_PROMPT, build_look_prompt(req, weather))
 
 
 def scan_products(image: str) -> ScanResult:

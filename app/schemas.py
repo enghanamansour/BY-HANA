@@ -55,7 +55,7 @@ def check_image(v: str | None) -> str | None:
 SkinType = Literal["dry", "oily", "combination", "normal", "sensitive"]
 SkinTone = Literal["fair", "light", "medium", "tan", "deep"]
 Undertone = Literal["warm", "cool", "neutral", "unknown"]
-City = Literal["riyadh", "jeddah", "dammam", "makkah", "madinah", "abha", "other"]
+City = Literal["riyadh", "jeddah", "dammam", "makkah", "madinah", "abha", "taif", "other"]
 Occasion = Literal["wedding", "milka", "eid", "graduation", "work", "daily", "evening"]
 Budget = Literal["low", "medium", "high"]
 Coverage = Literal["none", "hijab", "niqab"]
@@ -167,11 +167,18 @@ class Colour(BaseModel):
     name_en: str
 
 
+class Weather(BaseModel):
+    temp_c: int
+    humidity: int
+    uv: float
+
+
 class LookResponse(LlamaLook):
     colors: dict[str, Colour]  # area -> exact colour from the palette, painted onto the face
     compatibility_ok: bool
     compatibility_warnings: list[CompatibilityWarning]
     model: str
+    weather: Weather | None = None  # live conditions from Open-Meteo, when available
 
 
 # ---------- 2) Read products from a photo ----------
