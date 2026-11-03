@@ -879,7 +879,8 @@ html { scroll-padding-top: 100px; }
 [dir="rtl"] .topbar::after { transform-origin: right; }
 
 /* Aurora drifts a little slower than the page (parallax), driven by --sy from JS */
-.aurora { transform: translate3d(0, calc(var(--sy, 0) * -0.12px), 0); }
+/* It is taller than the screen by 20vh and never moves further than that, so it always covers the bottom. */
+.aurora { bottom: -20vh; transform: translate3d(0, max(-20vh, calc(var(--sy, 0) * -0.12px)), 0); }
 
 /* Headline is "applied" like a swatch: a soft reveal along the reading direction */
 .hero h1 {
