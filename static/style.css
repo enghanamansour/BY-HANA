@@ -852,3 +852,9 @@ html { scroll-padding-top: 100px; }
   background: var(--glass-strong); border: 1.5px solid var(--glass-border);
 }
 .chat-input textarea:focus { outline: none; border-color: var(--accent); }
+
+/* Trust pills live at the end of the page now; the headline goes back to the main sans font. */
+.trust { display: flex; justify-content: center; padding: 0 16px 28px; }
+.trust .hero-pills { margin: 0; }
+.hero h1 { font-family: var(--font); font-weight: 700; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.3; }
+[dir="ltr"] .hero h1 { font-family: var(--font); font-style: normal; font-weight: 700; }

@@ -9,7 +9,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%233B2535'/><path d='M32 47C20 39 20 27 26.5 27c3 0 4.6 1.8 5.5 3.6.9-1.8 2.5-3.6 5.5-3.6C44 27 44 39 32 47Z' fill='%23E11D48'/></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@600;700&family=Playfair+Display:ital,wght@1,500;1,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,500;1,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script>
     // Apply the saved theme before first paint so the page never flashes the wrong colours.
@@ -71,11 +71,7 @@
         <button class="btn primary big" type="button" data-goto="face"><svg class="icon"><use href="#i-scan-face"/></svg><span data-i18n="cta.start">ابدئي من وجهك</span></button>
         <button class="btn ghost big" type="button" id="hero-chat"><svg class="icon"><use href="#i-sparkles"/></svg><span data-i18n="cta.ask">اسألي هنو</span></button>
       </div>
-      <div class="hero-pills">
-        <span><svg class="icon"><use href="#i-sparkles"/></svg><em data-i18n="pill.llama">مدعومة بـ Llama 3.3</em></span>
-        <span><svg class="icon"><use href="#i-palette"/></svg><em data-i18n="pill.shades">48 لون احترافي</em></span>
-        <span><svg class="icon"><use href="#i-languages"/></svg><em data-i18n="pill.dialect">تفهم لهجتك</em></span>
-      </div>
+
     </section>
 
     <section class="studio">
@@ -741,6 +737,14 @@
   </section>
 
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <section class="trust">
+<div class="hero-pills">
+        <span><svg class="icon"><use href="#i-sparkles"/></svg><em data-i18n="pill.llama">مدعومة بـ Llama 3.3</em></span>
+        <span><svg class="icon"><use href="#i-palette"/></svg><em data-i18n="pill.shades">48 لون احترافي</em></span>
+        <span><svg class="icon"><use href="#i-languages"/></svg><em data-i18n="pill.dialect">تفهم لهجتك</em></span>
+      </div>
+  </section>
 
   <footer class="footer">
     <p data-i18n="footer.note">هذي نصايح بس، وأي منتج جديد جربيه على جزء صغير من بشرتك قبل لا تستخدمينه.</p>
