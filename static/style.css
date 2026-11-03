@@ -832,3 +832,14 @@ html { scroll-padding-top: 100px; }
 .chips label:hover span, .side-link:hover, .swatches button:hover { transform: translateY(-1px); }
 
 .hero-cta + .hero-pills { margin-top: 20px; }
+
+/* Aurora, stronger: clear clouds of colour on a lighter base so they read on screen. */
+:root:not([data-theme="dark"]) { --page-bg: linear-gradient(180deg, #FFF9FA 0%, #FDF4F6 100%); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --page-bg: linear-gradient(180deg, #171117 0%, #120E13 100%); } }
+.aurora span { filter: blur(64px); opacity: .7; }
+.aurora span:nth-child(1) { background: #F59BBB; width: 46vmax; height: 46vmax; top: -14vmax; inset-inline-start: -8vmax; }
+.aurora span:nth-child(2) { background: #FFC1A1; width: 42vmax; height: 42vmax; top: -6vmax; inset-inline-end: -10vmax; }
+.aurora span:nth-child(3) { background: #D8B1F4; width: 44vmax; height: 44vmax; bottom: -16vmax; inset-inline-start: 22vmax; }
+.aurora span:nth-child(4) { background: #EE86AC; width: 30vmax; height: 30vmax; top: 34vh; inset-inline-end: 10vmax; opacity: .45; }
+:root[data-theme="dark"] .aurora span { opacity: .3; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .aurora span { opacity: .3; } }
